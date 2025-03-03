@@ -1,0 +1,22 @@
+{
+  "name": "@wealthee/firebase",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "firebase emulators:start",
+    "deploy": "firebase deploy",
+    "deploy:functions": "firebase deploy --only functions",
+    "build": "cd functions && npm run build",
+    "lint": "cd functions && npm run lint",
+    "check-types": "cd functions && npm run check-types"
+  },
+  "dependencies": {
+    "firebase-tools": "^12.9.1"
+  },
+  "devDependencies": {
+    "typescript": "5.7.3"
+  },
+  "engines": {
+    "node": "18"
+  }
+}
