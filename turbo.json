@@ -10,15 +10,15 @@
     "lint": {
       "dependsOn": ["^lint"]
     },
-    "check-types": {
-      "dependsOn": ["^check-types"]
+    "tsc": {
+      "dependsOn": ["^tsc"]
     },
     "dev": {
       "cache": false,
       "persistent": true
     },
     "deploy": {
-      "dependsOn": ["build", "lint", "check-types"]
+      "dependsOn": ["build", "lint", "tsc"]
     }
   }
 }
