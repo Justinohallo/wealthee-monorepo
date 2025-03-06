@@ -1,5 +1,4 @@
 import Image, { type ImageProps } from "next/image";
-import { Button } from "@repo/ui/button";
 import styles from "./page.module.css";
 
 type Props = Omit<ImageProps, "src"> & {
@@ -63,9 +62,6 @@ export default function Home() {
             Read our docs
           </a>
         </div>
-        <Button appName="web" className={styles.secondary}>
-          Open alert
-        </Button>
       </main>
       <footer className={styles.footer}>
         <a
@@ -80,7 +76,7 @@ export default function Home() {
             width={16}
             height={16}
           />
-          Examples
+          Examplesddddd
         </a>
         <a
           href="https://turbo.build?utm_source=create-turbo"
@@ -94,7 +90,7 @@ export default function Home() {
             width={16}
             height={16}
           />
-          Go to turbo.build →
+          Go to turbo.build →ddd
         </a>
       </footer>
     </div>

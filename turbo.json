@@ -13,6 +13,7 @@
     "tsc": {
       "dependsOn": ["^tsc"]
     },
+    "serve": {},
     "dev": {
       "cache": false,
       "persistent": true
