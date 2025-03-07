@@ -1,0 +1,5 @@
+# Ignore everything by default
+*
+
+# Only allow the Next.js app to be deployed
+!apps/web/**
