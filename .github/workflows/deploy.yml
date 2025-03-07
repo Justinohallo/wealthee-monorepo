@@ -76,6 +76,11 @@ jobs:
       - name: Install Vercel CLI
         run: npm install --global vercel@latest
 
+      - name: Install Next.js app dependencies
+        run: |
+          cd apps/web
+          npm install
+
       - name: Pull Vercel Environment Information
         run: |
           cd apps/web
@@ -84,6 +89,7 @@ jobs:
       - name: Build Next.js App
         run: |
           cd apps/web
+          npm run build
           vercel build --prod --token=${{ secrets.VERCEL_TOKEN }}
 
       - name: Deploy Next.js App to Vercel
@@ -140,6 +146,11 @@ jobs:
       - name: Install Vercel CLI
         run: npm install --global vercel@latest
 
+      - name: Install Next.js app dependencies
+        run: |
+          cd apps/web
+          npm install
+
       - name: Pull Vercel Environment Information
         run: |
           cd apps/web
@@ -148,6 +159,7 @@ jobs:
       - name: Build Next.js App
         run: |
           cd apps/web
+          npm run build
           vercel build --token=${{ secrets.VERCEL_TOKEN }}
 
       - name: Deploy Next.js App to Vercel (Preview)
