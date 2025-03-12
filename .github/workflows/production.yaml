@@ -69,7 +69,7 @@ jobs:
           run: CI=false npm run build --filter=functions
 
         - name: Deploy to Hosting and Functions
-          run: firebase deploy --only functions --token ${{ secrets.FIREBASE_TOKEN }} --project monorepo-test-bd9f1 --force
+          run: firebase deploy --only functions --token ${{ secrets.FIREBASE_TOKEN }} --project wealthee-a97ed --force
 
     Deploy-Production:
       runs-on: ubuntu-latest
