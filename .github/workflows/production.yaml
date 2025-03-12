@@ -1,0 +1,95 @@
+name: Production Deployment
+env:
+  VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+  VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+
+on:
+  push:
+    branches:
+      - main
+jobs:
+    Lint:
+      runs-on: ubuntu-latest
+      steps:
+        - uses: actions/checkout@v4
+
+        - name: Setup Node.js
+          uses: actions/setup-node@v4
+          with:
+            node-version: '22.x'
+
+        - name: Install dependencies
+          run: npm install
+
+        - name: Run linting
+          run: npm run lint
+
+    Type-Check:
+      runs-on: ubuntu-latest
+      steps:
+        - uses: actions/checkout@v4
+
+        - name: Setup Node.js
+          uses: actions/setup-node@v4
+          with:
+            node-version: '22.x'
+
+        - name: Install dependencies
+          run: npm install
+
+        - name: Run type checking
+          run: npm run check-types
+
+    Deploy-Firebase:
+      needs: [Lint, Type-Check]
+      runs-on: ubuntu-latest
+      env:
+        TURBO_TOKEN: ${{ secrets.TURBO_TOKEN }}
+        TURBO_TEAM: ${{ vars.TURBO_TEAM }}
+      strategy:
+        matrix:
+          node-version: [ 22.x]
+
+      steps:
+        - name: Checkout repository
+          uses: actions/checkout@v4
+
+        - name: Set up Node.js ${{ matrix.node-version }}
+          uses: actions/setup-node@v4
+          with:
+            node-version: ${{ matrix.node-version }}
+
+        - name: Install dependencies
+          run: npm install
+
+        - name: Install Firebase CLI
+          run: npm install -g firebase-tools
+
+        - name: Build project
+          run: CI=false npm run build --filter=functions
+
+        - name: Deploy to Hosting and Functions
+          run: firebase deploy --only functions --token ${{ secrets.FIREBASE_TOKEN }} --project monorepo-test-bd9f1 --force
+
+    Deploy-Production:
+      runs-on: ubuntu-latest
+      needs: [Lint, Type-Check, Deploy-Firebase]
+      steps:
+        - uses: actions/checkout@v4
+
+        - name: Set up Node.js
+          uses: actions/setup-node@v4
+          with:
+            node-version: 22
+
+        - name: Install Vercel CLI
+          run: npm install --global vercel@latest
+
+        - name: Pull Vercel Environment Information
+          run: vercel pull --yes --environment=production --token=${{ secrets.VERCEL_TOKEN }}
+
+        - name: Build Project Artifacts
+          run: vercel build --prod --token=${{ secrets.VERCEL_TOKEN }}
+
+        - name: Deploy Project Artifacts to Vercel
+          run: vercel deploy --prebuilt --prod --token=${{ secrets.VERCEL_TOKEN }}

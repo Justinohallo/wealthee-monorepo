@@ -5,22 +5,14 @@
     "moduleResolution": "nodenext",
     "noImplicitReturns": true,
     "noUnusedLocals": true,
-    "outDir": "dist",
+    "outDir": "lib",
     "sourceMap": true,
     "strict": true,
     "target": "es2017",
-    "skipLibCheck": true,
-    "forceConsistentCasingInFileNames": true,
-    "resolveJsonModule": true
+    "skipLibCheck": true
   },
   "compileOnSave": true,
   "include": [
-    "src/**/*",
-    ".eslintrc.js",
-    "*.js"
-  ],
-  "exclude": [
-    "**/node_modules",
-    "**/dist"
+    "src"
   ]
 }
