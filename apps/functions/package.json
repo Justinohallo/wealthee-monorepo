@@ -1,10 +1,11 @@
 {
-  "name": "functions",
+  "name": "@repo/functions",
   "scripts": {
     "lint": "eslint --ext .js,.ts .",
     "lint:fix": "eslint --fix --ext  .js,.ts .",
     "build": "tsc",
     "dev": "tsc --watch",
+    "tsc": "tsc --noEmit",
     "serve": "npm run build && firebase emulators:start --only functions,auth ",
     "shell": "npm run build && firebase functions:shell",
     "start": "npm run shell",
