@@ -38,7 +38,7 @@ jobs:
           run: npm install
 
         - name: Run type checking
-          run: npm run check-types
+          run: npm run tsc
 
     Deploy-Firebase:
       needs: [Lint, Type-Check]
