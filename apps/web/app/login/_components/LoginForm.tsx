@@ -11,7 +11,6 @@ import { getDashboardUrl } from "@/lib/auth-utils"
 import { signInWithEmailAndPassword, signOut } from "firebase/auth"
 import { theme } from "@/styles/theme"
 import { type UserRole } from "@/contexts/AuthContext"
-import { useAuth } from "@/contexts/AuthContext"
 import { useRouter } from "next/navigation"
 import { useState } from "react"
 import { useToast } from '@/hooks/use-toast'
@@ -22,13 +21,8 @@ export const LoginForm = () => {
   const [loading, setLoading] = useState(false)
   const router = useRouter()
   const { toast } = useToast()
-  const { user } = useAuth()
 
-  // Redirect if user is already logged in
-  // if (user) {
-  //   router.push("/dashboard")
-  //   return null
-  // }
+
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()

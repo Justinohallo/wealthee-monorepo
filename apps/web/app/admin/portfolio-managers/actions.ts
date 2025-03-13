@@ -1,27 +1,6 @@
 "use server"
 
-interface PortfolioManager {
-  uid: string
-  email: string
-  emailVerified: boolean
-  displayName: string
-  disabled: boolean
-  metadata: {
-    lastSignInTime: string | null
-    creationTime: string
-    lastRefreshTime: string | null
-  }
-  customClaims: {
-    role: string
-  }
-  tokensValidAfterTime: string
-  providerData: Array<{
-    uid: string
-    displayName: string
-    email: string
-    providerId: string
-  }>
-}
+import { PortfolioManager } from "@/types/portfolioManager"
 
 export async function fetchPortfolioManagers(): Promise<PortfolioManager[]> {
   try {
@@ -31,7 +10,7 @@ export async function fetchPortfolioManagers(): Promise<PortfolioManager[]> {
     }
     const data = await response.json()
 
-    return data.map((manager: any) => ({
+    return data.map((manager: PortfolioManager) => ({
       uid: manager.uid,
       email: manager.email,
       emailVerified: manager.emailVerified,

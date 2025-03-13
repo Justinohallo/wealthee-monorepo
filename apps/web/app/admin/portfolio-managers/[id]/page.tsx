@@ -1,17 +1,13 @@
-import { notFound } from "next/navigation"
-import Link from "next/link"
-import { Button } from "@/components/ui/button"
-import { fetchPortfolioManager } from "./actions"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 
+import { Button } from "@/components/ui/button"
+import Link from "next/link"
+import { fetchPortfolioManager } from "./actions"
+import { notFound } from "next/navigation"
+
 export default async function PortfolioManagerPage({ params }: { params: { id: string } }) {
-  let manager
-  try {
-    manager = await fetchPortfolioManager(params.id)
-  } catch (error) {
-    console.error("Error fetching portfolio manager:", error)
-    notFound()
-  }
+  const { id } = await params
+  const manager = await fetchPortfolioManager(id)
 
   if (!manager) {
     notFound()
