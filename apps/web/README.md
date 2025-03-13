@@ -20,17 +20,74 @@ You can start editing the page by modifying `app/page.tsx`. The page auto-update
 
 This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load Inter, a custom Google Font.
 
-## Learn More
+## App Structure and User Roles
 
-To learn more about Next.js, take a look at the following resources:
+### User Types and Relationships
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+The application has three user types with specific relationships:
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+1. **Admin**
+   - Can create and manage Portfolio Managers
+   - Has access to all system data
 
-## Deploy on Vercel
+2. **Portfolio Manager**
+   - Created by Admins
+   - Can create and manage Clients (1:many relationship)
+   - Can create multiple SnapTrade connections
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+3. **Client**
+   - Created by a Portfolio Manager
+   - Has a 1:1 relationship with their Portfolio Manager
+   - Can create a single SnapTrade connection (1:1)
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+### Directory Structure
+
+```
+app/
+├── admin/                       # Admin dashboard (admin only)
+│   ├── page.tsx                 # Admin overview
+│   ├── portfolio-managers/      # Manage all portfolio managers
+│   │   ├── page.tsx             # List all portfolio managers
+│   │   ├── create/              # Create new portfolio manager
+│   │   └── [id]/                # Single portfolio manager view
+│   └── settings/                # Admin settings
+│
+├── manager/                     # Portfolio manager area
+│   ├── page.tsx                 # Manager dashboard
+│   ├── clients/                 # Client management
+│   │   ├── page.tsx             # List all clients
+│   │   ├── create/              # Create new client
+│   │   └── [id]/                # Single client view
+│   ├── snaptrade/               # Manager's SnapTrade connections
+│   │   ├── page.tsx             # List all connections
+│   │   ├── create/              # Create new connection
+│   │   └── [id]/                # Single connection details
+│   └── settings/                # Manager settings
+│
+├── client/                      # Client area
+│   ├── page.tsx                 # Client dashboard
+│   ├── snaptrade/               # Client's SnapTrade connection
+│   │   ├── page.tsx             # Connection details
+│   │   └── connect/             # Create connection
+│   └── settings/                # Client settings
+│
+├── api/                         # API routes
+│   ├── admin/                   # Admin-only endpoints
+│   ├── manager/                 # Manager endpoints
+│   ├── client/                  # Client endpoints
+│   └── snaptrade/               # SnapTrade API integration
+│
+└── auth/                        # Authentication pages
+    ├── login/
+    └── signup/
+```
+
+### Access Control Strategy
+
+- Top-level role separation with `/admin`, `/manager`, and `/client` routes
+- Flat structure where possible for better navigation
+- Nested routes for clear parent-child relationships
+- ID-based routes for specific resources
+- Middleware for role-based access control
+
+

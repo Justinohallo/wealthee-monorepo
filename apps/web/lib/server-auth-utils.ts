@@ -29,7 +29,7 @@ export const verifySessionAndGetUser = async () => {
  * Gets the user role from cookies in server components
  * @returns The user role from cookies
  */
-export const getUserRole = async (): Promise<UserRole> => {
+export const getUserRole = async (): Promise<UserRole | null> => {
   const cookieStore = await cookies()
   const role = cookieStore.get("userRole")?.value as UserRole
   return role || null
