@@ -6,13 +6,10 @@
     "build": {
       "dependsOn": ["^build"],
       "inputs": ["$TURBO_DEFAULT$", ".env*"],
-      "outputs": [".next/**", "!.next/cache/**", "lib/**", "dist/**", ".vercel/**"],
-      "env": ["NODE_ENV"]
+      "outputs": [".next/**", "!.next/cache/**", "lib/**", "dist/**", ".vercel/**"]
     },
     "lint": {
-      "dependsOn": ["^lint"],
-            "env": ["NODE_ENV"]
-
+      "dependsOn": ["^lint"]
     },
     "tsc": {
       "dependsOn": ["^tsc"]
@@ -20,12 +17,10 @@
     "serve": {},
     "dev": {
       "cache": false,
-      "persistent": true,
-      "env": ["NODE_ENV"]
+      "persistent": true
     },
     "deploy": {
-      "dependsOn": ["build", "lint", "tsc"],
-      "env": ["NODE_ENV"]
+      "dependsOn": ["build", "lint", "tsc"]
     }
   }
 }
