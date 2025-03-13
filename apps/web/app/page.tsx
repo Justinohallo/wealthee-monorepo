@@ -1,10 +1,15 @@
+import Hero from "@/app/_components/Hero"
+
+export const metadata = {
+  title: "Wealthee - Empowering Portfolio Management",
+  description: "Revolutionizing financial services with expert portfolio management and copy-trading",
+}
 
 export default function Home() {
   return (
-    <div>
-      <h1 className="text-3xl font-bold underline text-red-500">
-        Hello world!
-      </h1>
-    </div>
-  );
+    <main>
+      <Hero />
+    </main>
+  )
 }
+
