@@ -1,3 +1,5 @@
+'use server'
+
 import { cert, getApps, initializeApp } from "firebase-admin/app"
 
 import { z } from "zod"
@@ -48,7 +50,7 @@ const firebaseConfig = firebaseConfigSchema.parse({
   privateKey: process.env.FIREBASE_PRIVATE_KEY?.replace(/\\n/g, "\n"),
 })
 
-export const initializeFirebaseAdmin = () => {
+export const initializeFirebaseAdmin = async () => {
   if (!getApps().length) {
     initializeApp({
       credential: cert(firebaseConfig),
