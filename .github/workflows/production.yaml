@@ -104,9 +104,9 @@ jobs:
         - name: Deploy Project Artifacts to Vercel
           run: |
             vercel deploy --prebuilt --prod --token=${{ secrets.VERCEL_TOKEN }} \
-            --env FIREBASE_PROJECT_ID="${{ secrets.FIREBASE_PROJECT_ID }}" \
-            --env FIREBASE_CLIENT_EMAIL="${{ secrets.FIREBASE_CLIENT_EMAIL }}" \
-            --env FIREBASE_PRIVATE_KEY="${{ secrets.FIREBASE_PRIVATE_KEY }}" \
+            --env FIREBASE_PROJECT_ID="CMON" \
+            --env FIREBASE_CLIENT_EMAIL="CLIENT_EMAIL" \
+            --env FIREBASE_PRIVATE_KEY="PRIVATE_LEY" \
             --env NEXT_PUBLIC_FIREBASE_API_KEY="${{ secrets.NEXT_PUBLIC_FIREBASE_API_KEY }}" \
             --env NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN="${{ secrets.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN }}" \
             --env NEXT_PUBLIC_FIREBASE_PROJECT_ID="${{ secrets.NEXT_PUBLIC_FIREBASE_PROJECT_ID }}" \
