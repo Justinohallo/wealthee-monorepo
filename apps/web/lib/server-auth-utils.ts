@@ -3,7 +3,7 @@ import { type UserRole } from "@/types/user"
 import { redirect } from "next/navigation"
 import { getDashboardUrl } from "./auth-utils"
 import { getAuth } from "firebase-admin/auth"
-import { initializeFirebaseAdmin } from "./firebase-admin"
+import { initializeFirebaseAdmin } from "@/app/api/auth/login/route"
 
 export const verifySessionAndGetUser = async () => {
   initializeFirebaseAdmin()
