@@ -15,7 +15,7 @@ const firebaseConfigSchema = z.object({
 const validateEnv = () => {
   try {
 
-    return firebaseConfigSchema.parse({
+    return firebaseConfigSchema.safeParse({
       projectId: process.env.FIREBASE_PROJECT_ID,
       clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
       privateKey: process.env.FIREBASE_PRIVATE_KEY?.replace(/\\n/g, "\n"),
@@ -30,9 +30,9 @@ const validateEnv = () => {
 export const initializeFirebaseAdmin = async () => {
   const firebaseConfig = validateEnv();
 
-  if (!getApps().length && firebaseConfig) {
+  if (!getApps().length && firebaseConfig?.success) {
     initializeApp({
-      credential: cert(firebaseConfig),
+      credential: cert(firebaseConfig.data),
     })
 
     throw new Error("Firebase Admin SDK not initialized")
