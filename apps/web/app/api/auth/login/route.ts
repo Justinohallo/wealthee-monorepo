@@ -49,9 +49,12 @@ export const initializeFirebaseAdmin = async () => {
   }
 }
 
-initializeFirebaseAdmin()
+
 
 export const POST = async (request: Request) => {
+
+  initializeFirebaseAdmin();
+
   const { idToken } = await request.json()
 
   try {
