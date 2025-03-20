@@ -95,4 +95,13 @@ jobs:
           run: |
             vercel deploy --prebuilt --prod \
             --token=${{ secrets.VERCEL_TOKEN }} \
-            --env API_ROUTE_TEST="${{ secrets.API_ROUTE_TEST }}"
+            --env API_ROUTE_TEST="${{ secrets.API_ROUTE_TEST }}" \
+            --env FIREBASE_PROJECT_ID="${{ secrets.FIREBASE_PROJECT_ID }}" \
+            --env FIREBASE_CLIENT_EMAIL="${{ secrets.FIREBASE_CLIENT_EMAIL }}" \
+            --env FIREBASE_PRIVATE_KEY="${{ secrets.FIREBASE_PRIVATE_KEY }}" \
+            --env NEXT_PUBLIC_FIREBASE_API_KEY="${{ secrets.NEXT_PUBLIC_FIREBASE_API_KEY }}" \
+            --env NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN="${{ secrets.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN }}" \
+            --env NEXT_PUBLIC_FIREBASE_PROJECT_ID="${{ secrets.NEXT_PUBLIC_FIREBASE_PROJECT_ID }}" \
+            --env NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET="${{ secrets.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET }}" \
+            --env NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID="${{ secrets.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID }}" \
+            --env NEXT_PUBLIC_FIREBASE_APP_ID="${{ secrets.NEXT_PUBLIC_FIREBASE_APP_ID }}"
