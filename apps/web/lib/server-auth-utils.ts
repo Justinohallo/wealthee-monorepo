@@ -3,10 +3,8 @@ import { type UserRole } from "@/types/user"
 import { redirect } from "next/navigation"
 import { getDashboardUrl } from "./auth-utils"
 import { getAuth } from "firebase-admin/auth"
-import { initializeFirebaseAdmin } from "@/app/api/auth/login/route"
 
 export const verifySessionAndGetUser = async () => {
-  initializeFirebaseAdmin()
   const cookieStore = await cookies()
   const sessionCookie = await cookieStore.get("__session")?.value
   const token = await cookieStore.get("idToken")?.value
