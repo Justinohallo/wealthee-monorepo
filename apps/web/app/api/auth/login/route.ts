@@ -11,17 +11,31 @@ const firebaseConfigSchema = z.object({
   privateKey: z.string().min(1, "FIREBASE_PRIVATE_KEY is required"),
 })
 
-const firebaseConfig = firebaseConfigSchema.parse({
-  projectId: process.env.FIREBASE_PROJECT_ID,
-  clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
-  privateKey: process.env.FIREBASE_PRIVATE_KEY?.replace(/\\n/g, "\n"),
-})
+// Validate environment variables
+const validateEnv = () => {
+  try {
+
+    return firebaseConfigSchema.parse({
+      projectId: process.env.FIREBASE_PROJECT_ID,
+      clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
+      privateKey: process.env.FIREBASE_PRIVATE_KEY?.replace(/\\n/g, "\n"),
+    })
+  } catch (error) {
+    console.error('Environment validation error:', error);
+
+  }
+};
+
 
 export const initializeFirebaseAdmin = async () => {
-  if (!getApps().length) {
+  const firebaseConfig = validateEnv();
+
+  if (!getApps().length && firebaseConfig) {
     initializeApp({
       credential: cert(firebaseConfig),
     })
+
+    throw new Error("Firebase Admin SDK not initialized")
 
     // Connect to auth emulator in development
     // if (process.env.NODE_ENV === 'development') {
