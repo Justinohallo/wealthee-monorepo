@@ -39,7 +39,6 @@ export const initializeFirebaseAdmin = async () => {
       }),
     })
 
-    throw new Error("Firebase Admin SDK not initialized")
 
     // Connect to auth emulator in development
     // if (process.env.NODE_ENV === 'development') {
