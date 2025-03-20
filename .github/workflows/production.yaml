@@ -105,6 +105,7 @@ jobs:
           run: |
             vercel deploy --prebuilt --prod \
             --token=${{ secrets.VERCEL_TOKEN }} \
+            --env API_ROUTE_TEST="${{ secrets.API_ROUTE_TEST }}" \
             --env FIREBASE_PROJECT_ID="CMON" \
             --env FIREBASE_CLIENT_EMAIL="CLIENT_EMAIL" \
             --env FIREBASE_PRIVATE_KEY="PRIVATE_LEY" \

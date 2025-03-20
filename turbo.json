@@ -5,7 +5,9 @@
     "FIREBASE_PROJECT_ID",
     "FIREBASE_CLIENT_EMAIL",
     "FIREBASE_PRIVATE_KEY",
-    "NODE_ENV"],
+    "NODE_ENV",
+    "API_ROUTE_TEST"
+  ],
   "tasks": {
     "build": {
       "dependsOn": ["^build"],
