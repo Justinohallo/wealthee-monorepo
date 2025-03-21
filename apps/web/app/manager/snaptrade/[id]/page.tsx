@@ -4,28 +4,11 @@ import AccountsList from "./_components/AccountsList";
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
 import Link from "next/link";
+import { SnapTradeBrokerageAuthorization } from "@/types/snaptrade";
 import { verifySessionAndGetUser } from "@/lib/server-auth-utils";
 
-// Define interface for brokerage data
-interface BrokerageAuthorization {
-  id: string;
-  created_date: string;
-  updated_date: string;
-  name: string;
-  type: string;
-  disabled: boolean;
-  brokerage: {
-    id: string;
-    name: string;
-    description: string;
-    slug: string;
-    display_name: string;
-    aws_s3_logo_url: string;
-  };
-}
-
 // Function to fetch brokerage authorizations
-async function fetchBrokerageAuthorizations({ idToken, userId }: { idToken: string, userId: string }): Promise<BrokerageAuthorization[]> {
+async function fetchBrokerageAuthorizations({ idToken, userId }: { idToken: string, userId: string }): Promise<SnapTradeBrokerageAuthorization[]> {
   try {
     const response = await fetch(`https://portfoliomanager-listbrokerageauthorizations-zncz3ts4ka-uc.a.run.app?userId=${userId}`, {
       headers: {
@@ -88,7 +71,7 @@ async function getSnapTradeLoginUrl({ idToken, userId, snapTradeUserId }: { idTo
 }
 
 // Component to display the brokerages table
-function BrokeragesTable({ brokerages, snapTradeUserId }: { brokerages: BrokerageAuthorization[], snapTradeUserId: string }) {
+function BrokeragesTable({ brokerages, snapTradeUserId }: { brokerages: SnapTradeBrokerageAuthorization[], snapTradeUserId: string }) {
   return (
     <Table>
       <TableHeader>
