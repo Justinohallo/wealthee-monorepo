@@ -508,3 +508,195 @@ export const detailBrokerageAuthorization = onRequest({
 });
 
 
+export const listSnapTradeUserAccounts = onRequest({
+  secrets: [...snaptradeSecrets],
+  cors: ["https://wealthee-next-app.vercel.app"],
+}, async (req, res) => {
+  try {
+    // Authenticate the portfolio manager
+    const decodedToken = await authenticatePortfolioManager(req, res);
+    if (!decodedToken) return;
+
+    // Validate required parameters
+    if (!validateRequiredParams({
+      req,
+      params: ["userId", "snapTradeUserId"],
+      source: "query",
+      res,
+    })) {
+      return;
+    }
+
+    const {userId, snapTradeUserId} = req.query;
+
+    // Get SnapTrade user data
+    const snapTradeUser = await getSnapTradeUser({
+      portfolioManagerId: userId as string,
+      snapTradeUserId: snapTradeUserId as string,
+      res,
+    });
+    if (!snapTradeUser) return;
+
+    // Create SnapTrade client and call API
+    const snaptrade = createSnapTradeClient();
+
+    const response = await snaptrade.accountInformation.listUserAccounts({
+      userId: snapTradeUserId as string,
+      userSecret: snapTradeUser.userSecret,
+    });
+
+    res.json({accounts: response.data});
+  } catch (error) {
+    handleError({
+      res,
+      error,
+      context: "list SnapTrade user accounts",
+    });
+  }
+});
+
+export const getSnapTradeUserAccountDetails = onRequest({
+  secrets: [...snaptradeSecrets],
+  cors: ["https://wealthee-next-app.vercel.app"],
+}, async (req, res) => {
+  try {
+    // Authenticate the portfolio manager
+    const decodedToken = await authenticatePortfolioManager(req, res);
+    if (!decodedToken) return;
+
+    // Validate required parameters
+    if (!validateRequiredParams({
+      req,
+      params: ["userId", "snapTradeUserId", "accountId"],
+      source: "query",
+      res,
+    })) {
+      return;
+    }
+
+    const {userId, snapTradeUserId, accountId} = req.query;
+
+    // Get SnapTrade user data
+    const snapTradeUser = await getSnapTradeUser({
+      portfolioManagerId: userId as string,
+      snapTradeUserId: snapTradeUserId as string,
+      res,
+    });
+    if (!snapTradeUser) return;
+
+    // Create SnapTrade client and call API
+    const snaptrade = createSnapTradeClient();
+
+    const response = await snaptrade.accountInformation.getUserAccountDetails({
+      accountId: accountId as string,
+      userId: snapTradeUserId as string,
+      userSecret: snapTradeUser.userSecret,
+    });
+
+    res.json({accountDetails: response.data});
+  } catch (error) {
+    handleError({
+      res,
+      error,
+      context: "get SnapTrade user account details",
+    });
+  }
+});
+
+export const getSnapTradeUserHoldings = onRequest({
+  secrets: [...snaptradeSecrets],
+  cors: ["https://wealthee-next-app.vercel.app"],
+}, async (req, res) => {
+  try {
+    // Authenticate the portfolio manager
+    const decodedToken = await authenticatePortfolioManager(req, res);
+    if (!decodedToken) return;
+
+    // Validate required parameters
+    if (!validateRequiredParams({
+      req,
+      params: ["userId", "snapTradeUserId", "accountId"],
+      source: "query",
+      res,
+    })) {
+      return;
+    }
+
+    const {userId, snapTradeUserId, accountId} = req.query;
+
+    // Get SnapTrade user data
+    const snapTradeUser = await getSnapTradeUser({
+      portfolioManagerId: userId as string,
+      snapTradeUserId: snapTradeUserId as string,
+      res,
+    });
+    if (!snapTradeUser) return;
+
+    // Create SnapTrade client and call API
+    const snaptrade = createSnapTradeClient();
+
+    const response = await snaptrade.accountInformation.getUserHoldings({
+      accountId: accountId as string,
+      userId: snapTradeUserId as string,
+      userSecret: snapTradeUser.userSecret,
+    });
+
+    res.json({holdings: response.data});
+  } catch (error) {
+    handleError({
+      res,
+      error,
+      context: "get SnapTrade user holdings",
+    });
+  }
+});
+
+export const getSnapTradeUserAccountBalances = onRequest({
+  secrets: [...snaptradeSecrets],
+  cors: ["https://wealthee-next-app.vercel.app"],
+}, async (req, res) => {
+  try {
+    // Authenticate the portfolio manager
+    const decodedToken = await authenticatePortfolioManager(req, res);
+    if (!decodedToken) return;
+
+    // Validate required parameters
+    if (!validateRequiredParams({
+      req,
+      params: ["userId", "snapTradeUserId", "accountId"],
+      source: "query",
+      res,
+    })) {
+      return;
+    }
+
+    const {userId, snapTradeUserId, accountId} = req.query;
+
+    // Get SnapTrade user data
+    const snapTradeUser = await getSnapTradeUser({
+      portfolioManagerId: userId as string,
+      snapTradeUserId: snapTradeUserId as string,
+      res,
+    });
+    if (!snapTradeUser) return;
+
+    // Create SnapTrade client and call API
+    const snaptrade = createSnapTradeClient();
+
+    const response = await snaptrade.accountInformation.getUserAccountBalance({
+      accountId: accountId as string,
+      userId: snapTradeUserId as string,
+      userSecret: snapTradeUser.userSecret,
+    });
+
+    res.json({balances: response.data});
+  } catch (error) {
+    handleError({
+      res,
+      error,
+      context: "get SnapTrade user account balances",
+    });
+  }
+});
+
+

@@ -1,3 +1,4 @@
+import "@/lib/firebase-admin"
 import { cookies } from "next/headers"
 import { type UserRole } from "@/types/user"
 import { redirect } from "next/navigation"
