@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
+import Image from "next/image";
 import Link from "next/link";
 import { verifySessionAndGetUser } from "@/lib/server-auth-utils";
-
 // Define interface for brokerage data
 interface BrokerageAuthorization {
   id: string;
@@ -114,9 +114,11 @@ export default async function BrokerageDetailPage({
       <div className="bg-white rounded-lg shadow overflow-hidden p-6 mb-6">
         <div className="flex items-center mb-6">
           {brokerage.brokerage.aws_s3_logo_url && (
-            <img
+            <Image
               src={brokerage.brokerage.aws_s3_logo_url}
               alt={brokerage.brokerage.name}
+              width={48}
+              height={48}
               className="h-12 w-12 mr-4 object-contain"
             />
           )}

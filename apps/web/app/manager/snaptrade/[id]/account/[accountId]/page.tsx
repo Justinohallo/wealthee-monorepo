@@ -39,11 +39,11 @@ interface SnapTradeAccount {
   number: string;
   institution_name: string;
   meta: AccountMeta;
-  cash_restrictions: any[];
+  cash_restrictions: unknown[];
   created_date: string;
   sync_status: AccountSyncStatus;
   balance: AccountBalance;
-  raw_data: any;
+  raw_data: unknown;
   raw_type: string;
   brokerage_authorization: string;
   portfolio_group: string;

@@ -2,6 +2,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 
 import AccountsList from "./_components/AccountsList";
 import { Button } from "@/components/ui/button";
+import Image from "next/image";
 import Link from "next/link";
 import { verifySessionAndGetUser } from "@/lib/server-auth-utils";
 
@@ -108,9 +109,11 @@ function BrokeragesTable({ brokerages, snapTradeUserId }: { brokerages: Brokerag
               <TableCell>{brokerage.name}</TableCell>
               <TableCell className="flex items-center">
                 {brokerage.brokerage.aws_s3_logo_url && (
-                  <img
+                  <Image
                     src={brokerage.brokerage.aws_s3_logo_url}
                     alt={brokerage.brokerage.name}
+                    width={24}
+                    height={24}
                     className="h-6 w-6 mr-2 object-contain"
                   />
                 )}

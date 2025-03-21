@@ -1,7 +1,6 @@
 import { Button } from "@/components/ui/button"
 import Link from "next/link"
 import { SnaptradeOverview } from "./_components/SnaptradeOverview"
-import { verifySessionAndGetUser } from "@/lib/server-auth-utils"
 
 async function getSnaptradeData() {
   try {
@@ -26,7 +25,6 @@ async function getSnaptradeData() {
 }
 
 export default async function SnaptradePage() {
-  const user = await verifySessionAndGetUser();
   const data = await getSnaptradeData()
 
   return (
