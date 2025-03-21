@@ -20,6 +20,66 @@ You can start editing the page by modifying `app/page.tsx`. The page auto-update
 
 This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load Inter, a custom Google Font.
 
+## Environment Variables and Deployment
+
+### Build-time vs. Runtime Environment Variables
+
+This project uses both build-time and runtime environment variables, which behave differently in Next.js and Vercel deployments:
+
+#### Build-time Variables (`NEXT_PUBLIC_` prefix)
+
+- Used for client-side code (browser environment)
+- Must be prefixed with `NEXT_PUBLIC_`
+- Embedded directly into JavaScript bundles during build
+- Cannot be changed after deployment without rebuilding
+- Examples: `NEXT_PUBLIC_FIREBASE_API_KEY`, `NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN`
+
+#### Runtime Variables (no `NEXT_PUBLIC_` prefix)
+
+- Only available in server environments (API routes, Server Components, Server Actions)
+- Never exposed to the client
+- Can be updated without rebuilding the application
+- Examples: `FIREBASE_PROJECT_ID`, `FIREBASE_CLIENT_EMAIL`, `FIREBASE_PRIVATE_KEY`
+
+### CI/CD Configuration
+
+Our GitHub Actions workflow handles environment variables correctly:
+
+1. **Build-time Variables**: Set in the `env:` section of the workflow
+   ```yaml
+   env:
+     NEXT_PUBLIC_FIREBASE_API_KEY: ${{ secrets.NEXT_PUBLIC_FIREBASE_API_KEY }}
+     # Other NEXT_PUBLIC variables...
+   ```
+
+2. **Runtime Variables**: Passed to Vercel during deployment
+   ```yaml
+   vercel deploy --prebuilt --prod \
+   --env FIREBASE_PROJECT_ID="${{ secrets.FIREBASE_PROJECT_ID }}" \
+   --env FIREBASE_CLIENT_EMAIL="${{ secrets.FIREBASE_CLIENT_EMAIL }}"
+   # Other server-only variables...
+   ```
+
+### Firebase Admin SDK
+
+For server-side Firebase operations, we use a singleton pattern to initialize Firebase Admin:
+
+1. Import the initialization file (once) in server-side code:
+   ```typescript
+   import '@/lib/firebase-admin' 
+   import { getFirestore } from 'firebase-admin/firestore'
+   
+   // Now you can use Firebase Admin services
+   const db = getFirestore()
+   ```
+
+2. For API routes that depend on server environment variables, use:
+   ```typescript
+   export const dynamic = 'force-dynamic' // Ensures runtime access to variables
+   ```
+
+This approach prevents multiple initializations and ensures environment variables are properly accessed at runtime.
+
 ## App Structure and User Roles
 
 ### User Types and Relationships

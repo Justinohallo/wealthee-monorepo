@@ -25,6 +25,10 @@
       "cache": false,
       "persistent": true
     },
+    "//#emulators": {
+      "cache": false,
+      "persistent": true
+    },
     "deploy": {
       "dependsOn": ["build", "lint", "tsc"]
     }
