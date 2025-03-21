@@ -7,7 +7,7 @@
     "lint": "turbo run lint",
     "format": "prettier --write \"**/*.{ts,tsx,md}\"",
     "tsc": "turbo run tsc",
-    "emulators": "firebase emulators:start --only functions"
+    "emulators": "firebase emulators:start --only functions,database,auth"
 
   },
   "devDependencies": {

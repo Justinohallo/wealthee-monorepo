@@ -29,9 +29,14 @@ module.exports = {
   rules: {
     "quotes": ["error", "double"],
     "import/no-unresolved": 0,
-    "indent": ["error", 2],
-    "object-curly-spacing": ["error", "never"],
-    "no-unused-vars": ["error"],
-
+    "indent": "off",
+    "object-curly-spacing": "off",
+    "no-unused-vars": "off",
+    "@typescript-eslint/no-unused-vars": ["warn"],
+    "valid-jsdoc": "off",
+    "require-jsdoc": "off",
+    "max-len": ["warn", {"code": 120}],
+    "@typescript-eslint/no-explicit-any": "warn",
+    "comma-dangle": "off",
   },
 };

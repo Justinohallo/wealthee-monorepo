@@ -1,6 +1,8 @@
+import { connectAuthEmulator, getAuth } from "firebase/auth"
+import { connectDatabaseEmulator, getDatabase } from "firebase/database"
+import { connectFunctionsEmulator, getFunctions } from "firebase/functions"
 import { getApp, getApps, initializeApp } from "firebase/app"
 
-import { getAuth } from "firebase/auth"
 import { z } from "zod"
 
 export const firebaseConfigSchema = z.object({
@@ -24,6 +26,18 @@ const firebaseConfig = {
 const app = getApps().length > 0 ? getApp() : initializeApp(firebaseConfig)
 const auth = getAuth(app)
 
+// Initialize Realtime Database
+const db = getDatabase(app)
+
+// Initialize Cloud Functions
+const functions = getFunctions(app)
+
+// Connect to emulators in development
+if (process.env.NODE_ENV === "development") {
+  connectDatabaseEmulator(db, "localhost", 9000)
+  connectFunctionsEmulator(functions, "localhost", 5001)
+  connectAuthEmulator(auth, 'http://localhost:9099')
+}
 
 
 export { auth }

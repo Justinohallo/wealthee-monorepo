@@ -33,7 +33,7 @@ export const LoginForm = () => {
       const idToken = await userCredential.user.getIdToken()
       const idTokenResult = await userCredential.user.getIdTokenResult()
       const customClaims = idTokenResult.claims
-
+      console.log({ idToken, idTokenResult, customClaims })
       const response = await fetch("/api/auth/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
