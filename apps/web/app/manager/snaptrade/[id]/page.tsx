@@ -60,7 +60,6 @@ async function fetchBrokerageAuthorizations({ idToken, userId }: { idToken: stri
 
 // Function to get SnapTrade login URL
 async function getSnapTradeLoginUrl({ idToken, userId, snapTradeUserId }: { idToken: string, userId: string, snapTradeUserId: string }): Promise<string | null> {
-  console.log({ idToken, userId, snapTradeUserId })
   try {
     const response = await fetch(`https://portfoliomanager-loginsnaptradeuser-zncz3ts4ka-uc.a.run.app?userId=${userId}&snapTradeUserId=${snapTradeUserId}`, {
       headers: {

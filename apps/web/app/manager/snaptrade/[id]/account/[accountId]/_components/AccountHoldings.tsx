@@ -190,7 +190,6 @@ async function fetchAccountHoldings({
     }
 
     const data = await response.json();
-    console.log(data)
     return data.holdings
   } catch (error) {
     console.error("Error fetching account holdings:", error);

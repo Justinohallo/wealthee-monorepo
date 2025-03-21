@@ -67,7 +67,7 @@ async function fetchSnapTradeAccounts({
 }): Promise<SnapTradeAccount[]> {
   try {
     const response = await fetch(
-      `https://portfoliomanager-listsnaptradeuseraccounts-zncz3ts4ka-uc.a.run.app?userId=${snapTradeUserId}&snapTradeUserId=${userId}`,
+      `https://portfoliomanager-listsnaptradeuseraccounts-zncz3ts4ka-uc.a.run.app?userId=${userId}&snapTradeUserId=${snapTradeUserId}`,
       {
         headers: {
           Authorization: `Bearer ${idToken}`,
@@ -76,7 +76,7 @@ async function fetchSnapTradeAccounts({
     );
 
     if (!response.ok) {
-      console.error(`HTTP error! status: ${response.json()}`);
+      console.error(`HTTP error! status: ${response.status}`);
       return [];
     }
 
