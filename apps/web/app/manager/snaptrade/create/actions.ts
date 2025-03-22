@@ -1,23 +1,21 @@
 "use server"
 
+import { PORTFOLIO_MANAGER } from "@/constants/functionNames"
+import { callFirebaseFunction } from "@/lib/firebase-functions"
 import { revalidatePath } from "next/cache"
-
-export async function registerSnapTradeUser(displayName: string, userId: string, idToken: string) {
+export async function registerSnapTradeUser({ displayName, userId, idToken }: { displayName: string, userId: string, idToken: string }) {
   try {
-    const response = await fetch("https://portfoliomanager-registersnaptradeuserwithdisplay-zncz3ts4ka-uc.a.run.app", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${idToken}`,
-      },
-      body: JSON.stringify({ displayName, userId }),
+    const result = await callFirebaseFunction({
+      idToken,
+      functionName: PORTFOLIO_MANAGER.SNAPTRADE.REGISTER_USER_WITH_DISPLAY,
+      options: {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ displayName, userId }),
+      }
     })
-
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`)
-    }
-
-    const result = await response.json()
 
     // Revalidate the SnapTrade user page to reflect the new data
     revalidatePath("/manager/snaptrade-user")

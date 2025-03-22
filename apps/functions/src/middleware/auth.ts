@@ -1,11 +1,11 @@
-import {AuthError, ForbiddenError} from "../utils/error-handling";
+import { AuthError, ForbiddenError } from "../utils/error-handling";
 /**
  * Authentication middleware
  */
-import {Request, Response} from "express";
+import { Request, Response } from "express";
 
-import {DecodedIdToken} from "firebase-admin/auth";
-import {auth} from "../config/firebase";
+import { DecodedIdToken } from "firebase-admin/auth";
+import { auth } from "../config/firebase";
 
 /**
  * Authenticates the request and verifies the user has the portfolio manager role
@@ -38,7 +38,7 @@ export async function authenticatePortfolioManager(
     return decodedToken;
   } catch (error) {
     if (error instanceof AuthError || error instanceof ForbiddenError) {
-      res.status(error.statusCode).json({error: error.message});
+      res.status(error.statusCode).json({ error: error.message });
     } else {
       res.status(401).json({
         error: `Authentication failed: ${error instanceof Error ? error.message : String(error)}`,
@@ -74,7 +74,7 @@ export async function authenticateUser(
     return decodedToken;
   } catch (error) {
     if (error instanceof AuthError) {
-      res.status(error.statusCode).json({error: error.message});
+      res.status(error.statusCode).json({ error: error.message });
     } else {
       res.status(401).json({
         error: `Authentication failed: ${error instanceof Error ? error.message : String(error)}`,

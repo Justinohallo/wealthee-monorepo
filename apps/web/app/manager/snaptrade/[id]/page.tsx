@@ -4,37 +4,27 @@ import AccountsList from "./_components/AccountsList";
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
 import Link from "next/link";
-import { SnapTradeBrokerageAuthorization } from "@/types/snaptrade";
+import { SnapTradeBrokerageAuthorization } from "../../../../types/snaptrade";
+import { callFirebaseFunction } from "@/lib/firebase-functions";
 import { verifySessionAndGetUser } from "@/lib/server-auth-utils";
 
 // Function to fetch brokerage authorizations
 async function fetchBrokerageAuthorizations({ idToken, userId }: { idToken: string, userId: string }): Promise<SnapTradeBrokerageAuthorization[]> {
   try {
-    const response = await fetch(`https://portfoliomanager-listbrokerageauthorizations-zncz3ts4ka-uc.a.run.app?userId=${userId}`, {
-      headers: {
-        'Authorization': `Bearer ${idToken}`
+    const data = await callFirebaseFunction<{ brokerageAuthorizations: SnapTradeBrokerageAuthorization[] }>({
+      idToken,
+      functionName: 'portfoliomanager-listbrokerageauthorizations',
+      queryParams: { userId },
+      options: {
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        method: 'GET',
+        revalidate: 0 // Don't cache this data
       }
     });
 
-    if (response.status === 401) {
-      console.error('Unauthorized: Please check your authentication credentials');
-      return [];
-    }
-
-    if (response.status === 404) {
-      console.error('Resource not found');
-      console.log(response)
-      return [];
-    }
-
-
-    if (!response.ok) {
-      console.error(`HTTP error! status: ${response.status}`);
-      return [];
-    }
-
-    const data = await response.json();
-    return data.brokerageAuthorizations || [];
+    return data?.brokerageAuthorizations || [];
   } catch (error) {
     console.error("Error fetching brokerage authorizations:", error);
     return [];
@@ -44,26 +34,23 @@ async function fetchBrokerageAuthorizations({ idToken, userId }: { idToken: stri
 // Function to get SnapTrade login URL
 async function getSnapTradeLoginUrl({ idToken, userId, snapTradeUserId }: { idToken: string, userId: string, snapTradeUserId: string }): Promise<string | null> {
   try {
-    const response = await fetch(`https://portfoliomanager-loginsnaptradeuser-zncz3ts4ka-uc.a.run.app?userId=${userId}&snapTradeUserId=${snapTradeUserId}`, {
-      headers: {
-        'Authorization': `Bearer ${idToken}`
+    const data = await callFirebaseFunction<{ loginResponse: { redirectURI: string } }>({
+      idToken,
+      functionName: 'portfoliomanager-loginsnaptradeuser',
+      queryParams: {
+        userId,
+        snapTradeUserId
+      },
+      options: {
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        method: 'GET',
+        revalidate: 0 // Don't cache this data
       }
     });
 
-    if (response.status === 401) {
-      console.error('Unauthorized: Please check your authentication credentials');
-      return null;
-    }
-
-    if (!response.ok) {
-      const result = await response.json();
-      console.log(result)
-      console.error(`HTTP error! status: ${response.status}`);
-      return null;
-    }
-
-    const data = await response.json();
-    return data.loginResponse.redirectURI || null;
+    return data?.loginResponse?.redirectURI || null;
   } catch (error) {
     console.error("Error fetching SnapTrade login URL:", error);
     return null;

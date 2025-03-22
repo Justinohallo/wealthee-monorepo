@@ -9,7 +9,7 @@ import { useRouter } from "next/navigation"
 import { useState } from "react"
 import { useToast } from "@/hooks/use-toast"
 
-export default function CreatePortfolioManagerForm() {
+export default function CreatePortfolioManagerForm({ idToken }: { idToken: string }) {
   const [displayName, setDisplayName] = useState("")
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
@@ -22,7 +22,7 @@ export default function CreatePortfolioManagerForm() {
     setIsLoading(true)
 
     try {
-      const result = await createPortfolioManager({ displayName, email, password })
+      const result = await createPortfolioManager({ displayName, email, password }, idToken)
       if (result.success) {
         toast({
           title: "Success",

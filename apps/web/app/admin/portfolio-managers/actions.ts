@@ -1,14 +1,23 @@
 "use server"
 
 import { PortfolioManager } from "@/types/portfolioManager"
+import { callFirebaseFunction } from "@/lib/firebase-functions"
 
 export async function fetchPortfolioManagers(): Promise<PortfolioManager[]> {
   try {
-    const response = await fetch("https://portfoliomanager-listportfoliomanagers-zncz3ts4ka-uc.a.run.app/")
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`)
+    const data = await callFirebaseFunction<PortfolioManager[]>({
+      functionName: 'portfoliomanager-listportfoliomanagers',
+      options: {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
+    })
+
+    if (!data) {
+      return [];
     }
-    const data = await response.json()
 
     return data.map((manager: PortfolioManager) => ({
       uid: manager.uid,

@@ -1,6 +1,8 @@
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 
 import Link from "next/link";
+import { PORTFOLIO_MANAGER } from "@/constants/functionNames";
+import { callFirebaseFunction } from "@/lib/firebase-functions";
 import { verifySessionAndGetUser } from "@/lib/server-auth-utils";
 
 // Define interface for user data
@@ -11,31 +13,26 @@ interface SnapTradeUser {
   // Add other properties as needed once we know the actual data structure
 }
 
-// Function to fetch SnapTrade users from HTTP endpoint
+// Function to fetch SnapTrade users
 async function fetchSnapTradeUsers({ idToken, userId }: { idToken: string, userId: string }): Promise<SnapTradeUser[]> {
   try {
-    // This is a placeholder - we'll replace with the actual endpoint later
-    const response = await fetch(`https://portfoliomanager-getsnaptradeusers-zncz3ts4ka-uc.a.run.app?userId=${userId}`, {
-      headers: {
-        'Authorization': `Bearer ${idToken}`
+    const data = await callFirebaseFunction<{ snapTradeUsers: SnapTradeUser[] }>({
+      idToken,
+      functionName: PORTFOLIO_MANAGER.SNAPTRADE.GET_USERS,
+      queryParams: { userId },
+      options: {
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        method: 'GET',
+        revalidate: 0 // Don't cache this data
       }
-    })
+    });
 
-
-    if (response.status === 401) {
-      throw new Error('Unauthorized: Please check your authentication credentials')
-    }
-
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`)
-    }
-
-
-    const { snapTradeUsers } = await response.json()
-    return snapTradeUsers as SnapTradeUser[]
+    return data?.snapTradeUsers || [];
   } catch (error) {
-    throw new Error(error as string)
-
+    console.error("Error fetching SnapTrade users:", error);
+    throw new Error(error instanceof Error ? error.message : String(error));
   }
 }
 

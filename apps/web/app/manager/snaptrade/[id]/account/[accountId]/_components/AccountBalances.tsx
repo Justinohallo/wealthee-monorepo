@@ -8,6 +8,7 @@ import {
 } from "@/components/ui/table";
 
 import { Suspense } from "react";
+import { callFirebaseFunction } from "@/lib/firebase-functions";
 import { formatCurrency } from "@/lib/utils";
 
 interface Currency {
@@ -38,21 +39,23 @@ async function fetchAccountBalances({
   accountId: string;
 }): Promise<AccountBalancesResponse | null> {
   try {
-    const response = await fetch(
-      `https://portfoliomanager-getsnaptradeuseraccountbalances-zncz3ts4ka-uc.a.run.app?userId=${userId}&snapTradeUserId=${snapTradeUserId}&accountId=${accountId}`,
-      {
+    const data = await callFirebaseFunction<AccountBalancesResponse>({
+      idToken,
+      functionName: 'portfoliomanager-getsnaptradeuseraccountbalances',
+      queryParams: {
+        userId,
+        snapTradeUserId,
+        accountId
+      },
+      options: {
         headers: {
-          Authorization: `Bearer ${idToken}`,
+          'Content-Type': 'application/json'
         },
+        method: 'GET',
+        revalidate: 0 // Don't cache this data
       }
-    );
+    });
 
-    if (!response.ok) {
-      console.error(`HTTP error! status: ${response.status}`);
-      return null;
-    }
-
-    const data = await response.json();
     return data;
   } catch (error) {
     console.error("Error fetching account balances:", error);

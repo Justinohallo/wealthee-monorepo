@@ -9,6 +9,7 @@ import {
 
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
+import { callFirebaseFunction } from "@/lib/firebase-functions";
 import { formatCurrency } from "@/lib/utils";
 
 // Define interfaces for the account data
@@ -66,22 +67,23 @@ async function fetchSnapTradeAccounts({
   snapTradeUserId: string;
 }): Promise<SnapTradeAccount[]> {
   try {
-    const response = await fetch(
-      `https://portfoliomanager-listsnaptradeuseraccounts-zncz3ts4ka-uc.a.run.app?userId=${userId}&snapTradeUserId=${snapTradeUserId}`,
-      {
+    const data = await callFirebaseFunction<{ accounts: SnapTradeAccount[] }>({
+      idToken,
+      functionName: 'portfoliomanager-listsnaptradeuseraccounts',
+      queryParams: {
+        userId,
+        snapTradeUserId
+      },
+      options: {
         headers: {
-          Authorization: `Bearer ${idToken}`,
+          'Content-Type': 'application/json'
         },
+        method: 'GET',
+        revalidate: 0 // Don't cache this data
       }
-    );
+    });
 
-    if (!response.ok) {
-      console.error(`HTTP error! status: ${response.status}`);
-      return [];
-    }
-
-    const data = await response.json();
-    return data.accounts || [];
+    return data?.accounts || [];
   } catch (error) {
     console.error("Error fetching SnapTrade accounts:", error);
     return [];

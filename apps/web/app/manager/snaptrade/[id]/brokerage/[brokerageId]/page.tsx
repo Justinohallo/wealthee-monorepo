@@ -1,7 +1,9 @@
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
 import Link from "next/link";
+import { callFirebaseFunction } from "@/lib/firebase-functions";
 import { verifySessionAndGetUser } from "@/lib/server-auth-utils";
+
 // Define interface for brokerage data
 interface BrokerageAuthorization {
   id: string;
@@ -33,26 +35,24 @@ async function fetchBrokerageAuthorization({
   snapTradeUserId: string
 }): Promise<BrokerageAuthorization | null> {
   try {
-    const response = await fetch(`https://portfoliomanager-detailbrokerageauthorization-zncz3ts4ka-uc.a.run.app
-?userId=${userId}&authorizationId=${brokerageId}&snapTradeUserId=${snapTradeUserId}`, {
-      headers: {
-        'Authorization': `Bearer ${idToken}`
+    const data = await callFirebaseFunction<{ brokerageAuthorization: BrokerageAuthorization }>({
+      idToken,
+      functionName: 'portfoliomanager-detailbrokerageauthorization',
+      queryParams: {
+        userId,
+        authorizationId: brokerageId,
+        snapTradeUserId
+      },
+      options: {
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        method: 'GET',
+        revalidate: 0 // Don't cache this data
       }
     });
 
-    if (!response.ok) {
-      console.log(await response.json());
-      console.error(`HTTP error! status: ${response.status}`);
-      return null;
-    }
-
-    const data = await response.json();
-    console.log(data);
-    const brokerage = data.brokerageAuthorization
-
-    // Find the specific brokerage by ID
-
-    return brokerage || null;
+    return data?.brokerageAuthorization || null;
   } catch (error) {
     console.error("Error fetching brokerage authorization:", error);
     return null;

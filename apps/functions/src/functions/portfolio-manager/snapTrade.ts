@@ -10,6 +10,7 @@ import { createHttpFunction } from "../../utils/function-wrapper";
 import { createSnapTradeClient } from "../../services/snaptrade/client";
 import { db } from "../../config/firebase";
 import { logger } from "../../utils/logger";
+import { snaptradeSecrets } from "../../config";
 
 /**
  * Registers a primary SnapTrade user for a portfolio manager
@@ -252,7 +253,8 @@ export const registerSnaptradeUserWithDisplay = createHttpFunction({
     requiredRole: "portfolioManager",
     requiredParams: {
       body: ["userId", "displayName"]
-    }
+    },
+    secrets: snaptradeSecrets
   }
 });
 
@@ -297,7 +299,8 @@ export const getSnaptradeUsers = createHttpFunction({
     requiredRole: "portfolioManager",
     requiredParams: {
       query: ["userId"]
-    }
+    },
+    secrets: snaptradeSecrets
   }
 });
 

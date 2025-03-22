@@ -57,7 +57,7 @@ export const createPortfolioManager = createHttpFunction({
  * Lists all portfolio manager users
  */
 export const listPortfolioManagers = createHttpFunction({
-  handler: async ({ req, res }) => {
+  handler: async ({ res }) => {
     logger.info("Listing all portfolio manager users", "PortfolioManagerUsers");
 
     // Fetch all users and filter by custom claim role "portfolioManager"
@@ -103,15 +103,14 @@ export const listPortfolioManagers = createHttpFunction({
 export const getPortfolioManager = createHttpFunction({
   handler: async ({ req, res }) => {
     // Check for required query parameter
-    const { uid } = req.params;
+    const { uid } = req.query;
     if (!uid) {
       throw new ValidationError("Required path parameter 'uid' is missing");
     }
 
     logger.info(`Getting portfolio manager with ID: ${uid}`, "PortfolioManagerUsers");
-
     // Get user from Firebase Auth
-    const user = await auth.getUser(uid);
+    const user = await auth.getUser(uid as string);
 
     // Verify that the user is a portfolio manager
     if (!user.customClaims || user.customClaims.role !== "portfolioManager") {
@@ -130,9 +129,13 @@ export const getPortfolioManager = createHttpFunction({
       displayName: user.displayName,
       photoURL: user.photoURL,
       disabled: user.disabled,
+      emailVerified: user.emailVerified,
+      providerData: user.providerData,
       metadata: {
         creationTime: user.metadata.creationTime,
         lastSignInTime: user.metadata.lastSignInTime,
+        lastRefreshTime: user.metadata.lastRefreshTime,
+        tokensValidAfterTime: user.tokensValidAfterTime,
       },
       customClaims: user.customClaims
     };

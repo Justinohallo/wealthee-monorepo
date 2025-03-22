@@ -2,17 +2,14 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 
 import { Button } from "@/components/ui/button"
 import Link from "next/link"
-import { fetchPortfolioManager } from "./actions"
-import { notFound } from "next/navigation"
+import { getPortfolioManager } from "@/services/portfolioManager"
+import { verifySessionAndGetUser } from "@/lib/server-auth-utils"
 
 export default async function PortfolioManagerPage({ params }: { params: { id: string } }) {
-  const { id } = await params
-  const manager = await fetchPortfolioManager(id)
-
-  if (!manager) {
-    notFound()
-  }
-
+  const user = await verifySessionAndGetUser();
+  const { id } = await params;
+  const manager = await getPortfolioManager(user?.token || '', id,)
+  console.log({ manager })
   return (
     <div className="p-8">
       <div className="flex justify-between items-center mb-6">
@@ -30,19 +27,19 @@ export default async function PortfolioManagerPage({ params }: { params: { id: s
           <dl className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <dt className="font-semibold">Name</dt>
-              <dd>{manager.displayName}</dd>
+              <dd>{manager?.displayName}</dd>
             </div>
             <div>
               <dt className="font-semibold">Email</dt>
-              <dd>{manager.email}</dd>
+              <dd>{manager?.email}</dd>
             </div>
             <div>
               <dt className="font-semibold">Email Verified</dt>
-              <dd>{manager.emailVerified ? "Yes" : "No"}</dd>
+              <dd>{manager?.emailVerified ? "Yes" : "No"}</dd>
             </div>
             <div>
               <dt className="font-semibold">Account Status</dt>
-              <dd>{manager.disabled ? "Disabled" : "Active"}</dd>
+              <dd>{manager?.disabled ? "Disabled" : "Active"}</dd>
             </div>
           </dl>
         </CardContent>
@@ -56,25 +53,19 @@ export default async function PortfolioManagerPage({ params }: { params: { id: s
           <dl className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <dt className="font-semibold">Creation Time</dt>
-              <dd>{new Date(manager.metadata.creationTime).toLocaleString()}</dd>
+              <dd>{new Date(manager?.metadata?.creationTime || '').toLocaleString()}</dd>
             </div>
             <div>
               <dt className="font-semibold">Last Sign In</dt>
               <dd>
-                {manager.metadata.lastSignInTime ? new Date(manager.metadata.lastSignInTime).toLocaleString() : "Never"}
+                {manager?.metadata?.lastSignInTime}
               </dd>
             </div>
             <div>
               <dt className="font-semibold">Last Refresh</dt>
               <dd>
-                {manager.metadata.lastRefreshTime
-                  ? new Date(manager.metadata.lastRefreshTime).toLocaleString()
-                  : "Never"}
+                {manager?.metadata?.lastRefreshTime}
               </dd>
-            </div>
-            <div>
-              <dt className="font-semibold">Tokens Valid After</dt>
-              <dd>{new Date(manager.tokensValidAfterTime).toLocaleString()}</dd>
             </div>
           </dl>
         </CardContent>
@@ -87,7 +78,7 @@ export default async function PortfolioManagerPage({ params }: { params: { id: s
         <CardContent>
           <dl>
             <dt className="font-semibold">Role</dt>
-            <dd>{manager.customClaims.role}</dd>
+            <dd>{manager?.customClaims?.role}</dd>
           </dl>
         </CardContent>
       </Card>

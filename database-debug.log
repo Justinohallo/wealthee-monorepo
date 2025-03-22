@@ -1,2 +1,8 @@
-11:04:36.968 [NamespaceSystem-akka.actor.default-dispatcher-4] INFO akka.event.slf4j.Slf4jLogger - Slf4jLogger started
-11:04:37.041 [main] INFO com.firebase.server.forge.App$ - Listening at 127.0.0.1:9000
+11:58:08.515 [NamespaceSystem-akka.actor.default-dispatcher-4] INFO akka.event.slf4j.Slf4jLogger - Slf4jLogger started
+11:58:08.596 [main] INFO com.firebase.server.forge.App$ - Listening at 127.0.0.1:9000
+12:27:02.750 [NamespaceSystem-akka.actor.default-dispatcher-8] INFO com.firebase.core.namespace.NamespaceActor - wealthee-a97ed successfully activated FBKV (SurveyIdle(0)) wait: 58ms, init: 0ms
+08:32:31.724 [FirebaseWorkerPool-1-4] WARN com.firebase.core.persistence.backend.dummy.EmulatorMetadataPersistence - Multiple projectIds are not recommended in single project mode. Requested 
+namespace wealthee-a97ed-default-rtdb, but the emulator is configured for wealthee-a97ed. To 
+opt-out of single project mode add/set the singleProjectMode: false property in 
+the firebase.json emulators config. 
+08:32:31.728 [NamespaceSystem-akka.actor.default-dispatcher-20] INFO com.firebase.core.namespace.NamespaceActor - wealthee-a97ed-default-rtdb successfully activated FBKV (SurveyIdle(0)) wait: 1ms, init: 0ms

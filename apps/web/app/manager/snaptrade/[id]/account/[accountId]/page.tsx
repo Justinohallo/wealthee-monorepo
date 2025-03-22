@@ -3,6 +3,7 @@ import AccountHoldings from "./_components/AccountHoldings";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { Suspense } from "react";
+import { callFirebaseFunction } from "@/lib/firebase-functions";
 import { formatCurrency } from "@/lib/utils";
 import { verifySessionAndGetUser } from "@/lib/server-auth-utils";
 
@@ -62,22 +63,24 @@ async function fetchAccountDetails({
   accountId: string;
 }): Promise<SnapTradeAccount | null> {
   try {
-    const response = await fetch(
-      `https://portfoliomanager-getsnaptradeuseraccountdetails-zncz3ts4ka-uc.a.run.app?userId=${userId}&snapTradeUserId=${snapTradeUserId}&accountId=${accountId}`,
-      {
+    const data = await callFirebaseFunction<{ accountDetails: SnapTradeAccount }>({
+      idToken,
+      functionName: 'portfoliomanager-getsnaptradeuseraccountdetails',
+      queryParams: {
+        userId,
+        snapTradeUserId,
+        accountId
+      },
+      options: {
         headers: {
-          Authorization: `Bearer ${idToken}`,
+          'Content-Type': 'application/json'
         },
+        method: 'GET',
+        revalidate: 0 // Don't cache this data
       }
-    );
+    });
 
-    if (!response.ok) {
-      console.error(`HTTP error! status: ${response.status}`);
-      return null;
-    }
-    const data = await response.json();
-
-    return data.accountDetails || null;
+    return data?.accountDetails || null;
   } catch (error) {
     console.error("Error fetching account details:", error);
     return null;

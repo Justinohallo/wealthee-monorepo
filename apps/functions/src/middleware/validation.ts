@@ -1,9 +1,9 @@
 /**
  * Request validation middleware
  */
-import {Request, Response} from "express";
+import { Request, Response } from "express";
 
-import {ValidationError} from "../utils/error-handling";
+import { ValidationError } from "../utils/error-handling";
 
 /**
  * Validates that all required parameters are present in the request
@@ -32,7 +32,7 @@ export function validateRequiredParams(
     return true;
   } catch (error) {
     if (error instanceof ValidationError) {
-      res.status(error.statusCode).json({error: error.message});
+      res.status(error.statusCode).json({ error: error.message });
     } else {
       res.status(400).json({
         error: `Validation failed: ${error instanceof Error ? error.message : String(error)}`,
@@ -54,10 +54,10 @@ export function validateParams({
   source,
   res,
 }: {
-    req: Request;
-    params: string[];
-    source: "query" | "body";
-    res: Response;
+  req: Request;
+  params: string[];
+  source: "query" | "body";
+  res: Response;
 }): boolean {
   return validateRequiredParams(req, params, source, res);
 }

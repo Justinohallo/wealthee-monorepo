@@ -18,7 +18,9 @@
       "@/pages/*": ["pages/*"],
       "@/public/*": ["public/*"],
       "@/utils/*": ["utils/*"],
+      "@/services/*": ["services/*"],
       "@/app/*": ["app/*"],
+      "@/constants/*": ["constants/*"],
     }
   },
   "include": [

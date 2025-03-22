@@ -34,7 +34,7 @@ export default function CreateSnapTradeUserPage() {
 
     try {
       const idToken = await user.getIdToken()
-      const result = await registerSnapTradeUser(displayName, user.uid, idToken)
+      const result = await registerSnapTradeUser({ displayName, userId: user.uid, idToken })
 
       if (result.success) {
         toast({
@@ -72,7 +72,7 @@ export default function CreateSnapTradeUserPage() {
             </div>
           </CardContent>
           <CardFooter>
-            <Button type="submit" className="w-full" disabled={isLoading}>
+            <Button type="submit" className="w-full" variant="default" disabled={isLoading}>
               {isLoading ? "Registering..." : "Register"}
             </Button>
           </CardFooter>

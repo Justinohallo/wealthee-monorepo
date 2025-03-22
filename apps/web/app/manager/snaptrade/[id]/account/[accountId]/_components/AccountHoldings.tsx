@@ -7,6 +7,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 
+import { callFirebaseFunction } from "@/lib/firebase-functions";
 import { formatCurrency } from "@/lib/utils";
 
 // Define interfaces for the holdings data based on SnapTrade API
@@ -174,30 +175,29 @@ async function fetchAccountHoldings({
   accountId: string;
 }): Promise<AccountHoldingsResponse | null> {
   try {
-    const response = await fetch(
-      `https://portfoliomanager-getsnaptradeuserholdings-zncz3ts4ka-uc.a.run.app
-?userId=${userId}&snapTradeUserId=${snapTradeUserId}&accountId=${accountId}`,
-      {
+    const data = await callFirebaseFunction<{ holdings: AccountHoldingsResponse }>({
+      idToken,
+      functionName: 'portfoliomanager-getsnaptradeuserholdings',
+      queryParams: {
+        userId,
+        snapTradeUserId,
+        accountId
+      },
+      options: {
         headers: {
-          Authorization: `Bearer ${idToken}`,
+          'Content-Type': 'application/json'
         },
+        method: 'GET',
+        revalidate: 0 // Don't cache this data
       }
-    );
+    });
 
-    if (!response.ok) {
-      console.error(`HTTP error! status: ${response.status}`);
-      return null;
-    }
-
-    const data = await response.json();
-    return data.holdings
+    return data?.holdings || null;
   } catch (error) {
     console.error("Error fetching account holdings:", error);
     return null;
   }
 }
-
-
 
 export const AccountHoldings = async ({
   idToken,
