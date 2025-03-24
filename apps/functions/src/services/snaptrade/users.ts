@@ -8,6 +8,7 @@ import { Response } from "express";
 import { createSnapTradeClient } from "./client";
 import { db } from "../../config/firebase";
 import { logger } from "../../utils/logger";
+import { SnapTradeUser } from "../../types/database";
 
 /**
  * Registers a new SnapTrade user and associates it with a portfolio manager
@@ -121,7 +122,7 @@ export const generateSnapTradeConnectionUrl = async (
 export const getSnapTradeUser = async (
   snapTradeUserId: string,
   res?: Response
-): Promise<any | null> => {
+): Promise<SnapTradeUser | null> => {
   logger.info(`Getting SnapTrade user with ID: ${snapTradeUserId}`, "SnapTradeUserService");
 
   // Get reference to the SnapTrade user

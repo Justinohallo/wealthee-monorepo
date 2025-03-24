@@ -35,7 +35,6 @@ export interface Client {
  * SnapTrade user data in the database
  */
 export interface SnapTradeUser {
-  userId: string;
   userSecret: string;
   createdAt: string;
   brokerageConnections?: Record<string, BrokerageConnection>;

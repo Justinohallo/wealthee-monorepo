@@ -9,6 +9,7 @@ import {
 
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
+import { SNAPTRADE } from "@/constants/functionNames";
 import { callFirebaseFunction } from "@/lib/firebase-functions";
 import { formatCurrency } from "@/lib/utils";
 
@@ -67,11 +68,10 @@ async function fetchSnapTradeAccounts({
   snapTradeUserId: string;
 }): Promise<SnapTradeAccount[]> {
   try {
-    const data = await callFirebaseFunction<{ accounts: SnapTradeAccount[] }>({
+    const response = await callFirebaseFunction<{ success: boolean, data: SnapTradeAccount[], timestamp: string }>({
       idToken,
-      functionName: ,
+      functionName: SNAPTRADE.ACCOUNTS.LIST_USER_ACCOUNTS,
       queryParams: {
-        userId,
         snapTradeUserId
       },
       options: {
@@ -83,7 +83,11 @@ async function fetchSnapTradeAccounts({
       }
     });
 
-    return data?.accounts || [];
+    if (response?.success && Array.isArray(response.data)) {
+      return response.data;
+    }
+
+    return [];
   } catch (error) {
     console.error("Error fetching SnapTrade accounts:", error);
     return [];

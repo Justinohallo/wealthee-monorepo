@@ -1,5 +1,10 @@
+import {
+  getAccountDetails as getSnapTradeAccountDetails,
+  listUserAccounts as listSnapTradeUserAccounts
+} from "../../services/snaptrade/accounts";
+
 import { createHttpFunction } from "../../utils/function-wrapper";
-import { getAccountDetails as getSnapTradeAccountDetails } from "../../services/snaptrade/accounts";
+import { getSnapTradeUser } from "../../services/snaptrade/users";
 /**
  * SnapTrade account related Cloud Functions
  */
@@ -19,17 +24,17 @@ export const getAccountDetails = createHttpFunction({
     // Get path parameters
     const { snapTradeUserId, accountId } = req.params;
 
+    // Get the SnapTrade user from the database
+    const snapTradeUser = await getSnapTradeUser(snapTradeUserId, res);
 
-    // We need to implement getSnapTradeUser helper function
-    // For now this is a placeholder
-    const snapTradeUser = {
-      userId: snapTradeUserId,
-      userSecret: "placeholder",
-    };
+    if (!snapTradeUser) {
+      // Error response is handled by getSnapTradeUser if res is passed
+      return;
+    }
 
     // Get account details using the service
     const accountDetails = await getSnapTradeAccountDetails(
-      snapTradeUser.userId,
+      snapTradeUserId,
       snapTradeUser.userSecret,
       accountId
     );
@@ -38,6 +43,42 @@ export const getAccountDetails = createHttpFunction({
     res.json({
       success: true,
       data: accountDetails,
+      timestamp: new Date().toISOString(),
+    });
+  },
+});
+
+/**
+ * Lists all accounts for a specific SnapTrade user
+ */
+export const listUserAccounts = createHttpFunction({
+  options: {
+    requireAuth: true,
+    requiredRole: "portfolioManager",
+    secrets: snaptradeSecrets,
+  },
+  handler: async ({ req, res }) => {
+    // Get query parameters
+    const { snapTradeUserId } = req.query;
+
+    // Get the SnapTrade user from the database
+    const snapTradeUser = await getSnapTradeUser(snapTradeUserId as string, res);
+
+    if (!snapTradeUser) {
+      // Error response is handled by getSnapTradeUser if res is passed
+      return;
+    }
+
+    // Get user accounts using the service
+    const accounts = await listSnapTradeUserAccounts(
+      snapTradeUserId as string,
+      snapTradeUser.userSecret
+    );
+
+    // Return success response
+    res.json({
+      success: true,
+      data: accounts,
       timestamp: new Date().toISOString(),
     });
   },

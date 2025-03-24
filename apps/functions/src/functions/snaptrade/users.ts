@@ -57,14 +57,10 @@ export const getUser = createHttpFunction({
     logger.info(`Getting SnapTrade user: ${snapTradeUserId}`, "SnapTradeUsers");
 
     // Get SnapTrade user data using the service
-    const snapTradeUser = await getSnapTradeUser(snapTradeUserId as string);
+    const snapTradeUser = await getSnapTradeUser(snapTradeUserId as string, res);
 
     if (!snapTradeUser) {
-      res.status(404).json({
-        success: false,
-        error: "SnapTrade user not found",
-        timestamp: new Date().toISOString(),
-      });
+      // Error response is handled by getSnapTradeUser if res is passed
       return;
     }
 

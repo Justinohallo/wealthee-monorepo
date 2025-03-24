@@ -1,11 +1,10 @@
 import {
-  deleteBrokerageConnection,
-  listBrokerageConnections,
+  deleteBrokerageConnectionService,
+  listBrokerageConnectionsService,
 } from "../../services/snaptrade/connections";
+import { generateSnapTradeConnectionUrl, getSnapTradeUser } from "../../services/snaptrade/users";
 
-import { ValidationError } from "../../utils/error-handling";
 import { createHttpFunction } from "../../utils/function-wrapper";
-import { generateSnapTradeConnectionUrl } from "../../services/snaptrade/users";
 import { logger } from "../../utils/logger";
 /**
  * SnapTrade brokerage connection related Cloud Functions
@@ -26,7 +25,6 @@ export const generateConnectionUrl = createHttpFunction({
       broker: broker as string | undefined,
       redirectUri: redirectUri as string | undefined
     });
-    console.log("data", data)
     // Return success response
     res.json({
       success: true,
@@ -44,33 +42,36 @@ export const generateConnectionUrl = createHttpFunction({
   }
 });
 
-
-
 /**
  * List all brokerage connections for a SnapTrade user
  */
-export const listBrokerageConnectionsForUser = createHttpFunction({
+export const listBrokerageConnections = createHttpFunction({
+  options: {
+    requireAuth: true,
+    requiredRole: "portfolioManager",
+    requiredParams: {
+      query: ["snapTradeUserId"]
+    },
+    secrets: snaptradeSecrets
+  },
   handler: async ({ req, res }) => {
     // Check for required path parameter
-    const { snapTradeUserId } = req.params;
-    if (!snapTradeUserId) {
-      throw new ValidationError("Required path parameter 'snapTradeUserId' is missing");
-    }
-
+    const { snapTradeUserId } = req.query;
     // Get the user from the database
     // This would pull from Firestore in a real implementation
     logger.info(`Listing brokerage connections for user ${snapTradeUserId}`,
       "SnapTradeConnectionFunction");
 
     // Get SnapTrade user details
-    const snapTradeUser = {
-      userId: snapTradeUserId,
-      userSecret: "user-secret", // In real implementation, retrieve from database
-    };
+    const snapTradeUser = await getSnapTradeUser(snapTradeUserId as string, res);
 
+    if (!snapTradeUser) {
+      // Error response is handled by getSnapTradeUser if res is passed
+      return;
+    }
     // Get all brokerage connections for the user
-    const connections = await listBrokerageConnections(
-      snapTradeUser.userId,
+    const connections = await listBrokerageConnectionsService(
+      snapTradeUserId as string,
       snapTradeUser.userSecret
     );
 
@@ -80,26 +81,16 @@ export const listBrokerageConnectionsForUser = createHttpFunction({
       timestamp: new Date().toISOString(),
     });
   },
-  options: {
-    requireAuth: true,
-    requiredRole: "portfolioManager",
-  }
+
 });
 
 /**
  * Delete a brokerage connection
  */
-export const deleteBrokerageConnectionForUser = createHttpFunction({
+export const deleteBrokerageConnection = createHttpFunction({
   handler: async ({ req, res }) => {
     // Check for required path parameters
     const { snapTradeUserId, connectionId } = req.params;
-    if (!snapTradeUserId) {
-      throw new ValidationError("Required path parameter 'snapTradeUserId' is missing");
-    }
-    if (!connectionId) {
-      throw new ValidationError("Required path parameter 'connectionId' is missing");
-    }
-
     // Get the user from the database
     // This would pull from Firestore in a real implementation
     logger.info(`Deleting brokerage connection ${connectionId} for user ${snapTradeUserId}`,
@@ -112,7 +103,7 @@ export const deleteBrokerageConnectionForUser = createHttpFunction({
     };
 
     // Delete the brokerage connection
-    const success = await deleteBrokerageConnection(
+    const success = await deleteBrokerageConnectionService(
       snapTradeUser.userId,
       snapTradeUser.userSecret,
       connectionId

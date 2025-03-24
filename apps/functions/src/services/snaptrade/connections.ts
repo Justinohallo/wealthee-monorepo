@@ -13,7 +13,7 @@ import { logger } from "../../utils/logger";
  * @param userSecret - SnapTrade user secret
  * @return List of brokerage connections
  */
-export const listBrokerageConnections = async (
+export const listBrokerageConnectionsService = async (
   userId: string,
   userSecret: string
 ): Promise<BrokerageConnectionDTO[]> => {
@@ -21,7 +21,8 @@ export const listBrokerageConnections = async (
     const client = createSnapTradeClient();
     const response = await client.connections.listBrokerageAuthorizations({
       userId,
-      userSecret
+      userSecret,
+
     });
 
     // Transform the API response to match our expected type
@@ -52,7 +53,7 @@ export const listBrokerageConnections = async (
  * @param connectionId - ID of the connection to delete
  * @return Whether the deletion was successful
  */
-export const deleteBrokerageConnection = async (
+export const deleteBrokerageConnectionService = async (
   userId: string,
   userSecret: string,
   connectionId: string

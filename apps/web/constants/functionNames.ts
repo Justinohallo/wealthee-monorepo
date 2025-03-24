@@ -31,6 +31,7 @@ export const PORTFOLIO_MANAGER = {
 export const SNAPTRADE = {
   ACCOUNTS: {
     GET_DETAILS: 'snaptrade-accounts-getAccountDetails',
+    LIST_USER_ACCOUNTS: 'snaptrade-accounts-listUserAccounts',
   },
 
   CONNECTIONS: {

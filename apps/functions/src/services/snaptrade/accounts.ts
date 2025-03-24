@@ -90,3 +90,28 @@ export const getAccountHoldings = async (
 
   return response.data;
 };
+
+/**
+ * Lists all accounts for a SnapTrade user
+ *
+ * @param userId - SnapTrade user ID
+ * @param userSecret - SnapTrade user secret
+ * @returns List of user accounts
+ */
+export const listUserAccounts = async (
+  userId: string,
+  userSecret: string
+) => {
+  logger.info(`Listing accounts for SnapTrade user ${userId}`, "SnapTradeAccountService");
+
+  // Create SnapTrade client
+  const snaptrade = createSnapTradeClient();
+
+  // Call SnapTrade API
+  const response = await snaptrade.accountInformation.listUserAccounts({
+    userId,
+    userSecret
+  });
+
+  return response.data;
+};

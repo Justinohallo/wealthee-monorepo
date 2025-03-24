@@ -15,7 +15,7 @@ async function fetchBrokerageAuthorizations({ idToken, userId }: { idToken: stri
     const data = await callFirebaseFunction<{ data: { brokerageAuthorizations: SnapTradeBrokerageAuthorization[] } }>({
       idToken,
       functionName: SNAPTRADE.CONNECTIONS.LIST_BROKERAGE_CONNECTIONS,
-      queryParams: { userId },
+      queryParams: { snapTradeUserId: userId },
       options: {
         headers: {
           'Content-Type': 'application/json'
