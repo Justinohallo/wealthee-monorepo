@@ -69,7 +69,7 @@ async function fetchSnapTradeAccounts({
   try {
     const data = await callFirebaseFunction<{ accounts: SnapTradeAccount[] }>({
       idToken,
-      functionName: 'portfoliomanager-listsnaptradeuseraccounts',
+      functionName: ,
       queryParams: {
         userId,
         snapTradeUserId

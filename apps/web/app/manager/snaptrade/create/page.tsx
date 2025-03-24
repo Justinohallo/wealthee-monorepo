@@ -41,7 +41,7 @@ export default function CreateSnapTradeUserPage() {
           title: "Success",
           description: "SnapTrade user registered successfully",
         })
-        router.push("/manager/snaptrade-user")
+        router.push("/manager/snaptrade")
       } else {
         throw new Error(result.error)
       }

@@ -34,9 +34,16 @@ export const SNAPTRADE = {
   },
 
   CONNECTIONS: {
-    GET_BROKERAGE_REDIRECT_URI: 'snaptrade-connections-getBrokerageRedirectUri',
     LIST_BROKERAGE_CONNECTIONS: 'snaptrade-connections-listBrokerageConnections',
     DELETE_BROKERAGE_CONNECTION: 'snaptrade-connections-deleteBrokerageConnection',
+    GENERATE_CONNECTION_URL: 'snaptrade-connections-generateConnectionUrl',
+  },
+
+  USERS: {
+    REGISTER: 'snaptrade-users-registerUser',
+    GET: 'snaptrade-users-getUser',
+    LIST_FOR_PORTFOLIO_MANAGER: 'snaptrade-users-listUsersForPortfolioManager',
+    LOGIN: 'snaptrade-users-loginUser',
   },
 
   // Kept for backwards compatibility

@@ -1,9 +1,8 @@
-import { NotFoundError } from "../../utils/error-handling";
+import { createHttpFunction } from "../../utils/function-wrapper";
+import { getAccountDetails as getSnapTradeAccountDetails } from "../../services/snaptrade/accounts";
 /**
  * SnapTrade account related Cloud Functions
  */
-import { createHttpFunction } from "../../utils/function-wrapper";
-import { snapTradeAccountService } from "../../services/snaptrade";
 import { snaptradeSecrets } from "../../config/secrets";
 
 /**
@@ -16,17 +15,10 @@ export const getAccountDetails = createHttpFunction({
     requiredRole: "portfolioManager",
     secrets: snaptradeSecrets,
   },
-  handler: async ({ req, res, auth }) => {
+  handler: async ({ req, res }) => {
     // Get path parameters
     const { snapTradeUserId, accountId } = req.params;
 
-    if (!snapTradeUserId || !accountId) {
-      throw new NotFoundError("Missing snapTradeUserId or accountId in path");
-    }
-
-    if (!auth) {
-      throw new Error("Authentication required");
-    }
 
     // We need to implement getSnapTradeUser helper function
     // For now this is a placeholder
@@ -36,17 +28,17 @@ export const getAccountDetails = createHttpFunction({
     };
 
     // Get account details using the service
-    const accountDetails = await snapTradeAccountService.getAccountDetails(
+    const accountDetails = await getSnapTradeAccountDetails(
       snapTradeUser.userId,
       snapTradeUser.userSecret,
       accountId
     );
 
+    // Return success response
     res.json({
       success: true,
       data: accountDetails,
       timestamp: new Date().toISOString(),
     });
   },
-
 });

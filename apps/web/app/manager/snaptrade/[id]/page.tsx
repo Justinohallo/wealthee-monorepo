@@ -4,6 +4,7 @@ import AccountsList from "./_components/AccountsList";
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
 import Link from "next/link";
+import { SNAPTRADE } from "@/constants/functionNames";
 import { SnapTradeBrokerageAuthorization } from "../../../../types/snaptrade";
 import { callFirebaseFunction } from "@/lib/firebase-functions";
 import { verifySessionAndGetUser } from "@/lib/server-auth-utils";
@@ -11,9 +12,9 @@ import { verifySessionAndGetUser } from "@/lib/server-auth-utils";
 // Function to fetch brokerage authorizations
 async function fetchBrokerageAuthorizations({ idToken, userId }: { idToken: string, userId: string }): Promise<SnapTradeBrokerageAuthorization[]> {
   try {
-    const data = await callFirebaseFunction<{ brokerageAuthorizations: SnapTradeBrokerageAuthorization[] }>({
+    const data = await callFirebaseFunction<{ data: { brokerageAuthorizations: SnapTradeBrokerageAuthorization[] } }>({
       idToken,
-      functionName: 'portfoliomanager-listbrokerageauthorizations',
+      functionName: SNAPTRADE.CONNECTIONS.LIST_BROKERAGE_CONNECTIONS,
       queryParams: { userId },
       options: {
         headers: {
@@ -24,7 +25,7 @@ async function fetchBrokerageAuthorizations({ idToken, userId }: { idToken: stri
       }
     });
 
-    return data?.brokerageAuthorizations || [];
+    return data?.data?.brokerageAuthorizations || [];
   } catch (error) {
     console.error("Error fetching brokerage authorizations:", error);
     return [];
@@ -32,11 +33,11 @@ async function fetchBrokerageAuthorizations({ idToken, userId }: { idToken: stri
 }
 
 // Function to get SnapTrade login URL
-async function getSnapTradeLoginUrl({ idToken, userId, snapTradeUserId }: { idToken: string, userId: string, snapTradeUserId: string }): Promise<string | null> {
+async function getSnapTradeBrokerageConnectionURL({ idToken, userId, snapTradeUserId }: { idToken: string, userId: string, snapTradeUserId: string }): Promise<string | null> {
   try {
-    const data = await callFirebaseFunction<{ loginResponse: { redirectURI: string } }>({
+    const data = await callFirebaseFunction<{ data: { url: string } }>({
       idToken,
-      functionName: 'portfoliomanager-loginsnaptradeuser',
+      functionName: SNAPTRADE.CONNECTIONS.GENERATE_CONNECTION_URL,
       queryParams: {
         userId,
         snapTradeUserId
@@ -50,7 +51,7 @@ async function getSnapTradeLoginUrl({ idToken, userId, snapTradeUserId }: { idTo
       }
     });
 
-    return data?.loginResponse?.redirectURI || null;
+    return data?.data?.url || null;
   } catch (error) {
     console.error("Error fetching SnapTrade login URL:", error);
     return null;
@@ -130,7 +131,7 @@ export default async function SnaptradeUserPage({ params }: { params: { id: stri
     userId: snaptradeUserId
   });
   // Get SnapTrade login URL
-  const loginUrl = await getSnapTradeLoginUrl({
+  const loginUrl = await getSnapTradeBrokerageConnectionURL({
     idToken: user?.token || '',
     userId: user?.decodedClaims.uid,
     snapTradeUserId: snaptradeUserId

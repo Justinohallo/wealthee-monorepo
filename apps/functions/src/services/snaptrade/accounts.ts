@@ -1,184 +1,92 @@
-import { AccountBalance, AccountDetails } from "../../types/snaptrade";
-// Import the SDK types to use them directly
-import { AccountHoldings, Position } from "snaptrade-typescript-sdk";
-
 /**
- * SnapTrade account operations service
+ * SnapTrade Account Service
+ *
+ * Provides functions for interacting with SnapTrade accounts
  */
+
 import { createSnapTradeClient } from "./client";
 import { logger } from "../../utils/logger";
 
-// Define more specific types to replace 'any'
-// interface Position {
-//   id: string;
-//   symbol: string;
-//   quantity: number;
-//   price: number;
-//   [key: string]: unknown;
-// }
+/**
+ * Gets account details for a specific SnapTrade account
+ *
+ * @param userId - SnapTrade user ID
+ * @param userSecret - SnapTrade user secret
+ * @param accountId - SnapTrade account ID
+ * @returns Account details
+ */
+export const getAccountDetails = async (
+  userId: string,
+  userSecret: string,
+  accountId: string
+) => {
+  logger.info(`Getting account details for SnapTrade account ${accountId}`, "SnapTradeAccountService");
 
-// interface Holding {
-//   id: string;
-//   symbol: string;
-//   quantity: number;
-//   value: number;
-//   [key: string]: unknown;
-// }
+  // Create SnapTrade client
+  const snaptrade = createSnapTradeClient();
+
+  // Call SnapTrade API
+  const response = await snaptrade.accountInformation.getUserAccountDetails({
+    userId,
+    userSecret,
+    accountId
+  });
+
+  return response.data;
+};
 
 /**
- * Service for SnapTrade account operations
+ * Gets account balances for a specific SnapTrade account
+ *
+ * @param userId - SnapTrade user ID
+ * @param userSecret - SnapTrade user secret
+ * @param accountId - SnapTrade account ID
+ * @returns Account balances
  */
-export const snapTradeAccountService = {
-  /**
-       * Get details for a specific account
-       *
-       * @param userId - SnapTrade user ID
-       * @param userSecret - SnapTrade user secret
-       * @param accountId - SnapTrade account ID
-       * @return Account details
-       */
-  async getAccountDetails(
-    userId: string,
-    userSecret: string,
-    accountId: string
-  ): Promise<AccountDetails | null> {
-    try {
-      const client = createSnapTradeClient();
-      const response = await client.accountInformation.getUserAccountDetails({
-        userId,
-        userSecret,
-        accountId,
-      });
+export const getAccountBalances = async (
+  userId: string,
+  userSecret: string,
+  accountId: string
+) => {
+  logger.info(`Getting account balances for SnapTrade account ${accountId}`, "SnapTradeAccountService");
 
-      // Transform the API response to match our AccountDetails type
-      const account = response.data;
-      const accountDetails: AccountDetails = {
-        id: account.id,
-        name: account.name || "",
-        number: account.number || "",
-        createdAt: account.createdDate || new Date().toISOString(),
-        brokerageId: account.brokerage?.id || "",
-        brokerageName: account.brokerage?.name || "",
-      };
+  // Create SnapTrade client
+  const snaptrade = createSnapTradeClient();
 
-      return accountDetails;
-    } catch (error) {
-      logger.error(
-        `Failed to get account details: ${error instanceof Error ? error.message : String(error)}`,
-        "SnapTradeAccountService",
-        error
-      );
-      throw error;
-    }
-  },
+  // Call SnapTrade API
+  const response = await snaptrade.accountInformation.getUserAccountBalance({
+    userId,
+    userSecret,
+    accountId
+  });
 
-  /**
-       * Get balance for a specific account
-       *
-       * @param userId - SnapTrade user ID
-       * @param userSecret - SnapTrade user secret
-       * @param accountId - SnapTrade account ID
-       * @return Account balance
-       */
-  async getAccountBalance(
-    userId: string,
-    userSecret: string,
-    accountId: string
-  ): Promise<AccountBalance | null> {
-    try {
-      const client = createSnapTradeClient();
-      const response = await client.accountInformation.getUserAccountBalance({
-        userId,
-        userSecret,
-        accountId,
-      });
+  return response.data;
+};
 
-      // Transform the API response to match our AccountBalance type
-      const balances = response.data;
-      // Assuming the first balance is the main one, or default to empty values
-      const firstBalance = Array.isArray(balances) && balances.length > 0 ? balances[0] : null;
+/**
+ * Gets holdings for a specific SnapTrade account
+ *
+ * @param userId - SnapTrade user ID
+ * @param userSecret - SnapTrade user secret
+ * @param accountId - SnapTrade account ID
+ * @returns Account holdings
+ */
+export const getAccountHoldings = async (
+  userId: string,
+  userSecret: string,
+  accountId: string
+) => {
+  logger.info(`Getting holdings for SnapTrade account ${accountId}`, "SnapTradeAccountService");
 
-      const accountBalance: AccountBalance = {
-        cash: firstBalance?.cash || 0,
-        marketValue: firstBalance?.marketValue || 0,
-        totalValue: firstBalance?.totalValue || 0,
-        currency: String(firstBalance?.currency || "USD"),
-      };
+  // Create SnapTrade client
+  const snaptrade = createSnapTradeClient();
 
-      return accountBalance;
-    } catch (error) {
-      logger.error(
-        `Failed to get account balance: ${error instanceof Error ? error.message : String(error)}`,
-        "SnapTradeAccountService",
-        error
-      );
-      throw error;
-    }
-  },
+  // Call SnapTrade API
+  const response = await snaptrade.accountInformation.getUserHoldings({
+    userId,
+    userSecret,
+    accountId
+  });
 
-  /**
-       * Get all positions for a specific account
-       *
-       * @param userId - SnapTrade user ID
-       * @param userSecret - SnapTrade user secret
-       * @param accountId - SnapTrade account ID
-       * @return Account positions
-       */
-  async getAccountPositions(
-    userId: string,
-    userSecret: string,
-    accountId: string
-  ): Promise<Position[]> {
-    try {
-      const client = createSnapTradeClient();
-      const response = await client.accountInformation.getUserAccountPositions({
-        userId,
-        userSecret,
-        accountId,
-      });
-
-      // Ensure the response is an array
-      return Array.isArray(response.data) ? response.data : [];
-    } catch (error) {
-      logger.error(
-        `Failed to get account positions: ${error instanceof Error ? error.message : String(error)}`,
-        "SnapTradeAccountService",
-        error
-      );
-      throw error;
-    }
-  },
-
-  /**
-       * Get all holdings for a specific account
-       *
-       * @param userId - SnapTrade user ID
-       * @param userSecret - SnapTrade user secret
-       * @param accountId - SnapTrade account ID
-       * @return Account holdings
-       */
-  async getAccountHoldings(
-    userId: string,
-    userSecret: string,
-    accountId: string
-  ): Promise<AccountHoldings[]> {
-    try {
-      const client = createSnapTradeClient();
-      const response = await client.accountInformation.getUserHoldings({
-        userId,
-        userSecret,
-        accountId,
-      });
-
-      // Ensure the response is an array
-      return Array.isArray(response.data) ? response.data : [];
-    } catch (error) {
-      logger.error(
-        `Failed to get account holdings: ${error instanceof Error ? error.message : String(error)}`,
-        "SnapTradeAccountService",
-        error
-      );
-      throw error;
-    }
-  },
+  return response.data;
 };
