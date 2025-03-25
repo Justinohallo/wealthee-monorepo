@@ -29,10 +29,33 @@ export const listBrokerageConnectionsService = async (
     const connections = response.data;
     return Array.isArray(connections) ? connections.map((auth: BrokerageAuthorization) => ({
       id: auth.id || "",
-      brokerageId: auth.brokerage?.id || "",
-      brokerageName: auth.brokerage?.name || "",
-      authorizationId: auth.id || "",
-      createdAt: auth.createdDate || new Date().toISOString(),
+      created_date: auth.createdDate || new Date().toISOString(),
+      brokerage: {
+        id: auth.brokerage?.id || "",
+        name: auth.brokerage?.name || "",
+        slug: auth.brokerage?.slug || "",
+        display_name: auth.brokerage?.displayName || auth.brokerage?.name || "",
+        description: auth.brokerage?.description || "",
+        aws_s3_logo_url: auth.brokerage?.logoUrl || "",
+        aws_s3_square_logo_url: auth.brokerage?.squareLogoUrl || "",
+        url: auth.brokerage?.url || "",
+        enabled: auth.brokerage?.enabled ?? true,
+        maintenance_mode: auth.brokerage?.maintenanceMode ?? false,
+        allows_trading: auth.brokerage?.allowsTrading ?? true,
+        allows_fractional_units: auth.brokerage?.allowsFractionalUnits ?? false,
+        has_reporting: auth.brokerage?.hasReporting ?? true,
+        is_real_time_connection: auth.brokerage?.isRealTimeConnection ?? false,
+        brokerage_type: {
+          id: auth.brokerage?.brokerageType?.id || "",
+          name: auth.brokerage?.brokerageType?.name || ""
+        },
+        exchanges: auth.brokerage?.exchanges || [],
+        open_url: auth.brokerage?.openUrl || ""
+      },
+      name: auth.name || "",
+      type: auth.type || "AUTH",
+      disabled: auth.disabled ?? false,
+      updated_date: auth.updatedDate || auth.createdDate || new Date().toISOString()
     })) : [];
   } catch (error) {
     logger.error(

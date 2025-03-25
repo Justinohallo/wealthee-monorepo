@@ -13,7 +13,7 @@ import { verifySessionAndGetUser } from "@/lib/server-auth-utils";
 // Function to fetch brokerage authorizations
 async function fetchBrokerageAuthorizations({ idToken, userId }: { idToken: string, userId: string }): Promise<SnapTradeBrokerageAuthorization[]> {
   try {
-    const data = await callFirebaseFunction<{ data: { brokerageAuthorizations: SnapTradeBrokerageAuthorization[] } }>({
+    const data = await callFirebaseFunction<{ data: { connections: SnapTradeBrokerageAuthorization[] } }>({
       idToken,
       functionName: SNAPTRADE.CONNECTIONS.LIST_BROKERAGE_CONNECTIONS,
       queryParams: { snapTradeUserId: userId },
@@ -25,8 +25,7 @@ async function fetchBrokerageAuthorizations({ idToken, userId }: { idToken: stri
         revalidate: 0 // Don't cache this data
       }
     });
-
-    return data?.data?.brokerageAuthorizations || [];
+    return data?.data?.connections || [];
   } catch (error) {
     console.error("Error fetching brokerage authorizations:", error);
     return [];

@@ -27,11 +27,41 @@ export interface SnapTradeAccountDTO {
  */
 export interface BrokerageConnectionDTO {
   id: string;
-  brokerageId: string;
-  brokerageName: string;
-  authorizationId: string;
-  createdAt: string;
+  created_date: string;
+  brokerage: {
+    id: string;
+    slug: string;
+    name: string;
+    display_name: string;
+    description: string;
+    aws_s3_logo_url: string;
+    aws_s3_square_logo_url: string;
+    url: string;
+    enabled: boolean;
+    maintenance_mode: boolean;
+    allows_trading: boolean;
+    allows_fractional_units: boolean;
+    has_reporting: boolean;
+    is_real_time_connection: boolean;
+    brokerage_type: {
+      id: string;
+      name: string;
+    };
+    exchanges: string[];
+    open_url: string;
+  };
+  name: string;
+  type: string;
+  disabled: boolean;
+  disabled_date?: string;
+  meta?: {
+    identifier: number;
+  };
+  updated_date: string;
 }
+
+
+
 
 /**
  * SnapTrade account details from API

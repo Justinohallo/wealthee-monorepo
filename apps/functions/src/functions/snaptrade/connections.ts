@@ -74,10 +74,9 @@ export const listBrokerageConnections = createHttpFunction({
       snapTradeUserId as string,
       snapTradeUser.userSecret
     );
-
     res.json({
       success: true,
-      data: connections,
+      data: { connections },
       timestamp: new Date().toISOString(),
     });
   },
