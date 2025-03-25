@@ -45,6 +45,7 @@ export const SNAPTRADE = {
     GET: 'snaptrade-users-getUser',
     LIST_FOR_PORTFOLIO_MANAGER: 'snaptrade-users-listUsersForPortfolioManager',
     LOGIN: 'snaptrade-users-loginUser',
+    DELETE: 'snaptrade-users-deleteUserV2',
   },
 
   // Kept for backwards compatibility

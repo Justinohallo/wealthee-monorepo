@@ -1,0 +1,114 @@
+---
+description: 
+globs: apps/web/**
+alwaysApply: false
+---
+# Cursor Rules for Mobile-First Development
+
+## Mobile-First Design Principles
+
+### Core Approach
+
+The Wealthee frontend follows a strict mobile-first approach. Always design and implement for smaller screens first, then enhance for larger viewports. This creates a solid foundation that ensures compatibility across all devices.
+
+#### Mobile-First Implementation
+- Start by designing the UI for 320px-375px width devices
+- Use Tailwind's mobile-first responsive modifiers (`sm:`, `md:`, `lg:`, `xl:`) to progressively enhance layouts
+- Never hide critical content on mobile - adapt it instead
+- Default to single-column layouts that expand to multi-column on larger screens
+
+### Responsive Layout Guidelines
+
+#### Content Organization
+```tsx
+// CORRECT: Mobile-first approach with stacked layout by default, row on larger screens
+<div className="flex flex-col md:flex-row gap-4">
+  <div className="w-full md:w-1/2">Content block 1</div>
+  <div className="w-full md:w-1/2">Content block 2</div>
+</div>
+
+// INCORRECT: Desktop-first approach that requires overrides for mobile
+<div className="flex flex-row gap-4 flex-col-reverse sm:flex-col">
+  <div className="w-1/2 w-full sm:w-full">Content block 1</div>
+  <div className="w-1/2 w-full sm:w-full">Content block 2</div>
+</div>
+```
+
+#### Key Breakpoints
+- Default (mobile): <640px - Single column layouts, stacked elements
+- sm: 640px - Improved spacing, slight layout adjustments
+- md: 768px - Potential switch to multi-column layouts where appropriate
+- lg: 1024px - Full desktop experience
+- xl: 1280px - Enhanced desktop layouts
+- 2xl: 1536px - Large screen optimizations
+
+#### Common Patterns
+1. **Stacking to Row Conversion**:
+   ```tsx
+   <div className="flex flex-col md:flex-row items-center gap-4">
+     <Avatar />
+     <div className="text-center md:text-left">User info</div>
+   </div>
+   ```
+
+2. **Full Width to Fixed Width**:
+   ```tsx
+   <div className="w-full max-w-full md:max-w-md mx-auto">
+     <Card>Content</Card>
+   </div>
+   ```
+
+3. **Navigation Transformation**:
+   ```tsx
+   // Mobile menu icon visible on small screens, hidden on md+
+   <button className="md:hidden">Menu</button>
+   // Full nav hidden on small screens, visible on md+
+   <nav className="hidden md:flex">Navigation items</nav>
+   ```
+
+### Accessibility Requirements
+
+#### Core Principles
+1. **Tap Targets**: All interactive elements must be at least 44×44px on mobile
+   ```tsx
+   <button className="min-h-[44px] min-w-[44px] p-2">Action</button>
+   ```
+
+2. **Font Sizes**: Base font size minimum 16px, with proper scaling
+   ```tsx
+   // Minimum text size for body content
+   <p className="text-base">Content</p>
+   ```
+
+3. **Contrast**: Maintain 4.5:1 contrast ratio for normal text, 3:1 for large text
+   ```tsx
+   // High contrast text on backgrounds
+   <p className="text-gray-900 dark:text-gray-100">Content</p>
+   ```
+
+4. **Touch Gestures**: Never rely solely on touch gestures without alternatives
+   ```tsx
+   <div
+     role="button"
+     onClick={handleAction}
+     onKeyDown={(e) => e.key === 'Enter' && handleAction()}
+     tabIndex={0}
+   >
+     Interactive Element
+   </div>
+   ```
+
+5. **Viewport Configuration**: Always include proper viewport meta tag
+   ```html
+   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+   ```
+
+### Testing Requirements
+
+1. Test all components across multiple viewport sizes (320px, 375px, 768px, 1024px)
+2. Verify touch target sizes on actual mobile devices
+3. Test with keyboard navigation to ensure focus states work properly
+4. Validate color contrast with WebAIM or similar tools
+5. Test with screen readers to verify accessibility
+
+Remember: Build mobile-first, expand to desktop, and ensure accessibility for all users at every viewport size.

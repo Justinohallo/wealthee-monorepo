@@ -1,0 +1,117 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+# Wealthee Monorepo Tech Stack
+
+## Project Architecture
+
+This is a Turborepo monorepo with the following structure:
+- `apps/web`: Next.js web application
+- `apps/functions`: Firebase Cloud Functions
+- `packages/*`: Shared packages (if any)
+
+## Technology Stack
+
+### Core Technologies
+- **Package Manager**: npm@10.9.0
+- **Node.js**: >=18 (functions require Node 22)
+- **TypeScript**: 5.7.3
+- **Build System**: Turborepo
+
+### Web Application (`apps/web`)
+- **Framework**: Next.js 15.1.6
+- **Runtime**: React 19
+- **Styling**:
+  - TailwindCSS 4.0.13
+  - Radix UI components
+  - class-variance-authority
+  - tailwind-merge
+  - tailwindcss-animate
+- **Form Handling**:
+  - react-hook-form
+  - zod (validation)
+  - @hookform/resolvers
+- **Data Visualization**: recharts
+- **Firebase**: Latest version
+- **Development**:
+  - Turbopack for development
+  - ESLint with strict rules
+  - TypeScript strict mode
+
+### Firebase Functions (`apps/functions`)
+- **Runtime**: Node.js 22
+- **Framework**: Firebase Functions v6.2.0
+- **HTTP Layer**: Express 4.21.2
+- **Dependencies**:
+  - firebase-admin
+  - snaptrade-typescript-sdk
+- **Development**:
+  - TypeScript
+  - ESLint with Google config
+  - Firebase Functions Test framework
+
+## Development Guidelines
+
+### 1. TypeScript Usage
+- Strict mode is enabled across all packages
+- Use type inference where possible
+- Prefer interfaces over type aliases for object types
+- Use `@repo/typescript-config` for consistent TypeScript settings
+
+### 2. Code Style
+- ESLint is configured with strict rules
+- Prettier is used for code formatting
+- Follow the existing code style in each package
+- Use conventional commits
+
+### 3. Package Management
+- Use workspace dependencies for internal packages
+- Keep dependencies up to date
+- Use exact versions for critical dependencies
+- Document major dependency updates
+
+### 4. Development Workflow
+- Use `npm run dev` for local development
+- Firebase emulators are available for local testing
+- Use `npm run build` to build all packages
+- Use `npm run tsc` to type-check all packages
+
+### 5. Testing
+- Write unit tests for critical business logic
+- Use Firebase Functions Test framework for functions
+- Test components with React Testing Library
+- Maintain good test coverage
+
+### 6. Performance
+- Use Next.js server components where appropriate
+- Implement proper code splitting
+- Optimize bundle sizes
+- Monitor performance metrics
+
+### 7. Security
+- Follow Firebase security best practices
+- Implement proper authentication flows
+- Validate all user inputs
+- Keep dependencies updated for security patches
+
+## Deployment
+
+### Web Application
+- Deployed on Vercel
+- Uses Next.js production optimizations
+- Environment variables managed through Vercel
+
+### Firebase Functions
+- Deployed to Firebase Cloud Functions
+- Uses Node.js 22 runtime
+- Environment variables managed through Firebase
+
+## Monitoring and Logging
+- Use Firebase Functions logs for backend monitoring
+- Implement proper error tracking
+- Monitor performance metrics
+- Set up alerts for critical issues
+
+Remember: This is a modern, type-safe stack with a focus on developer experience and maintainability. Follow these guidelines to maintain consistency across the project. 

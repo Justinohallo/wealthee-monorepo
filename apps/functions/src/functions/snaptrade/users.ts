@@ -6,9 +6,11 @@
  */
 
 import {
+  deleteSnapTradeUserFromDb,
   getSnapTradeUser,
   getSnapTradeUsersForPortfolioManager,
-  registerSnapTradeUser
+  registerSnapTradeUser,
+  verifyPortfolioManagerAccess
 } from "../../services/snaptrade/users";
 
 import { createHttpFunction } from "../../utils/function-wrapper";
@@ -112,6 +114,52 @@ export const listUsersForPortfolioManager = createHttpFunction({
     },
     secrets: snaptradeSecrets
   }
+});
+
+/**
+ * Deletes a SnapTrade user
+ */
+export const deleteUserV2 = createHttpFunction({
+  options: {
+    requireAuth: true,
+    requiredRole: "portfolioManager",
+    secrets: snaptradeSecrets,
+    requiredParams: {
+      query: ["portfolioManagerId", "snapTradeUserId"]
+    }
+  },
+  handler: async ({ req, res }) => {
+    // Get query parameters
+    const { portfolioManagerId, snapTradeUserId } = req.query;
+
+
+
+    // Validate access
+    const hasAccess = await verifyPortfolioManagerAccess(
+      portfolioManagerId as string,
+      snapTradeUserId as string,
+      res
+    );
+
+    if (!hasAccess) {
+      // Error response is handled by verifyPortfolioManagerAccess if res is passed
+      return;
+    }
+
+    // Delete the user
+    await deleteSnapTradeUserFromDb(
+      snapTradeUserId as string,
+      portfolioManagerId as string
+    );
+
+
+    // Return success response
+    res.json({
+      success: true,
+      data: { deleted: true },
+      timestamp: new Date().toISOString(),
+    });
+  },
 });
 
 

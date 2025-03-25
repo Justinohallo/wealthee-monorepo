@@ -1,5 +1,6 @@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 
+import { DeleteUserButton } from "./_components/DeleteUserButton";
 import Link from "next/link";
 import { SNAPTRADE } from "@/constants/functionNames";
 import { callFirebaseFunction } from "@/lib/firebase-functions";
@@ -36,7 +37,7 @@ async function fetchSnapTradeUsers({ idToken, portfolioManagerId }: { idToken: s
 }
 
 // Component to display the users table
-function UsersTable({ users }: { users: SnapTradeUser[] }) {
+function UsersTable({ users, idToken, portfolioManagerId }: { users: SnapTradeUser[], idToken: string, portfolioManagerId: string }) {
   return (
     <Table>
       <TableHeader>
@@ -54,13 +55,21 @@ function UsersTable({ users }: { users: SnapTradeUser[] }) {
               <TableCell>{user.id}</TableCell>
               <TableCell>{user.displayName}</TableCell>
               <TableCell>{new Date(user.createdAt).toLocaleDateString()}</TableCell>
-              <TableCell>
-                <Link
-                  href={`/manager/snaptrade/${user.id}`}
-                  className="text-blue-600 hover:text-blue-800 underline"
-                >
-                  View Details
-                </Link>
+              <TableCell className="opacity-100">
+                <div className="flex space-x-2 opacity-100">
+                  <Link
+                    href={`/manager/snaptrade/${user.id}`}
+                    className="text-blue-600 hover:text-blue-800 underline"
+                  >
+                    View Details
+                  </Link>
+                  <DeleteUserButton
+                    idToken={idToken}
+                    portfolioManagerId={portfolioManagerId}
+                    snapTradeUserId={user.id}
+                    displayName={user.displayName}
+                  />
+                </div>
               </TableCell>
             </TableRow>
           ))
@@ -89,7 +98,11 @@ export default async function SnaptradeUsersPage() {
   return (
     <div className="bg-white rounded-lg shadow overflow-hidden mt-6">
       <h2 className="text-xl font-semibold mb-4 px-4 pt-4">SnapTrade Users</h2>
-      <UsersTable users={users} />
+      <UsersTable
+        users={users}
+        idToken={user.token || ''}
+        portfolioManagerId={user.decodedClaims.uid}
+      />
     </div>
   )
 }

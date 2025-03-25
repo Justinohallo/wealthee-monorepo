@@ -1,0 +1,113 @@
+---
+description: Guidelines for creating HTTP functions in Firebase
+globs: ["apps/functions/src/functions/**/*", "apps/functions/src/**/function-wrapper.ts"]
+alwaysApply: false
+---
+# Cursor Rules for Firebase Functions
+
+## Function Wrapper Guidelines
+
+### createHttpFunction Usage
+
+The `createHttpFunction` wrapper provides standardized error handling, authentication, and parameter validation for Firebase HTTP functions. When implementing new functions, follow these guidelines:
+
+#### 1. Function Structure
+```typescript
+export const myFunction = createHttpFunction({
+  handler: async ({ req, res, auth }) => {
+    // Your function logic here
+  },
+  options: {
+    requireAuth: true, // If authentication is needed
+    requiredRole: 'admin', // If specific role is required
+    requiredParams: {
+      body: ['param1', 'param2'], // Required body parameters
+      query: ['queryParam1'] // Required query parameters
+    },
+    secrets: [mySecret] // If secrets are needed
+  }
+});
+```
+
+#### 2. Handler Context
+The handler receives a context object with:
+- `req`: Express Request object
+- `res`: Express Response object
+- `auth`: Decoded Firebase Auth token (if authentication is enabled)
+
+#### 3. Important Rules
+
+1. **Authentication Handling**
+   - DO NOT implement authentication logic in the handler
+   - Use the `requireAuth` and `requiredRole` options instead
+   - The auth token is automatically verified and available in the handler context
+
+2. **Parameter Validation**
+   - DO NOT validate parameters in the handler
+   - Use the `requiredParams` option to specify required body and query parameters
+   - Validation errors are automatically handled
+
+3. **Error Handling**
+   - DO NOT implement try/catch blocks in the handler
+   - All errors are automatically caught and handled by the wrapper
+   - Use the custom error classes (AuthError, ForbiddenError, ValidationError) when needed
+
+4. **Response Handling**
+   - Always use the provided `res` object to send responses
+   - Do not use Express's `next()` function
+   - Ensure all code paths end with a response
+
+#### 4. Example Implementation
+
+```typescript
+// Correct Implementation
+export const getUserData = createHttpFunction({
+  handler: async ({ req, res, auth }) => {
+    const userId = auth.uid; // Auth is guaranteed to exist if requireAuth is true
+    const data = await fetchUserData(userId);
+    res.json(data);
+  },
+  options: {
+    requireAuth: true,
+    requiredParams: {
+      query: ['type']
+    }
+  }
+});
+
+// Incorrect Implementation (DO NOT DO THIS)
+export const incorrectImplementation = createHttpFunction({
+  handler: async ({ req, res, auth }) => {
+    // DO NOT validate auth here
+    if (!req.headers.authorization) {
+      throw new Error('Unauthorized');
+    }
+
+    // DO NOT validate parameters here
+    if (!req.query.type) {
+      throw new Error('Missing type parameter');
+    }
+
+    // Your logic here
+  }
+});
+```
+
+#### 5. Common Pitfalls to Avoid
+
+1. Implementing authentication logic in the handler
+2. Adding try/catch blocks
+3. Manually validating parameters
+4. Not using the provided context object
+5. Not sending a response in all code paths
+
+#### 6. Testing Guidelines
+
+When testing functions:
+1. Mock the Firebase Auth service
+2. Test both authenticated and unauthenticated scenarios
+3. Verify parameter validation
+4. Test error handling scenarios
+5. Ensure all response paths are covered
+
+Remember: The wrapper handles the boilerplate, allowing you to focus on business logic in the handler.

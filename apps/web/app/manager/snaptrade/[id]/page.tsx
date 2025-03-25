@@ -2,6 +2,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 
 import AccountsList from "./_components/AccountsList";
 import { Button } from "@/components/ui/button";
+import { DeleteUserButton } from "../@users/_components/DeleteUserButton";
 import Image from "next/image";
 import Link from "next/link";
 import { SNAPTRADE } from "@/constants/functionNames";
@@ -82,8 +83,6 @@ function BrokeragesTable({ brokerages, snapTradeUserId }: { brokerages: SnapTrad
                   <Image
                     src={brokerage.brokerage.aws_s3_logo_url}
                     alt={brokerage.brokerage.name}
-                    width={24}
-                    height={24}
                     className="h-6 w-6 mr-2 object-contain"
                   />
                 )}
@@ -119,7 +118,7 @@ function BrokeragesTable({ brokerages, snapTradeUserId }: { brokerages: SnapTrad
 
 export default async function SnaptradeUserPage({ params }: { params: { id: string } }) {
   const user = await verifySessionAndGetUser();
-  if (!user) {
+  if (!user || !user.token) {
     return <div>Unauthorized</div>
   }
   const awaitedParams = await params;
@@ -127,13 +126,13 @@ export default async function SnaptradeUserPage({ params }: { params: { id: stri
 
   // Fetch brokerage authorizations
   const brokerages = await fetchBrokerageAuthorizations({
-    idToken: user?.token || '',
+    idToken: user.token,
     userId: snaptradeUserId
   });
   // Get SnapTrade login URL
   const loginUrl = await getSnapTradeBrokerageConnectionURL({
-    idToken: user?.token || '',
-    userId: user?.decodedClaims.uid,
+    idToken: user.token,
+    userId: user.decodedClaims.uid,
     snapTradeUserId: snaptradeUserId
   });
 
@@ -154,13 +153,23 @@ export default async function SnaptradeUserPage({ params }: { params: { id: stri
           <p className="text-gray-700 p-3 bg-gray-50 rounded-md">{snaptradeUserId}</p>
         </div>
 
-        {loginUrl && (
-          <div className="mt-4">
+        <div className="flex space-x-4 mt-4">
+          {loginUrl && (
             <a href={loginUrl} target="_blank" rel="noopener noreferrer">
               <Button>Login to SnapTrade</Button>
             </a>
+          )}
+
+          <div className="flex-shrink-0 opacity-100">
+            <DeleteUserButton
+              idToken={user.token}
+              portfolioManagerId={user.decodedClaims.uid}
+              snapTradeUserId={snaptradeUserId}
+              displayName="this SnapTrade user"
+              redirectUrl="/manager/snaptrade"
+            />
           </div>
-        )}
+        </div>
       </div>
 
       {/* Brokerages Table */}
@@ -170,8 +179,8 @@ export default async function SnaptradeUserPage({ params }: { params: { id: stri
       </div>
 
       <AccountsList
-        idToken={user?.token || ''}
-        userId={user?.decodedClaims.uid}
+        idToken={user.token}
+        userId={user.decodedClaims.uid}
         snapTradeUserId={snaptradeUserId}
       />
     </div>
