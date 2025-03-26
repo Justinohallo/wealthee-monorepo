@@ -1,0 +1,13 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+
+# Your rule content
+
+If there are more than 2 function arguments, you must use an object. 
+
+Functions should be short and only do one thing. Separate functions into smaller units when necessary. 
+
+Think about writing Functional Code. 

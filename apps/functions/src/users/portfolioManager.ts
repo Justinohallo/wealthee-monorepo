@@ -1,16 +1,14 @@
-import admin, {db} from "../firebaseAdmin";
+import admin, { db } from "../firebaseAdmin";
 import {
   authenticatePortfolioManager,
-  createSnapTradeClient,
   getSnapTradeUser,
   handleError,
   validateRequiredParams,
 } from "../middleware";
 
-import {onRequest} from "firebase-functions/v2/https";
-import {
-  snaptradeSecrets,
-} from "../snaptrade/secrets";
+import { createSnapTradeClient } from "../services";
+import { onRequest } from "firebase-functions/v2/https";
+import { snaptradeSecrets } from "../config";
 
 export const createPortfolioManager = onRequest(
   async (req, res) => {
@@ -26,7 +24,7 @@ export const createPortfolioManager = onRequest(
       }
 
       // Extract fields from request body
-      const {email, password, displayName} = req.body;
+      const { email, password, displayName } = req.body;
 
       // Create the auth user with additional fields if needed
       const userRecord = await admin.auth().createUser({
@@ -38,7 +36,7 @@ export const createPortfolioManager = onRequest(
       // Set custom claims to assign the role "portfolioManager"
       await admin.auth().setCustomUserClaims(
         userRecord.uid,
-        {role: "portfolioManager"}
+        { role: "portfolioManager" }
       );
 
       res.send({
@@ -80,12 +78,12 @@ export const registerPrimarySnaptradeUser = onRequest({
       return;
     }
 
-    const {userId} = req.body;
+    const { userId } = req.body;
     const userRef = db.ref(`portfolioManagers/${userId}/snapTrade`);
     const userSnapshot = await userRef.once("value");
 
     if (userSnapshot.exists()) {
-      res.status(409).json({message: "SnapTrade user already registered"});
+      res.status(409).json({ message: "SnapTrade user already registered" });
       return;
     }
 
@@ -93,7 +91,7 @@ export const registerPrimarySnaptradeUser = onRequest({
     const snaptrade = createSnapTradeClient();
     const data = await snaptrade
       .authentication
-      .registerSnapTradeUser({userId});
+      .registerSnapTradeUser({ userId });
 
     await userRef.set({
       userId,
@@ -102,7 +100,7 @@ export const registerPrimarySnaptradeUser = onRequest({
       selectedProfile: null,
     });
 
-    res.json({message: "SnapTrade user registered successfully"});
+    res.json({ message: "SnapTrade user registered successfully" });
   } catch (error) {
     handleError({
       res,
@@ -142,7 +140,7 @@ export const getPortfolioManager = onRequest(async (req, res) => {
       return;
     }
 
-    const {uid} = req.query;
+    const { uid } = req.query;
     const user = await admin.auth().getUser(uid as string);
 
     if (!user.customClaims || user.customClaims.role !== "portfolioManager") {
@@ -176,7 +174,7 @@ export const getPrimarySnaptradeUser = onRequest(
         return;
       }
 
-      const {userId} = req.query;
+      const { userId } = req.query;
 
       // Retrieve snaptrade info from the Realtime Database
       const userSnapRef = db.ref(`portfolioManagers/${userId}/snapTrade`);
@@ -238,7 +236,7 @@ export const checkSnapTradeUserExists = onRequest(
         return;
       }
 
-      const {userId} = req.query;
+      const { userId } = req.query;
 
       // Create SnapTrade client and call API
       const snaptrade = createSnapTradeClient();
@@ -248,7 +246,7 @@ export const checkSnapTradeUserExists = onRequest(
         listResponse.data.includes(userId as string) :
         false;
 
-      res.send({exists});
+      res.send({ exists });
     } catch (error) {
       handleError({
         res,
@@ -277,7 +275,7 @@ export const registerSnaptradeUserWithDisplay = onRequest({
       return;
     }
 
-    const {userId, displayName} = req.body;
+    const { userId, displayName } = req.body;
 
     // Create reference to the user's snaptrade data in realtime database
     const userRef = db.ref(`portfolioManagers/${userId}/snapTradeUsers`);
@@ -341,7 +339,7 @@ export const getSnaptradeUsers = onRequest({
       return;
     }
 
-    const {userId} = req.query;
+    const { userId } = req.query;
 
     // Get reference to the user's snapTradeUsers in realtime database
     const userRef = db.ref(`portfolioManagers/${userId}/snapTradeUsers`);
@@ -355,7 +353,7 @@ export const getSnaptradeUsers = onRequest({
       })) :
       [];
 
-    res.json({snapTradeUsers});
+    res.json({ snapTradeUsers });
   } catch (error) {
     handleError({
       res,
@@ -384,7 +382,7 @@ export const listBrokerageAuthorizations = onRequest({
       return;
     }
 
-    const {userId} = req.query;
+    const { userId } = req.query;
 
     // Get SnapTrade user data
     const snapTradeUser = await getSnapTradeUser({
@@ -402,7 +400,7 @@ export const listBrokerageAuthorizations = onRequest({
       userSecret: snapTradeUser.userSecret,
     });
 
-    res.json({brokerageAuthorizations: response.data});
+    res.json({ brokerageAuthorizations: response.data });
   } catch (error) {
     handleError({
       res,
@@ -431,7 +429,7 @@ export const loginSnapTradeUser = onRequest({
       return;
     }
 
-    const {userId, snapTradeUserId} = req.query;
+    const { userId, snapTradeUserId } = req.query;
 
     // Get SnapTrade user data
     const snapTradeUser = await getSnapTradeUser({
@@ -449,7 +447,7 @@ export const loginSnapTradeUser = onRequest({
       userSecret: snapTradeUser.userSecret,
     });
 
-    res.json({loginResponse: response.data});
+    res.json({ loginResponse: response.data });
   } catch (error) {
     handleError({
       res,
@@ -478,7 +476,7 @@ export const detailBrokerageAuthorization = onRequest({
       return;
     }
 
-    const {userId, snapTradeUserId, authorizationId} = req.query;
+    const { userId, snapTradeUserId, authorizationId } = req.query;
 
     // Get SnapTrade user data
     const snapTradeUser = await getSnapTradeUser({
@@ -497,7 +495,7 @@ export const detailBrokerageAuthorization = onRequest({
       userSecret: snapTradeUser.userSecret,
     });
 
-    res.json({brokerageAuthorization: response.data});
+    res.json({ brokerageAuthorization: response.data });
   } catch (error) {
     handleError({
       res,
@@ -527,7 +525,7 @@ export const listSnapTradeUserAccounts = onRequest({
       return;
     }
 
-    const {userId, snapTradeUserId} = req.query;
+    const { userId, snapTradeUserId } = req.query;
 
     // Get SnapTrade user data
     const snapTradeUser = await getSnapTradeUser({
@@ -545,7 +543,7 @@ export const listSnapTradeUserAccounts = onRequest({
       userSecret: snapTradeUser.userSecret,
     });
 
-    res.json({accounts: response.data});
+    res.json({ accounts: response.data });
   } catch (error) {
     handleError({
       res,
@@ -574,7 +572,7 @@ export const getSnapTradeUserAccountDetails = onRequest({
       return;
     }
 
-    const {userId, snapTradeUserId, accountId} = req.query;
+    const { userId, snapTradeUserId, accountId } = req.query;
 
     // Get SnapTrade user data
     const snapTradeUser = await getSnapTradeUser({
@@ -593,7 +591,7 @@ export const getSnapTradeUserAccountDetails = onRequest({
       userSecret: snapTradeUser.userSecret,
     });
 
-    res.json({accountDetails: response.data});
+    res.json({ accountDetails: response.data });
   } catch (error) {
     handleError({
       res,
@@ -622,7 +620,7 @@ export const getSnapTradeUserHoldings = onRequest({
       return;
     }
 
-    const {userId, snapTradeUserId, accountId} = req.query;
+    const { userId, snapTradeUserId, accountId } = req.query;
 
     // Get SnapTrade user data
     const snapTradeUser = await getSnapTradeUser({
@@ -641,7 +639,7 @@ export const getSnapTradeUserHoldings = onRequest({
       userSecret: snapTradeUser.userSecret,
     });
 
-    res.json({holdings: response.data});
+    res.json({ holdings: response.data });
   } catch (error) {
     handleError({
       res,
@@ -670,7 +668,7 @@ export const getSnapTradeUserAccountBalances = onRequest({
       return;
     }
 
-    const {userId, snapTradeUserId, accountId} = req.query;
+    const { userId, snapTradeUserId, accountId } = req.query;
 
     // Get SnapTrade user data
     const snapTradeUser = await getSnapTradeUser({
@@ -689,7 +687,7 @@ export const getSnapTradeUserAccountBalances = onRequest({
       userSecret: snapTradeUser.userSecret,
     });
 
-    res.json({balances: response.data});
+    res.json({ balances: response.data });
   } catch (error) {
     handleError({
       res,

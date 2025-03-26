@@ -35,9 +35,23 @@ export const SNAPTRADE = {
   },
 
   CONNECTIONS: {
+    /**
+     * 'snaptrade-connections-detailBrokerageAuthorization'
+     */
+    DETAIL_BROKERAGE_AUTHORIZATION: 'snaptrade-connections-detailBrokerageAuthorization',
+    /**
+     * 'snaptrade-connections-listBrokerageConnections'
+     */
     LIST_BROKERAGE_CONNECTIONS: 'snaptrade-connections-listBrokerageConnections',
+    /**
+     * 'snaptrade-connections-deleteBrokerageConnection'
+     */
     DELETE_BROKERAGE_CONNECTION: 'snaptrade-connections-deleteBrokerageConnection',
+    /**
+     * 'snaptrade-connections-generateConnectionUrl'
+     */
     GENERATE_CONNECTION_URL: 'snaptrade-connections-generateConnectionUrl',
+
   },
 
   USERS: {

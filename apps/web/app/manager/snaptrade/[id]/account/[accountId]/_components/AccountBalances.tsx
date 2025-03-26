@@ -8,60 +8,8 @@ import {
 } from "@/components/ui/table";
 
 import { Suspense } from "react";
-import { callFirebaseFunction } from "@/lib/firebase-functions";
 import { formatCurrency } from "@/lib/utils";
-
-interface Currency {
-  id: string;
-  code: string;
-  name: string;
-}
-
-interface Balance {
-  currency: Currency;
-  cash: number;
-  buying_power: number;
-}
-
-interface AccountBalancesResponse {
-  balances: Balance[];
-}
-
-async function fetchAccountBalances({
-  idToken,
-  userId,
-  snapTradeUserId,
-  accountId,
-}: {
-  idToken: string;
-  userId: string;
-  snapTradeUserId: string;
-  accountId: string;
-}): Promise<AccountBalancesResponse | null> {
-  try {
-    const data = await callFirebaseFunction<AccountBalancesResponse>({
-      idToken,
-      functionName: 'portfoliomanager-getsnaptradeuseraccountbalances',
-      queryParams: {
-        userId,
-        snapTradeUserId,
-        accountId
-      },
-      options: {
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        method: 'GET',
-        revalidate: 0 // Don't cache this data
-      }
-    });
-
-    return data;
-  } catch (error) {
-    console.error("Error fetching account balances:", error);
-    return null;
-  }
-}
+import { getAccountBalances } from "@/services/snaptrade/accounts";
 
 interface AccountBalancesProps {
   idToken: string;
@@ -71,14 +19,12 @@ interface AccountBalancesProps {
 }
 
 async function AccountBalancesContent({ idToken, userId, snapTradeUserId, accountId }: AccountBalancesProps) {
-  const balancesData = await fetchAccountBalances({
-    idToken,
-    userId,
-    snapTradeUserId,
-    accountId,
-  });
 
-  if (!balancesData || !balancesData.balances.length) {
+  const response = await getAccountBalances({ userId, snapTradeUserId, accountId, idToken });
+
+
+
+  if (!response) {
     return (
       <div className="p-4 bg-gray-50 rounded-md text-center">
         <p className="text-gray-700">
@@ -99,16 +45,16 @@ async function AccountBalancesContent({ idToken, userId, snapTradeUserId, accoun
           </TableRow>
         </TableHeader>
         <TableBody>
-          {balancesData.balances.map((balance) => (
-            <TableRow key={balance.currency.id}>
+          {response.map((balance) => (
+            <TableRow key={balance.id}>
               <TableCell className="font-medium">
-                {balance.currency.code}
+                {balance.currency}
               </TableCell>
               <TableCell className="text-right">
-                {formatCurrency(balance.cash, balance.currency.code)}
+                {formatCurrency(balance.value, balance.currency)}
               </TableCell>
               <TableCell className="text-right">
-                {formatCurrency(balance.buying_power, balance.currency.code)}
+                {formatCurrency(balance.value, balance.currency)}
               </TableCell>
             </TableRow>
           ))}

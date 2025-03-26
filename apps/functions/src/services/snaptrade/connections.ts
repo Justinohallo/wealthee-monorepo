@@ -1,9 +1,7 @@
-import { BrokerageAuthorization } from "snaptrade-typescript-sdk";
-import { BrokerageConnectionDTO } from "../../types/snaptrade";
+import { createSnapTradeClient } from "./client";
 /**
  * SnapTrade brokerage connection service
  */
-import { createSnapTradeClient } from "./client";
 import { logger } from "../../utils/logger";
 
 /**
@@ -16,7 +14,7 @@ import { logger } from "../../utils/logger";
 export const listBrokerageConnectionsService = async (
   userId: string,
   userSecret: string
-): Promise<BrokerageConnectionDTO[]> => {
+) => {
   try {
     const client = createSnapTradeClient();
     const response = await client.connections.listBrokerageAuthorizations({
@@ -27,39 +25,43 @@ export const listBrokerageConnectionsService = async (
 
     // Transform the API response to match our expected type
     const connections = response.data;
-    return Array.isArray(connections) ? connections.map((auth: BrokerageAuthorization) => ({
-      id: auth.id || "",
-      created_date: auth.createdDate || new Date().toISOString(),
-      brokerage: {
-        id: auth.brokerage?.id || "",
-        name: auth.brokerage?.name || "",
-        slug: auth.brokerage?.slug || "",
-        display_name: auth.brokerage?.displayName || auth.brokerage?.name || "",
-        description: auth.brokerage?.description || "",
-        aws_s3_logo_url: auth.brokerage?.logoUrl || "",
-        aws_s3_square_logo_url: auth.brokerage?.squareLogoUrl || "",
-        url: auth.brokerage?.url || "",
-        enabled: auth.brokerage?.enabled ?? true,
-        maintenance_mode: auth.brokerage?.maintenanceMode ?? false,
-        allows_trading: auth.brokerage?.allowsTrading ?? true,
-        allows_fractional_units: auth.brokerage?.allowsFractionalUnits ?? false,
-        has_reporting: auth.brokerage?.hasReporting ?? true,
-        is_real_time_connection: auth.brokerage?.isRealTimeConnection ?? false,
-        brokerage_type: {
-          id: auth.brokerage?.brokerageType?.id || "",
-          name: auth.brokerage?.brokerageType?.name || ""
-        },
-        exchanges: auth.brokerage?.exchanges || [],
-        open_url: auth.brokerage?.openUrl || ""
-      },
-      name: auth.name || "",
-      type: auth.type || "AUTH",
-      disabled: auth.disabled ?? false,
-      updated_date: auth.updatedDate || auth.createdDate || new Date().toISOString()
-    })) : [];
+    return connections;
   } catch (error) {
     logger.error(
       `Failed to list brokerage connections: ${error instanceof Error ?
+        error.message : String(error)}`,
+      "SnapTradeConnectionService",
+      error
+    );
+    throw error;
+  }
+};
+
+/**
+ * Get details for a specific brokerage authorization
+ *
+ * @param userId - SnapTrade user ID
+ * @param userSecret - SnapTrade user secret
+ * @param authorizationId - ID of the brokerage authorization to retrieve
+ * @return Brokerage authorization details
+ */
+export const detailBrokerageAuthorizationService = async (
+  userId: string,
+  userSecret: string,
+  authorizationId: string
+) => {
+  try {
+    const client = createSnapTradeClient();
+    const response = await client.connections.detailBrokerageAuthorization({
+      userId,
+      userSecret,
+      authorizationId,
+    });
+
+    return response.data;
+  } catch (error) {
+    logger.error(
+      `Failed to get brokerage authorization details: ${error instanceof Error ?
         error.message : String(error)}`,
       "SnapTradeConnectionService",
       error

@@ -1,0 +1,232 @@
+---
+description: Guidelines for calling Firebase Cloud Functions from the web app
+globs: apps/web/**/*.tsx,apps/web/**/*.ts
+alwaysApply: false
+---
+
+# Wealthee Firebase Function Calls
+
+## Overview
+
+The `callFirebaseFunction` utility provides standardized error handling, authentication, retry capability, and monitoring when interacting with Firebase Cloud Functions. **Always use this utility instead of direct fetch calls** when communicating with Firebase Functions.
+
+## Required Usage Pattern
+
+```typescript
+import { callFirebaseFunction } from "@/lib/firebase-functions";
+
+// Typed response for better type safety
+interface MyFunctionResponse {
+    id: string;
+    name: string;
+}
+
+// Correct implementation
+async function fetchDataFromFirebase(userId: string): Promise<MyFunctionResponse> {
+  const result = await callFirebaseFunction<MyFunctionResponse>({
+    idToken: "user-auth-token", // From auth context
+    functionName: "my-firebase-function-name",
+    queryParams: { userId },
+    options: {
+      method: "GET",
+      revalidate: 60, // Cache for 60 seconds
+    }
+  });
+
+  return result;
+}
+```
+
+## Parameters
+
+| Parameter | Required | Description |
+|-----------|----------|-------------|
+| `idToken` | Optional | Firebase ID token for authenticated requests. Omit only for public functions. |
+| `functionName` | Required | Name of the Firebase function to call (without domain/path). |
+| `queryParams` | Optional | URL query parameters as a Record<string, string>. |
+| `options` | Optional | Fetch configuration including headers, method, body, etc. |
+| `retries` | Optional | Number of retry attempts for transient errors (default: 1). |
+
+## Authentication Rules
+
+1. **Always provide idToken for authenticated functions:**
+   ```typescript
+   // Correct - Authenticated request
+   const result = await callFirebaseFunction({
+     idToken: userToken, // From auth context
+     functionName: "secured-function"
+   });
+   ```
+
+2. **Only omit idToken for public functions:**
+   ```typescript
+   // Correct - Public function
+   const result = await callFirebaseFunction({
+     functionName: "public-health-check"
+   });
+   ```
+
+## Error Handling
+
+The utility provides built-in error handling, but you should still handle errors in your application code:
+
+```typescript
+try {
+  const result = await callFirebaseFunction({
+    functionName: "my-function",
+    idToken
+  });
+  // Handle success
+} catch (error) {
+  // Check for specific error types
+  if (error instanceof FirebaseFunctionError) {
+    if (error.statusCode === 403) {
+      // Handle permission error
+    } else {
+      // Handle other Firebase errors
+    }
+  } else {
+    // Handle unexpected errors
+  }
+}
+```
+
+## Type Safety
+
+Always provide a generic type parameter for proper type safety:
+
+```typescript
+// Correct - With type safety
+const result = await callFirebaseFunction<UserData>({
+  functionName: "get-user",
+  idToken
+});
+
+// Incorrect - No type information
+const result = await callFirebaseFunction({
+  functionName: "get-user",
+  idToken
+});
+```
+
+## Common Mistakes to Avoid
+
+1. **❌ DO NOT use direct fetch calls to Firebase Functions:**
+   ```typescript
+   // INCORRECT - direct fetch
+   const response = await fetch(`https://us-central1-${projectId}.cloudfunctions.net/myFunction`);
+   ```
+
+2. **❌ DO NOT hardcode Firebase Function URLs:**
+   ```typescript
+   // INCORRECT - hardcoded URL
+   const baseUrl = "https://my-function-abc123.cloudfunctions.net";
+   ```
+
+3. **❌ DO NOT implement your own retry logic or error handling:**
+   ```typescript
+   // INCORRECT - custom retry logic
+   let attempts = 0;
+   while (attempts < 3) {
+     try {
+       const response = await fetch(functionUrl);
+       // ...
+     } catch (error) {
+       attempts++;
+     }
+   }
+   ```
+
+4. **❌ DO NOT pass sensitive data in query parameters:**
+   ```typescript
+   // INCORRECT - sensitive data in query params
+   const result = await callFirebaseFunction({
+     functionName: "update-user",
+     queryParams: { password: "secret123" } // WRONG!
+   });
+   ```
+
+## Best Practices
+
+1. **Group related function calls in domain-specific service files:**
+   ```typescript
+   // services/users.ts
+   export async function getUser(userId: string, idToken: string): Promise<User> {
+     return callFirebaseFunction<User>({
+       idToken,
+       functionName: "get-user",
+       queryParams: { userId }
+     });
+   }
+   ```
+
+2. **Use appropriate cache validation:**
+   ```typescript
+   // Cacheable data (GET requests)
+   const data = await callFirebaseFunction({
+     functionName: "get-static-data",
+     options: { revalidate: 3600 } // Cache for 1 hour
+   });
+
+   // Real-time data (should not be cached)
+   const data = await callFirebaseFunction({
+     functionName: "get-real-time-data",
+     options: { revalidate: 0 } // Don't cache
+   });
+   ```
+
+3. **Handle function-specific errors at the service level:**
+   ```typescript
+   export async function deleteUser(userId: string, idToken: string) {
+     try {
+       return await callFirebaseFunction({
+         idToken,
+         functionName: "delete-user",
+         queryParams: { userId },
+         options: { method: "DELETE" }
+       });
+     } catch (error) {
+       if (error instanceof FirebaseFunctionError && error.statusCode === 409) {
+         throw new Error("User has active subscriptions and cannot be deleted");
+       }
+       throw error;
+     }
+   }
+   ```
+
+4. **Use appropriate HTTP methods:**
+   ```typescript
+   // GET - Retrieve data
+   const user = await callFirebaseFunction({
+     functionName: "get-user",
+     queryParams: { userId },
+     options: { method: "GET" }
+   });
+
+   // POST - Create resources
+   const newUser = await callFirebaseFunction({
+     functionName: "create-user",
+     options: {
+       method: "POST",
+       body: JSON.stringify(userData)
+     }
+   });
+
+   // PUT - Replace resources
+   const updatedUser = await callFirebaseFunction({
+     functionName: "update-user",
+     options: {
+       method: "PUT",
+       body: JSON.stringify(userData)
+     }
+   });
+
+   // DELETE - Remove resources
+   const result = await callFirebaseFunction({
+     functionName: "delete-user",
+     queryParams: { userId },
+     options: { method: "DELETE" }
+   });
+   ```
+
+Remember: This utility centralizes error handling, authentication, and monitoring for all Firebase Function calls. Using it consistently ensures reliable communication with your backend.

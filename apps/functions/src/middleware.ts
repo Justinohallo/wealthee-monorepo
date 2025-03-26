@@ -1,9 +1,9 @@
-import {Response} from "express";
 import * as logger from "firebase-functions/logger";
-import {Request} from "firebase-functions/v2/https";
-import {Snaptrade} from "snaptrade-typescript-sdk";
-import admin, {db} from "./firebaseAdmin";
-import {snapTradeClientId, snapTradeConsumerKey} from "./snaptrade/secrets";
+
+import admin, { db } from "./firebaseAdmin";
+
+import { Request } from "firebase-functions/v2/https";
+import { Response } from "express";
 
 /**
  * Authenticates a portfolio manager from the request
@@ -18,7 +18,7 @@ export const authenticatePortfolioManager = async (
   // Check if Authorization header exists
   const authHeader = req.headers.authorization;
   if (!authHeader || !authHeader.startsWith("Bearer ")) {
-    res.status(401).json({error: "Unauthorized - No token provided"});
+    res.status(401).json({ error: "Unauthorized - No token provided" });
     return null;
   }
 
@@ -31,14 +31,14 @@ export const authenticatePortfolioManager = async (
 
     // Check if user has the portfolioManager role
     if (!decodedToken.role || decodedToken.role !== "portfolioManager") {
-      res.status(403).json({error: "Forbidden - Insufficient permissions"});
+      res.status(403).json({ error: "Forbidden - Insufficient permissions" });
       return null;
     }
 
     return decodedToken;
   } catch (error) {
-    console.error({error});
-    res.status(401).json({error: "Unauthorized - Invalid token"});
+    console.error({ error });
+    res.status(401).json({ error: "Unauthorized - Invalid token" });
     return null;
   }
 };
@@ -66,7 +66,7 @@ export const validateRequiredParams = ({
 
   for (const param of params) {
     if (!paramsSource[param]) {
-      res.status(400).json({error: `${param} is required`});
+      res.status(400).json({ error: `${param} is required` });
       return false;
     }
   }
@@ -113,17 +113,6 @@ export const getSnapTradeUser = async ({
   }
 
   return snapTradeUser;
-};
-
-/**
- * Creates a new SnapTrade client
- * @return {Snaptrade} A new SnapTrade client instance
- */
-export const createSnapTradeClient = () => {
-  return new Snaptrade({
-    consumerKey: snapTradeConsumerKey.value(),
-    clientId: snapTradeClientId.value(),
-  });
 };
 
 /**

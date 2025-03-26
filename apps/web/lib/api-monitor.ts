@@ -106,7 +106,7 @@ class ApiMonitor {
       if ('statusCode' in error) {
         call.statusCode = error.statusCode;
       } else if (error instanceof Error && 'status' in error) {
-        // @ts-ignore - handle potential status property in Error objects
+        // @ts-expect-error - handle potential status property in Error objects
         call.statusCode = error.status;
       }
     }

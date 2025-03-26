@@ -20,8 +20,6 @@ export interface PortfolioManager {
   providerData?: unknown[];
 }
 
-
-
 /**
  * Portfolio Manager Service
  *
@@ -38,7 +36,7 @@ export async function createPortfolioManager(
   if (typeof idTokenOrData === 'string' && data) {
     // New API format - using ID token
     try {
-      const result = await callFirebaseFunction({
+      const response = await callFirebaseFunction<{ manager: PortfolioManager }>({
         idToken: idTokenOrData,
         functionName: PORTFOLIO_MANAGER.USERS.CREATE,
         options: {
@@ -50,7 +48,7 @@ export async function createPortfolioManager(
         }
       });
 
-      return result as PortfolioManager;
+      return response?.data?.manager || null;
     } catch (error) {
       console.error('Error creating portfolio manager:', error);
       return null;
@@ -58,7 +56,7 @@ export async function createPortfolioManager(
   } else if (typeof idTokenOrData === 'object') {
     // Legacy API format - no ID token
     try {
-      const result = await callFirebaseFunction({
+      const response = await callFirebaseFunction<{ manager: PortfolioManager }>({
         functionName: PORTFOLIO_MANAGER.USERS.CREATE,
         options: {
           method: "POST",
@@ -69,7 +67,7 @@ export async function createPortfolioManager(
         }
       });
 
-      return { success: true, data: result };
+      return { success: true, data: response?.data?.manager };
     } catch (error) {
       console.error("Failed to create portfolio manager:", error);
       return { success: false, error: error instanceof Error ? error.message : String(error) };
@@ -84,11 +82,7 @@ export async function createPortfolioManager(
  */
 export async function listPortfolioManagers(idToken: string): Promise<PortfolioManager[]> {
   try {
-    const response = await callFirebaseFunction<{
-      data: PortfolioManager[],
-      success: boolean,
-      timestamp: string,
-    }>({
+    const response = await callFirebaseFunction<{ managers: PortfolioManager[] }>({
       idToken,
       functionName: PORTFOLIO_MANAGER.USERS.LIST,
       options: {
@@ -98,7 +92,7 @@ export async function listPortfolioManagers(idToken: string): Promise<PortfolioM
         },
       }
     });
-    return response?.data || [];
+    return response?.data?.managers || [];
   } catch (error) {
     console.error('Error fetching portfolio managers:', error);
     return [];
@@ -111,10 +105,10 @@ export async function listPortfolioManagers(idToken: string): Promise<PortfolioM
 export async function getPortfolioManager(
   idTokenOrUid: string,
   managerId: string
-) {
+): Promise<PortfolioManager | null> {
   try {
     // New API format with idToken and managerId
-    const data = await callFirebaseFunction<{ data: PortfolioManager, success: boolean, timestamp: string }>({
+    const response = await callFirebaseFunction<{ manager: PortfolioManager }>({
       idToken: idTokenOrUid,
       functionName: PORTFOLIO_MANAGER.USERS.GET,
       queryParams: { uid: managerId },
@@ -125,14 +119,9 @@ export async function getPortfolioManager(
         },
       }
     });
-    console.log(data)
-    if (!data) {
-      return null;
-    }
 
-    return data.data;
+    return response?.data?.manager || null;
   } catch (error) {
-
     console.error('Error fetching portfolio manager:', error);
     return null;
   }
@@ -147,7 +136,7 @@ export async function updatePortfolioManager(
   data: Partial<Omit<PortfolioManager, 'id' | 'createdAt'>>
 ): Promise<PortfolioManager | null> {
   try {
-    return await callFirebaseFunction<PortfolioManager>({
+    const response = await callFirebaseFunction<{ manager: PortfolioManager }>({
       idToken,
       functionName: 'portfoliomanager-updateportfoliomanager',
       options: {
@@ -161,6 +150,8 @@ export async function updatePortfolioManager(
         })
       }
     });
+
+    return response?.data?.manager || null;
   } catch (error) {
     console.error('Error updating portfolio manager:', error);
     return null;
@@ -175,7 +166,7 @@ export async function deletePortfolioManager(
   managerId: string
 ): Promise<boolean> {
   try {
-    await callFirebaseFunction({
+    const response = await callFirebaseFunction<{ success: boolean }>({
       idToken,
       functionName: 'portfoliomanager-deleteportfoliomanager',
       queryParams: { managerId },
@@ -186,7 +177,8 @@ export async function deletePortfolioManager(
         },
       }
     });
-    return true;
+
+    return response?.data?.success || false;
   } catch (error) {
     console.error('Error deleting portfolio manager:', error);
     return false;

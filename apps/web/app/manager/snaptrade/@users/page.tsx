@@ -1,35 +1,14 @@
+import { SnapTradeUser, listSnapTradeUsersForPortfolioManager } from "@/services/snaptrade/users";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 
-import { DeleteUserButton } from "./_components/DeleteUserButton";
+import { DeleteSnapTradeUserButton } from "./_components/DeleteUserButton";
 import Link from "next/link";
-import { SNAPTRADE } from "@/constants/functionNames";
-import { callFirebaseFunction } from "@/lib/firebase-functions";
 import { verifySessionAndGetUser } from "@/lib/server-auth-utils";
-
-// Define interface for user data
-interface SnapTradeUser {
-  id: string;
-  displayName: string;
-  createdAt: string;
-  // Add other properties as needed once we know the actual data structure
-}
 
 // Function to fetch SnapTrade users
 async function fetchSnapTradeUsers({ idToken, portfolioManagerId }: { idToken: string, portfolioManagerId: string }): Promise<SnapTradeUser[]> {
   try {
-    const data = await callFirebaseFunction<{ data: { snapTradeUsers: SnapTradeUser[] } }>({
-      idToken,
-      functionName: SNAPTRADE.USERS.LIST_FOR_PORTFOLIO_MANAGER,
-      queryParams: { portfolioManagerId },
-      options: {
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        method: 'GET',
-        revalidate: 0 // Don't cache this data
-      }
-    });
-    return data?.data?.snapTradeUsers || [];
+    return await listSnapTradeUsersForPortfolioManager(portfolioManagerId, idToken);
   } catch (error) {
     console.error("Error fetching SnapTrade users:", error);
     throw new Error(error instanceof Error ? error.message : String(error));
@@ -63,7 +42,7 @@ function UsersTable({ users, idToken, portfolioManagerId }: { users: SnapTradeUs
                   >
                     View Details
                   </Link>
-                  <DeleteUserButton
+                  <DeleteSnapTradeUserButton
                     idToken={idToken}
                     portfolioManagerId={portfolioManagerId}
                     snapTradeUserId={user.id}
@@ -85,24 +64,48 @@ function UsersTable({ users, idToken, portfolioManagerId }: { users: SnapTradeUs
   )
 }
 
-// Main page component for the parallel route
-export default async function SnaptradeUsersPage() {
-  const user = await verifySessionAndGetUser();
+// Page component
+export default async function UsersPage() {
+  const sessionData = await verifySessionAndGetUser();
 
-  if (!user) {
-    return <div>Unauthorized</div>
+  if (!sessionData) {
+    return <div>Unauthorized</div>;
   }
 
-  // Fetch SnapTrade users with error handling
-  const users = await fetchSnapTradeUsers({ idToken: user?.token || '', portfolioManagerId: user?.decodedClaims.uid })
+  const { decodedClaims, token } = sessionData;
+  const idToken = token || '';
+  const userId = decodedClaims.uid;
+
+  // Fetch SnapTrade users for the portfolio manager
+  let users: SnapTradeUser[] = [];
+  let error = null;
+
+  try {
+    users = await fetchSnapTradeUsers({
+      idToken,
+      portfolioManagerId: userId,
+    });
+  } catch (e) {
+    error = e instanceof Error ? e.message : String(e);
+    console.error("Error in UsersPage:", error);
+  }
+
   return (
-    <div className="bg-white rounded-lg shadow overflow-hidden mt-6">
-      <h2 className="text-xl font-semibold mb-4 px-4 pt-4">SnapTrade Users</h2>
-      <UsersTable
-        users={users}
-        idToken={user.token || ''}
-        portfolioManagerId={user.decodedClaims.uid}
-      />
+    <div className="space-y-6">
+      <div className="space-y-2">
+        <h1 className="text-3xl font-bold">SnapTrade Users</h1>
+        <p className="text-muted-foreground">
+          Manage your SnapTrade users here
+        </p>
+      </div>
+
+      {error ? (
+        <div className="p-4 border border-red-300 bg-red-50 text-red-700 rounded-md">
+          Error: {error}
+        </div>
+      ) : (
+        <UsersTable users={users} idToken={idToken} portfolioManagerId={userId} />
+      )}
     </div>
-  )
+  );
 }

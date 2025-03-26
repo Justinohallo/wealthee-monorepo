@@ -1,3 +1,4 @@
+import { SnapTradeAccount, fetchSnapTradeAccounts } from "@/services/snaptrade/accounts";
 import {
   Table,
   TableBody,
@@ -9,90 +10,7 @@ import {
 
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
-import { SNAPTRADE } from "@/constants/functionNames";
-import { callFirebaseFunction } from "@/lib/firebase-functions";
 import { formatCurrency } from "@/lib/utils";
-
-// Define interfaces for the account data
-interface AccountBalance {
-  total: {
-    amount: number;
-    currency: string;
-  };
-}
-
-interface AccountSyncStatus {
-  holdings: {
-    last_successful_sync: string;
-    initial_sync_completed: boolean;
-  };
-  transactions: {
-    last_successful_sync: string;
-    first_transaction_date: string | null;
-    initial_sync_completed: boolean;
-  };
-}
-
-interface AccountMeta {
-  type: string;
-  status: "open" | "closed";
-  institution_name: string;
-  unifiedAccountType: string;
-  linked_account_id?: string;
-}
-
-export interface SnapTradeAccount {
-  id: string;
-  brokerage_authorization: string;
-  portfolio_group: string;
-  name: string;
-  number: string;
-  institution_name: string;
-  meta: AccountMeta;
-  cash_restrictions: unknown[];
-  created_date: string;
-  sync_status: AccountSyncStatus;
-  balance: AccountBalance;
-  raw_data: unknown;
-  raw_type: string;
-}
-
-// Function to fetch accounts data
-async function fetchSnapTradeAccounts({
-  idToken,
-  userId,
-  snapTradeUserId,
-}: {
-  idToken: string;
-  userId: string;
-  snapTradeUserId: string;
-}): Promise<SnapTradeAccount[]> {
-  try {
-    const response = await callFirebaseFunction<{ success: boolean, data: SnapTradeAccount[], timestamp: string }>({
-      idToken,
-      functionName: SNAPTRADE.ACCOUNTS.LIST_USER_ACCOUNTS,
-      queryParams: {
-        snapTradeUserId
-      },
-      options: {
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        method: 'GET',
-        revalidate: 0 // Don't cache this data
-      }
-    });
-
-    if (response?.success && Array.isArray(response.data)) {
-      return response.data;
-    }
-
-    return [];
-  } catch (error) {
-    console.error("Error fetching SnapTrade accounts:", error);
-    return [];
-  }
-}
 
 // Component to display accounts
 function AccountsDisplay({ accounts, snapTradeUserId }: { accounts: SnapTradeAccount[], snapTradeUserId: string }) {
@@ -128,27 +46,33 @@ function AccountsDisplay({ accounts, snapTradeUserId }: { accounts: SnapTradeAcc
               <TableRow key={account.id}>
                 <TableCell className="font-medium">{account.name}</TableCell>
                 <TableCell>{account.number}</TableCell>
-                <TableCell>{account.meta.unifiedAccountType.replace(/_/g, " ")}</TableCell>
+                <TableCell>{account.meta?.unifiedAccountType?.replace(/_/g, " ") || "N/A"}</TableCell>
                 <TableCell>
                   <span
-                    className={`px-2 py-1 text-xs rounded-full ${account.meta.status === "open"
+                    className={`px-2 py-1 text-xs rounded-full ${account.meta?.status === "open"
                       ? "bg-green-100 text-green-800"
                       : "bg-red-100 text-red-800"
                       }`}
                   >
-                    {account.meta.status}
+                    {account.meta?.status || "unknown"}
                   </span>
                 </TableCell>
                 <TableCell>
-                  {formatCurrency(
-                    account.balance.total.amount,
-                    account.balance.total.currency
-                  )}
+                  {account.balance?.total
+                    ? formatCurrency(
+                      account.balance.total.amount,
+                      account.balance.total.currency
+                    )
+                    : "N/A"
+                  }
                 </TableCell>
                 <TableCell>
-                  {new Date(
-                    account.sync_status.holdings.last_successful_sync
-                  ).toLocaleDateString()}
+                  {account.sync_status?.holdings?.last_successful_sync
+                    ? new Date(
+                      account.sync_status.holdings.last_successful_sync
+                    ).toLocaleDateString()
+                    : "Never"
+                  }
                 </TableCell>
                 <TableCell>
                   <Link
@@ -178,11 +102,6 @@ export default async function AccountsList({
   userId: string;
   snapTradeUserId: string;
 }) {
-  const accounts = await fetchSnapTradeAccounts({
-    idToken,
-    userId,
-    snapTradeUserId,
-  });
-
+  const accounts = await fetchSnapTradeAccounts(userId, snapTradeUserId, idToken);
   return <AccountsDisplay accounts={accounts} snapTradeUserId={snapTradeUserId} />;
 }

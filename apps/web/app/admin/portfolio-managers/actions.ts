@@ -5,7 +5,7 @@ import { callFirebaseFunction } from "@/lib/firebase-functions"
 
 export async function fetchPortfolioManagers(): Promise<PortfolioManager[]> {
   try {
-    const data = await callFirebaseFunction<PortfolioManager[]>({
+    const response = await callFirebaseFunction<{ managers: PortfolioManager[] }>({
       functionName: 'portfoliomanager-listportfoliomanagers',
       options: {
         method: "GET",
@@ -15,11 +15,11 @@ export async function fetchPortfolioManagers(): Promise<PortfolioManager[]> {
       }
     })
 
-    if (!data) {
+    if (!response?.data?.managers) {
       return [];
     }
 
-    return data.map((manager: PortfolioManager) => ({
+    return response.data.managers.map((manager: PortfolioManager) => ({
       uid: manager.uid,
       email: manager.email,
       emailVerified: manager.emailVerified,

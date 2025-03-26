@@ -1,5 +1,6 @@
 import {
   deleteBrokerageConnectionService,
+  detailBrokerageAuthorizationService,
   listBrokerageConnectionsService,
 } from "../../services/snaptrade/connections";
 import { generateSnapTradeConnectionUrl, getSnapTradeUser } from "../../services/snaptrade/users";
@@ -84,28 +85,79 @@ export const listBrokerageConnections = createHttpFunction({
 });
 
 /**
- * Delete a brokerage connection
+ * Get details for a specific brokerage authorization
  */
-export const deleteBrokerageConnection = createHttpFunction({
+export const detailBrokerageAuthorization = createHttpFunction({
+  options: {
+    requireAuth: true,
+    requiredRole: "portfolioManager",
+    requiredParams: {
+      query: ["snapTradeUserId", "authorizationId"]
+    },
+    secrets: snaptradeSecrets
+  },
   handler: async ({ req, res }) => {
-    // Check for required path parameters
-    const { snapTradeUserId, connectionId } = req.params;
-    // Get the user from the database
-    // This would pull from Firestore in a real implementation
-    logger.info(`Deleting brokerage connection ${connectionId} for user ${snapTradeUserId}`,
+    // Check for required query parameters
+    const { snapTradeUserId, authorizationId } = req.query;
+
+    logger.info(`Fetching brokerage details for authorization ${authorizationId} and user ${snapTradeUserId}`,
       "SnapTradeConnectionFunction");
 
     // Get SnapTrade user details
-    const snapTradeUser = {
-      userId: snapTradeUserId,
-      userSecret: "user-secret", // In real implementation, retrieve from database
-    };
+    const snapTradeUser = await getSnapTradeUser(snapTradeUserId as string, res);
+
+    if (!snapTradeUser) {
+      // Error response is handled by getSnapTradeUser if res is passed
+      return;
+    }
+
+    // Get brokerage authorization details
+    const brokerageAuthorization = await detailBrokerageAuthorizationService(
+      snapTradeUserId as string,
+      snapTradeUser.userSecret,
+      authorizationId as string
+    );
+
+    res.json({
+      success: true,
+      data: { brokerageAuthorization },
+      timestamp: new Date().toISOString(),
+    });
+  }
+});
+
+/**
+ * Delete a brokerage connection
+ */
+export const deleteBrokerageConnection = createHttpFunction({
+  options: {
+    requireAuth: true,
+    requiredRole: "portfolioManager",
+    requiredParams: {
+      query: ["snapTradeUserId", "brokerageId"]
+    },
+    secrets: snaptradeSecrets
+  },
+  handler: async ({ req, res }) => {
+    // Check for required query parameters
+    const { snapTradeUserId, brokerageId } = req.query;
+
+    logger.info(`Deleting brokerage connection ${brokerageId} for user ${snapTradeUserId}`,
+      "SnapTradeConnectionFunction");
+
+    // Get SnapTrade user details
+    const snapTradeUser = await getSnapTradeUser(snapTradeUserId as string, res);
+
+    if (!snapTradeUser) {
+      // Error response is handled by getSnapTradeUser if res is passed
+      return;
+    }
 
     // Delete the brokerage connection
     const success = await deleteBrokerageConnectionService(
-      snapTradeUser.userId,
+      snapTradeUserId as string,
       snapTradeUser.userSecret,
-      connectionId
+      brokerageId as string
     );
 
     res.json({
@@ -113,9 +165,5 @@ export const deleteBrokerageConnection = createHttpFunction({
       data: { deleted: success },
       timestamp: new Date().toISOString(),
     });
-  },
-  options: {
-    requireAuth: true,
-    requiredRole: "portfolioManager",
   }
 });

@@ -150,9 +150,8 @@ export async function callFirebaseFunction<T = unknown>({
   queryParams?: Record<string, string>,
   options?: FetchOptions,
   retries?: number
-}): Promise<T | null> {
+}): Promise<{ data: T, } | null> {
   const functionUrl = buildFunctionUrl(functionName, queryParams);
-  console.log({ functionUrl })
   console.log(`Calling Firebase function '${functionName}' at: ${functionUrl}`);
 
   // Start monitoring the API call

@@ -1,6 +1,6 @@
 ---
 description: Guidelines for creating HTTP functions in Firebase
-globs: ["apps/functions/src/functions/**/*", "apps/functions/src/**/function-wrapper.ts"]
+globs: ["apps/functions/src/functions/**/*"
 alwaysApply: false
 ---
 # Cursor Rules for Firebase Functions

@@ -206,7 +206,7 @@ export const updateClient = createHttpFunction({
 
     // If email or name was updated, update Auth user record as well
     if (clientData.email || clientData.firstName || clientData.lastName) {
-      const updateParams: any = {};
+      const updateParams: Partial<{ email: string, displayName: string }> = {};
 
       if (clientData.email) {
         updateParams.email = clientData.email;

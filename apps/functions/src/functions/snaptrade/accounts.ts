@@ -78,7 +78,7 @@ export const listUserAccounts = createHttpFunction({
     // Return success response
     res.json({
       success: true,
-      data: accounts,
+      data: { accounts },
       timestamp: new Date().toISOString(),
     });
   },

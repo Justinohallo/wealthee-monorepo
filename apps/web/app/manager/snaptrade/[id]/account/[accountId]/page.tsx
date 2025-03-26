@@ -3,89 +3,9 @@ import AccountHoldings from "./_components/AccountHoldings";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { Suspense } from "react";
-import { callFirebaseFunction } from "@/lib/firebase-functions";
+import { fetchAccountDetails } from "@/services/snaptrade/accounts";
 import { formatCurrency } from "@/lib/utils";
 import { verifySessionAndGetUser } from "@/lib/server-auth-utils";
-
-// Interface for the account data
-interface AccountBalance {
-  total: {
-    amount: number;
-    currency: string;
-  };
-}
-
-interface AccountSyncStatus {
-  holdings: {
-    last_successful_sync: string;
-    initial_sync_completed: boolean;
-  };
-  transactions: {
-    last_successful_sync: string;
-    first_transaction_date: string | null;
-    initial_sync_completed: boolean;
-  };
-}
-
-interface AccountMeta {
-  type: string;
-  status: "open" | "closed";
-  institution_name: string;
-  unifiedAccountType: string;
-}
-
-interface SnapTradeAccount {
-  id: string;
-  name: string;
-  number: string;
-  institution_name: string;
-  meta: AccountMeta;
-  cash_restrictions: unknown[];
-  created_date: string;
-  sync_status: AccountSyncStatus;
-  balance: AccountBalance;
-  raw_data: unknown;
-  raw_type: string;
-  brokerage_authorization: string;
-  portfolio_group: string;
-}
-
-// Function to fetch account details
-async function fetchAccountDetails({
-  idToken,
-  userId,
-  snapTradeUserId,
-  accountId,
-}: {
-  idToken: string;
-  userId: string;
-  snapTradeUserId: string;
-  accountId: string;
-}): Promise<SnapTradeAccount | null> {
-  try {
-    const data = await callFirebaseFunction<{ accountDetails: SnapTradeAccount }>({
-      idToken,
-      functionName: 'portfoliomanager-getsnaptradeuseraccountdetails',
-      queryParams: {
-        userId,
-        snapTradeUserId,
-        accountId
-      },
-      options: {
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        method: 'GET',
-        revalidate: 0 // Don't cache this data
-      }
-    });
-
-    return data?.accountDetails || null;
-  } catch (error) {
-    console.error("Error fetching account details:", error);
-    return null;
-  }
-}
 
 // Format date to a readable string
 function formatDate(dateString: string): string {
@@ -106,18 +26,21 @@ export default async function AccountDetailsPage({
   const snapTradeUserId = awaitedParams.id;
   const accountId = awaitedParams.accountId;
 
-  const user = await verifySessionAndGetUser();
-  if (!user) {
+  const session = await verifySessionAndGetUser();
+  if (!session) {
     return <div>Unauthorized</div>;
   }
 
+  const idToken = session.token || '';
+  const userId = session.decodedClaims.uid;
+
   // Fetch the account details
-  const account = await fetchAccountDetails({
-    idToken: user?.token || '',
-    userId: user?.decodedClaims.uid,
+  const account = await fetchAccountDetails(
+    userId,
     snapTradeUserId,
     accountId,
-  });
+    idToken
+  );
 
   return (
     <div className="p-8">
@@ -159,29 +82,32 @@ export default async function AccountDetailsPage({
                 </div>
                 <div className="mb-4">
                   <h3 className="text-sm font-medium text-gray-500">Type</h3>
-                  <p className="text-lg">{account.meta.unifiedAccountType.replace(/_/g, " ")}</p>
+                  <p className="text-lg">{account.meta?.unifiedAccountType?.replace(/_/g, " ") || "N/A"}</p>
                 </div>
               </div>
               <div>
                 <div className="mb-4">
                   <h3 className="text-sm font-medium text-gray-500">Status</h3>
                   <span
-                    className={`px-2 py-1 text-xs rounded-full ${account.meta.status === "open"
+                    className={`px-2 py-1 text-xs rounded-full ${account.meta?.status === "open"
                       ? "bg-green-100 text-green-800"
                       : "bg-red-100 text-red-800"
                       }`}
                   >
-                    {account.meta.status}
+                    {account.meta?.status || "unknown"}
                   </span>
                 </div>
                 <div className="mb-4">
                   <h3 className="text-sm font-medium text-gray-500">Created Date</h3>
-                  <p className="text-lg">{formatDate(account.created_date)}</p>
+                  <p className="text-lg">{account.created_date ? formatDate(account.created_date) : "N/A"}</p>
                 </div>
                 <div className="mb-4">
                   <h3 className="text-sm font-medium text-gray-500">Balance</h3>
                   <p className="text-2xl font-bold text-green-600">
-                    {formatCurrency(account.balance.total.amount, account.balance.total.currency)}
+                    {account.balance?.total
+                      ? formatCurrency(account.balance.total.amount, account.balance.total.currency)
+                      : "N/A"
+                    }
                   </p>
                 </div>
               </div>
@@ -190,50 +116,56 @@ export default async function AccountDetailsPage({
 
           {/* Account Balances */}
           <AccountBalances
-            idToken={user?.token || ''}
-            userId={user?.decodedClaims.uid}
+            idToken={idToken}
+            userId={userId}
             snapTradeUserId={snapTradeUserId}
             accountId={accountId}
           />
 
           {/* Sync Status */}
-          <div className="bg-white rounded-lg shadow overflow-hidden p-6">
-            <h2 className="text-xl font-semibold mb-4">Sync Status</h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div>
-                <h3 className="text-sm font-medium text-gray-500 mb-2">Holdings</h3>
-                <div className="p-4 bg-gray-50 rounded-md">
-                  <div className="mb-2">
-                    <span className="text-sm font-medium text-gray-500">Last Successful Sync:</span>
-                    <span className="ml-2">{formatDate(account.sync_status.holdings.last_successful_sync)}</span>
-                  </div>
+          {account.sync_status && (
+            <div className="bg-white rounded-lg shadow overflow-hidden p-6">
+              <h2 className="text-xl font-semibold mb-4">Sync Status</h2>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {account.sync_status.holdings && (
                   <div>
-                    <span className="text-sm font-medium text-gray-500">Initial Sync Completed:</span>
-                    <span className="ml-2">{account.sync_status.holdings.initial_sync_completed ? "Yes" : "No"}</span>
-                  </div>
-                </div>
-              </div>
-              <div>
-                <h3 className="text-sm font-medium text-gray-500 mb-2">Transactions</h3>
-                <div className="p-4 bg-gray-50 rounded-md">
-                  <div className="mb-2">
-                    <span className="text-sm font-medium text-gray-500">Last Successful Sync:</span>
-                    <span className="ml-2">{account.sync_status.transactions.last_successful_sync}</span>
-                  </div>
-                  {account.sync_status.transactions.first_transaction_date && (
-                    <div className="mb-2">
-                      <span className="text-sm font-medium text-gray-500">First Transaction Date:</span>
-                      <span className="ml-2">{account.sync_status.transactions.first_transaction_date}</span>
+                    <h3 className="text-sm font-medium text-gray-500 mb-2">Holdings</h3>
+                    <div className="p-4 bg-gray-50 rounded-md">
+                      <div className="mb-2">
+                        <span className="text-sm font-medium text-gray-500">Last Successful Sync:</span>
+                        <span className="ml-2">{formatDate(account.sync_status.holdings.last_successful_sync)}</span>
+                      </div>
+                      <div>
+                        <span className="text-sm font-medium text-gray-500">Initial Sync Completed:</span>
+                        <span className="ml-2">{account.sync_status.holdings.initial_sync_completed ? "Yes" : "No"}</span>
+                      </div>
                     </div>
-                  )}
-                  <div>
-                    <span className="text-sm font-medium text-gray-500">Initial Sync Completed:</span>
-                    <span className="ml-2">{account.sync_status.transactions.initial_sync_completed ? "Yes" : "No"}</span>
                   </div>
-                </div>
+                )}
+                {account.sync_status.transactions && (
+                  <div>
+                    <h3 className="text-sm font-medium text-gray-500 mb-2">Transactions</h3>
+                    <div className="p-4 bg-gray-50 rounded-md">
+                      <div className="mb-2">
+                        <span className="text-sm font-medium text-gray-500">Last Successful Sync:</span>
+                        <span className="ml-2">{account.sync_status.transactions.last_successful_sync}</span>
+                      </div>
+                      {account.sync_status.transactions.first_transaction_date && (
+                        <div className="mb-2">
+                          <span className="text-sm font-medium text-gray-500">First Transaction Date:</span>
+                          <span className="ml-2">{account.sync_status.transactions.first_transaction_date}</span>
+                        </div>
+                      )}
+                      <div>
+                        <span className="text-sm font-medium text-gray-500">Initial Sync Completed:</span>
+                        <span className="ml-2">{account.sync_status.transactions.initial_sync_completed ? "Yes" : "No"}</span>
+                      </div>
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
-          </div>
+          )}
 
           {/* Technical Details */}
           <div className="bg-white rounded-lg shadow overflow-hidden p-6">
@@ -243,22 +175,28 @@ export default async function AccountDetailsPage({
                 <h3 className="text-sm font-medium text-gray-500">Account ID</h3>
                 <p className="text-sm font-mono p-2 bg-gray-50 rounded-md overflow-x-auto">{account.id}</p>
               </div>
-              <div className="mb-4">
-                <h3 className="text-sm font-medium text-gray-500">Brokerage Authorization ID</h3>
-                <Link href={`/manager/snaptrade/${snapTradeUserId}/brokerage/${account.brokerage_authorization}`} className="block">
-                  <p className="text-sm font-mono p-2 bg-gray-50 rounded-md overflow-x-auto hover:bg-blue-50 hover:text-blue-600 transition-colors cursor-pointer">
-                    {account.brokerage_authorization}
-                  </p>
-                </Link>
-              </div>
-              <div className="mb-4">
-                <h3 className="text-sm font-medium text-gray-500">Portfolio Group ID</h3>
-                <p className="text-sm font-mono p-2 bg-gray-50 rounded-md overflow-x-auto">{account.portfolio_group}</p>
-              </div>
-              <div className="mb-4">
-                <h3 className="text-sm font-medium text-gray-500">Raw Type</h3>
-                <p className="text-sm p-2 bg-gray-50 rounded-md">{account.raw_type}</p>
-              </div>
+              {account.brokerage_authorization && (
+                <div className="mb-4">
+                  <h3 className="text-sm font-medium text-gray-500">Brokerage Authorization ID</h3>
+                  <Link href={`/manager/snaptrade/${snapTradeUserId}/brokerage/${account.brokerage_authorization}`} className="block">
+                    <p className="text-sm font-mono p-2 bg-gray-50 rounded-md overflow-x-auto hover:bg-blue-50 hover:text-blue-600 transition-colors cursor-pointer">
+                      {account.brokerage_authorization}
+                    </p>
+                  </Link>
+                </div>
+              )}
+              {account.portfolio_group && (
+                <div className="mb-4">
+                  <h3 className="text-sm font-medium text-gray-500">Portfolio Group ID</h3>
+                  <p className="text-sm font-mono p-2 bg-gray-50 rounded-md overflow-x-auto">{account.portfolio_group}</p>
+                </div>
+              )}
+              {account.raw_type && (
+                <div className="mb-4">
+                  <h3 className="text-sm font-medium text-gray-500">Raw Type</h3>
+                  <p className="text-sm p-2 bg-gray-50 rounded-md">{account.raw_type}</p>
+                </div>
+              )}
             </div>
           </div>
 
@@ -272,8 +210,8 @@ export default async function AccountDetailsPage({
             </div>
           }>
             <AccountHoldings
-              idToken={user?.token || ''}
-              userId={user?.decodedClaims.uid}
+              idToken={idToken}
+              userId={userId}
               snapTradeUserId={snapTradeUserId}
               accountId={accountId}
             />

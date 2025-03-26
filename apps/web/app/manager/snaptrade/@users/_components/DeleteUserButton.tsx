@@ -1,7 +1,7 @@
 "use client";
 
 import { DeleteConfirmationDialog } from "@/components/delete-confirmation-dialog";
-import { deleteSnapTradeUser } from "@/services/snapTrade";
+import { deleteSnapTradeUser } from "@/services/snaptrade/users";
 import { useRouter } from "next/navigation";
 import { useToast } from "@/hooks/use-toast";
 
@@ -19,7 +19,7 @@ interface DeleteResult {
   error?: string;
 }
 
-export function DeleteUserButton({
+export function DeleteSnapTradeUserButton({
   idToken,
   portfolioManagerId,
   snapTradeUserId,
@@ -75,7 +75,7 @@ export function DeleteUserButton({
       title="Delete SnapTrade User"
       description={`Are you sure you want to delete "${displayName}"? This action cannot be undone and will remove all associated data from SnapTrade.`}
       onDelete={handleDelete}
-      buttonText="Delete"
+      buttonText="Delete SnapTrade User"
       buttonVariant="destructive"
       buttonSize="sm"
     />
