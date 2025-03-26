@@ -16,7 +16,6 @@ export const verifySessionAndGetUser = async () => {
 
   try {
     const decodedClaims = await getAuth().verifySessionCookie(sessionCookie, true)
-    console.log("Session verified successfully", decodedClaims)
     return { decodedClaims, token }
   } catch (error) {
     console.error("Session verification error:", error)

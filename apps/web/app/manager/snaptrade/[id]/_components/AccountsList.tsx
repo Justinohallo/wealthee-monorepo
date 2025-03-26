@@ -1,4 +1,3 @@
-import { SnapTradeAccount, fetchSnapTradeAccounts } from "@/services/snaptrade/accounts";
 import {
   Table,
   TableBody,
@@ -10,10 +9,19 @@ import {
 
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
+import { fetchSnapTradeAccounts } from "@/services/snaptrade/accounts";
 import { formatCurrency } from "@/lib/utils";
 
-// Component to display accounts
-function AccountsDisplay({ accounts, snapTradeUserId }: { accounts: SnapTradeAccount[], snapTradeUserId: string }) {
+// The main component that fetches data
+export default async function AccountsList({
+  idToken,
+  snapTradeUserId,
+}: {
+  idToken: string;
+  userId: string;
+  snapTradeUserId: string;
+}) {
+  const accounts = await fetchSnapTradeAccounts({ snapTradeUserId, idToken });
   if (!accounts.length) {
     return (
       <div className="bg-white rounded-lg shadow p-6 mb-6">
@@ -60,8 +68,8 @@ function AccountsDisplay({ accounts, snapTradeUserId }: { accounts: SnapTradeAcc
                 <TableCell>
                   {account.balance?.total
                     ? formatCurrency(
-                      account.balance.total.amount,
-                      account.balance.total.currency
+                      account.balance.total.amount ?? 0,
+                      account.balance.total.currency ?? ''
                     )
                     : "N/A"
                   }
@@ -90,18 +98,4 @@ function AccountsDisplay({ accounts, snapTradeUserId }: { accounts: SnapTradeAcc
       </div>
     </div>
   );
-}
-
-// The main component that fetches data
-export default async function AccountsList({
-  idToken,
-  userId,
-  snapTradeUserId,
-}: {
-  idToken: string;
-  userId: string;
-  snapTradeUserId: string;
-}) {
-  const accounts = await fetchSnapTradeAccounts(userId, snapTradeUserId, idToken);
-  return <AccountsDisplay accounts={accounts} snapTradeUserId={snapTradeUserId} />;
 }

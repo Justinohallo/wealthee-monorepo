@@ -30,8 +30,22 @@ export const PORTFOLIO_MANAGER = {
 // SnapTrade functions
 export const SNAPTRADE = {
   ACCOUNTS: {
+    /**
+     * 'snaptrade-accounts-getAccountDetails'
+     */
     GET_DETAILS: 'snaptrade-accounts-getAccountDetails',
+    /**
+     * 'snaptrade-accounts-listUserAccounts'
+     */
     LIST_USER_ACCOUNTS: 'snaptrade-accounts-listUserAccounts',
+    /**
+     * 'snaptrade-accounts-getAccountBalances'
+     */
+    GET_ACCOUNT_BALANCES: 'snaptrade-accounts-getAccountBalances',
+    /**
+     * 'snaptrade-accounts-getAccountHoldings'
+     */
+    GET_ACCOUNT_HOLDINGS: 'snaptrade-accounts-getAccountHoldings',
   },
 
   CONNECTIONS: {

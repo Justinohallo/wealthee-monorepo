@@ -15,7 +15,7 @@ function BrokerageRow({
   brokerage,
   snapTradeUserId,
   idToken,
-  userId
+
 }: {
   brokerage: BrokerageAuthorization,
   snapTradeUserId: string,

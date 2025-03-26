@@ -1,4 +1,3 @@
-import { AccountHolding, getAccountHoldings } from "@/services/snaptrade/accounts";
 import {
   Table,
   TableBody,
@@ -9,27 +8,7 @@ import {
 } from "@/components/ui/table";
 
 import { formatCurrency } from "@/lib/utils";
-
-// Function to fetch account holdings
-async function fetchAccountHoldings({
-  idToken,
-  userId,
-  snapTradeUserId,
-  accountId
-}: {
-  idToken: string;
-  userId: string;
-  snapTradeUserId: string;
-  accountId: string;
-}): Promise<{ holdings: AccountHolding[], totalMarketValue: number } | null> {
-  try {
-    const response = await getAccountHoldings(userId, snapTradeUserId, accountId, idToken);
-    return response;
-  } catch (error) {
-    console.error("Error fetching account holdings:", error);
-    return null;
-  }
-}
+import { getAccountHoldings } from "@/services/snaptrade/accounts";
 
 export const AccountHoldings = async ({
   idToken,
@@ -42,14 +21,9 @@ export const AccountHoldings = async ({
   snapTradeUserId: string;
   accountId: string;
 }) => {
-  const holdingsData = await fetchAccountHoldings({
-    idToken,
-    userId,
-    snapTradeUserId,
-    accountId,
-  });
+  const response = await getAccountHoldings({ userId, snapTradeUserId, accountId, idToken });
 
-  if (!holdingsData || holdingsData.holdings.length === 0) {
+  if (!response) {
     return (
       <div className="bg-white rounded-lg shadow overflow-hidden p-6">
         <h2 className="text-xl font-semibold mb-4">Holdings</h2>
@@ -60,15 +34,16 @@ export const AccountHoldings = async ({
         </div>
       </div>
     );
-  }
 
+  }
+  console.log(response)
   return (
     <div className="space-y-6">
       {/* Stock Positions */}
       <div className="bg-white rounded-lg shadow overflow-hidden p-6">
         <h2 className="text-xl font-semibold mb-4">Stock Positions</h2>
         <div className="overflow-x-auto">
-          {holdingsData.holdings.length === 0 ? (
+          {response.positions?.length === 0 ? (
             <div className="p-4 bg-gray-50 rounded-md text-center">
               <p className="text-gray-700">No stock positions in this account.</p>
             </div>
@@ -80,22 +55,24 @@ export const AccountHoldings = async ({
                   <TableHead className="text-right">Quantity</TableHead>
                   <TableHead className="text-right">Market Value</TableHead>
                   <TableHead className="text-right">Avg Purchase</TableHead>
+                  <TableHead className="text-right">Book Value</TableHead>
                   <TableHead className="text-right">Currency</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {holdingsData.holdings.map((holding) => {
+                {response.positions?.map((holding) => {
                   return (
-                    <TableRow key={`${holding.id}-${holding.quantity}`}>
-                      <TableCell className="font-medium">{holding.symbol}</TableCell>
-                      <TableCell className="text-right">{holding.quantity.toFixed(2)}</TableCell>
-                      <TableCell className="text-right">{formatCurrency(holding.marketValue, holding.currency)}</TableCell>
+                    <TableRow key={`${holding.symbol?.symbol?.symbol}-${holding.units}`}>
+                      <TableCell className="font-medium">{holding?.symbol?.symbol?.symbol}</TableCell>
+                      <TableCell className="text-right">{holding.units?.toFixed(2)}</TableCell>
                       <TableCell className="text-right">
-                        {holding.averagePrice
-                          ? formatCurrency(holding.averagePrice, holding.currency)
+                        {holding.price
+                          ? formatCurrency(holding?.price || 0, holding.currency.code)
                           : 'N/A'}
                       </TableCell>
-                      <TableCell className="text-right">{holding.currency}</TableCell>
+                      <TableCell className="text-right">{formatCurrency(holding?.average_purchase_price ?? 0, holding.currency.code)}</TableCell>
+                      <TableCell className="text-right">{formatCurrency((holding?.average_purchase_price ?? 0) * (holding?.units ?? 0), holding.currency.code)}</TableCell>
+                      <TableCell className="text-right">{holding.currency.code}</TableCell>
                     </TableRow>
                   );
                 })}
@@ -112,7 +89,7 @@ export const AccountHoldings = async ({
           <div className="p-4 bg-gray-50 rounded-md">
             <h3 className="text-lg font-medium mb-2">Total Market Value</h3>
             <p className="text-2xl font-bold text-green-600">
-              {formatCurrency(holdingsData.totalMarketValue, "USD")}
+              {formatCurrency(response.total_value?.value ?? 0, "USD")}
             </p>
           </div>
         </div>

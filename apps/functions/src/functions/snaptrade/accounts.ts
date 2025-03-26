@@ -1,5 +1,7 @@
 import {
-  getAccountDetails as getSnapTradeAccountDetails,
+  getAccountBalancesService,
+  getAccountDetailsService,
+  getAccountHoldingsService,
   listUserAccounts as listSnapTradeUserAccounts
 } from "../../services/snaptrade/accounts";
 
@@ -19,30 +21,36 @@ export const getAccountDetails = createHttpFunction({
     requireAuth: true,
     requiredRole: "portfolioManager",
     secrets: snaptradeSecrets,
+    requiredParams: {
+      query: ["snapTradeUserId", "accountId"]
+    }
+
+
   },
   handler: async ({ req, res }) => {
     // Get path parameters
-    const { snapTradeUserId, accountId } = req.params;
+    const { snapTradeUserId, accountId } = req.query;
 
-    // Get the SnapTrade user from the database
-    const snapTradeUser = await getSnapTradeUser(snapTradeUserId, res);
+    // // Get the SnapTrade user from the database
+    const snapTradeUser = await getSnapTradeUser(snapTradeUserId as string, res);
 
     if (!snapTradeUser) {
       // Error response is handled by getSnapTradeUser if res is passed
       return;
     }
 
-    // Get account details using the service
-    const accountDetails = await getSnapTradeAccountDetails(
-      snapTradeUserId,
-      snapTradeUser.userSecret,
-      accountId
+    // // Get account details using the service
+    const accountDetails = await getAccountDetailsService({
+      userId: snapTradeUserId as string,
+      userSecret: snapTradeUser.userSecret,
+      accountId: accountId as string
+    }
     );
 
     // Return success response
     res.json({
       success: true,
-      data: accountDetails,
+      data: { accountDetails },
       timestamp: new Date().toISOString(),
     });
   },
@@ -79,6 +87,86 @@ export const listUserAccounts = createHttpFunction({
     res.json({
       success: true,
       data: { accounts },
+      timestamp: new Date().toISOString(),
+    });
+  },
+});
+
+/**
+ * Gets account balances for a specific SnapTrade account
+ */
+export const getAccountBalances = createHttpFunction({
+  options: {
+    requireAuth: true,
+    requiredRole: "portfolioManager",
+    secrets: snaptradeSecrets,
+    requiredParams: {
+      query: ["snapTradeUserId", "accountId"]
+    }
+  },
+  handler: async ({ req, res }) => {
+    // Get query parameters
+    const { snapTradeUserId, accountId } = req.query;
+
+    // Get the SnapTrade user from the database
+    const snapTradeUser = await getSnapTradeUser(snapTradeUserId as string, res);
+
+    if (!snapTradeUser) {
+      // Error response is handled by getSnapTradeUser if res is passed
+      return;
+    }
+
+    // Get account balances using the service
+    const balances = await getAccountBalancesService(
+      snapTradeUserId as string,
+      snapTradeUser.userSecret,
+      accountId as string
+    );
+
+    // Return success response
+    res.json({
+      success: true,
+      data: { balances },
+      timestamp: new Date().toISOString(),
+    });
+  },
+});
+
+/**
+ * Gets account holdings for a specific SnapTrade account
+ */
+export const getAccountHoldings = createHttpFunction({
+  options: {
+    requireAuth: true,
+    requiredRole: "portfolioManager",
+    secrets: snaptradeSecrets,
+    requiredParams: {
+      query: ["snapTradeUserId", "accountId"]
+    }
+  },
+  handler: async ({ req, res }) => {
+    // Get query parameters
+    const { snapTradeUserId, accountId } = req.query;
+
+    // Get the SnapTrade user from the database
+    const snapTradeUser = await getSnapTradeUser(snapTradeUserId as string, res);
+
+    if (!snapTradeUser) {
+      // Error response is handled by getSnapTradeUser if res is passed
+      return;
+    }
+
+    // Get account holdings using the service
+    const holdings = await getAccountHoldingsService({
+      userId: snapTradeUserId as string,
+      userSecret: snapTradeUser.userSecret,
+      accountId: accountId as string
+    });
+
+    // Return success response
+    res.json({
+      success: true,
+      data: { holdings },
       timestamp: new Date().toISOString(),
     });
   },

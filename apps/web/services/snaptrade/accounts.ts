@@ -1,6 +1,6 @@
 import { SNAPTRADE } from "@/constants/functionNames";
 import { callFirebaseFunction } from "@/lib/firebase-functions";
-import { type Account } from "snaptrade-typescript-sdk";
+import { type Balance, type Account, type AccountHoldingsAccount } from "snaptrade-typescript-sdk";
 
 /**
  * List all accounts for a SnapTrade user
@@ -62,14 +62,14 @@ export async function getAccountDetails(
  */
 export async function getAccountBalances({ userId, snapTradeUserId, accountId, idToken }: { userId: string, snapTradeUserId: string, accountId: string, idToken: string }) {
   try {
-    const response = await callFirebaseFunction<AccountBalance[]>({
+    const response = await callFirebaseFunction<{ balances: Balance[] }>({
       idToken,
-      functionName: SNAPTRADE.LEGACY.GET_USER_ACCOUNT_BALANCES,
+      functionName: SNAPTRADE.ACCOUNTS.GET_ACCOUNT_BALANCES,
       queryParams: { userId, snapTradeUserId, accountId },
       options: { method: "GET" }
     });
 
-    return response?.data || null;
+    return response?.data?.balances || null;
   } catch (error) {
     console.error("Failed to get account balances:", error);
     return null;
@@ -79,24 +79,26 @@ export async function getAccountBalances({ userId, snapTradeUserId, accountId, i
 /**
  * Get account holdings
  */
-export async function getAccountHoldings(
-  userId: string,
-  snapTradeUserId: string,
-  accountId: string,
-  idToken: string
-): Promise<AccountHoldingsResponse | null> {
+export async function getAccountHoldings({ userId, snapTradeUserId, accountId, idToken }:
+  {
+    userId: string,
+    snapTradeUserId: string,
+    accountId: string,
+    idToken: string
+  }
+) {
   try {
-    const response = await callFirebaseFunction<{ data: AccountHoldingsResponse }>({
+    const response = await callFirebaseFunction<{ holdings: AccountHoldingsAccount }>({
       idToken,
-      functionName: SNAPTRADE.LEGACY.GET_USER_HOLDINGS,
+      functionName: SNAPTRADE.ACCOUNTS.GET_ACCOUNT_HOLDINGS,
       queryParams: { userId, snapTradeUserId, accountId },
       options: { method: "GET" }
     });
 
-    return response?.data?.data || null;
+    return response?.data?.holdings || null;
   } catch (error) {
     console.error("Failed to get account holdings:", error);
-    return null;
+    throw error;
   }
 }
 
@@ -104,33 +106,35 @@ export async function getAccountHoldings(
  * Get details for a specific account (fetches more comprehensive account details)
  */
 export async function fetchAccountDetails(
-  userId: string,
-  snapTradeUserId: string,
-  accountId: string,
-  idToken: string
-): Promise<SnapTradeAccount | null> {
+  { userId,
+    snapTradeUserId,
+    accountId,
+    idToken,
+  }: {
+    userId: string,
+    snapTradeUserId: string,
+    accountId: string,
+    idToken: string
+  }
+) {
   try {
-    const response = await callFirebaseFunction<{ accountDetails: SnapTradeAccount }>({
+    const response = await callFirebaseFunction<{ accountDetails: Account }>({
       idToken,
-      functionName: 'portfoliomanager-getsnaptradeuseraccountdetails',
+      functionName: 'snaptrade-accounts-getAccountDetails',
       queryParams: {
         userId,
         snapTradeUserId,
         accountId
       },
       options: {
-        headers: {
-          'Content-Type': 'application/json'
-        },
         method: 'GET',
         revalidate: 0 // Don't cache this data
       }
     });
-
     return response?.data?.accountDetails || null;
   } catch (error) {
     console.error("Error fetching account details:", error);
-    return null;
+    throw error;
   }
 }
 
@@ -138,12 +142,11 @@ export async function fetchAccountDetails(
  * Fetch all accounts for a SnapTrade user
  */
 export async function fetchSnapTradeAccounts(
-  userId: string,
-  snapTradeUserId: string,
-  idToken: string
-): Promise<SnapTradeAccount[]> {
+  { snapTradeUserId, idToken }: { snapTradeUserId: string, idToken: string }
+
+) {
   try {
-    const response = await callFirebaseFunction<{ accounts: SnapTradeAccount[] }>({
+    const response = await callFirebaseFunction<{ accounts: Account[] }>({
       idToken,
       functionName: SNAPTRADE.ACCOUNTS.LIST_USER_ACCOUNTS,
       queryParams: {
@@ -161,6 +164,6 @@ export async function fetchSnapTradeAccounts(
     return response?.data?.accounts || [];
   } catch (error) {
     console.error("Error fetching SnapTrade accounts:", error);
-    return [];
+    throw error
   }
 }

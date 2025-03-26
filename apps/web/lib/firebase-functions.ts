@@ -192,7 +192,6 @@ export async function callFirebaseFunction<T = unknown>({
       }
 
       const response = await fetch(functionUrl, fetchOptions);
-
       // Handle error responses
       if (!response.ok) {
         // Only retry on 5xx errors (server errors) and 429 (rate limiting)
@@ -205,7 +204,6 @@ export async function callFirebaseFunction<T = unknown>({
         }
 
         const error = await handleErrorResponse(response, functionName);
-        apiMonitor.endCallError(functionName, error);
         throw error;
       }
 

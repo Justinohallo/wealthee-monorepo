@@ -1,11 +1,11 @@
 import { AccountBalances } from "./_components/AccountBalances";
-import AccountHoldings from "./_components/AccountHoldings";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
-import { Suspense } from "react";
 import { fetchAccountDetails } from "@/services/snaptrade/accounts";
 import { formatCurrency } from "@/lib/utils";
 import { verifySessionAndGetUser } from "@/lib/server-auth-utils";
+import { AccountHoldings } from "./_components/AccountHoldings";
+import { Suspense } from "react";
 
 // Format date to a readable string
 function formatDate(dateString: string): string {
@@ -36,12 +36,13 @@ export default async function AccountDetailsPage({
 
   // Fetch the account details
   const account = await fetchAccountDetails(
-    userId,
-    snapTradeUserId,
-    accountId,
-    idToken
+    {
+      userId,
+      snapTradeUserId,
+      accountId,
+      idToken
+    }
   );
-
   return (
     <div className="p-8">
       <div className="flex items-center mb-6">
@@ -105,7 +106,7 @@ export default async function AccountDetailsPage({
                   <h3 className="text-sm font-medium text-gray-500">Balance</h3>
                   <p className="text-2xl font-bold text-green-600">
                     {account.balance?.total
-                      ? formatCurrency(account.balance.total.amount, account.balance.total.currency)
+                      ? formatCurrency(account.balance.total.amount || 0, account.balance.total.currency || 'CAD')
                       : "N/A"
                     }
                   </p>
@@ -133,7 +134,7 @@ export default async function AccountDetailsPage({
                     <div className="p-4 bg-gray-50 rounded-md">
                       <div className="mb-2">
                         <span className="text-sm font-medium text-gray-500">Last Successful Sync:</span>
-                        <span className="ml-2">{formatDate(account.sync_status.holdings.last_successful_sync)}</span>
+                        <span className="ml-2">{account.sync_status.holdings.last_successful_sync ? formatDate(account.sync_status.holdings.last_successful_sync) : "N/A"}</span>
                       </div>
                       <div>
                         <span className="text-sm font-medium text-gray-500">Initial Sync Completed:</span>
@@ -183,12 +184,6 @@ export default async function AccountDetailsPage({
                       {account.brokerage_authorization}
                     </p>
                   </Link>
-                </div>
-              )}
-              {account.portfolio_group && (
-                <div className="mb-4">
-                  <h3 className="text-sm font-medium text-gray-500">Portfolio Group ID</h3>
-                  <p className="text-sm font-mono p-2 bg-gray-50 rounded-md overflow-x-auto">{account.portfolio_group}</p>
                 </div>
               )}
               {account.raw_type && (

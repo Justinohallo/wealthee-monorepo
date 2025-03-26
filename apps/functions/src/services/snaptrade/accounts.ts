@@ -15,10 +15,15 @@ import { logger } from "../../utils/logger";
  * @param accountId - SnapTrade account ID
  * @returns Account details
  */
-export const getAccountDetails = async (
-  userId: string,
-  userSecret: string,
-  accountId: string
+export const getAccountDetailsService = async (
+  { userId,
+    userSecret,
+    accountId,
+  }: {
+    userId: string,
+    userSecret: string,
+    accountId: string
+  }
 ) => {
   logger.info(`Getting account details for SnapTrade account ${accountId}`, "SnapTradeAccountService");
 
@@ -43,7 +48,7 @@ export const getAccountDetails = async (
  * @param accountId - SnapTrade account ID
  * @returns Account balances
  */
-export const getAccountBalances = async (
+export const getAccountBalancesService = async (
   userId: string,
   userSecret: string,
   accountId: string
@@ -71,11 +76,15 @@ export const getAccountBalances = async (
  * @param accountId - SnapTrade account ID
  * @returns Account holdings
  */
-export const getAccountHoldings = async (
-  userId: string,
-  userSecret: string,
-  accountId: string
-) => {
+export const getAccountHoldingsService = async (
+  { userId,
+    userSecret,
+    accountId,
+  }: {
+    userId: string,
+    userSecret: string,
+    accountId: string
+  }) => {
   logger.info(`Getting holdings for SnapTrade account ${accountId}`, "SnapTradeAccountService");
 
   // Create SnapTrade client

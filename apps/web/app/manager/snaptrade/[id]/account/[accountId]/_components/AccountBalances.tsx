@@ -48,13 +48,13 @@ async function AccountBalancesContent({ idToken, userId, snapTradeUserId, accoun
           {response.map((balance) => (
             <TableRow key={balance.id}>
               <TableCell className="font-medium">
-                {balance.currency}
+                {balance.currency?.name}
               </TableCell>
               <TableCell className="text-right">
-                {formatCurrency(balance.value, balance.currency)}
+                {formatCurrency(balance.cash || 0, balance.currency?.code || 'CAD')}
               </TableCell>
               <TableCell className="text-right">
-                {formatCurrency(balance.value, balance.currency)}
+                {formatCurrency(balance.buying_power || 0, balance.currency?.code || 'CAD')}
               </TableCell>
             </TableRow>
           ))}
