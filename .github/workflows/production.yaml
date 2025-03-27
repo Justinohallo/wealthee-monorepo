@@ -69,7 +69,7 @@ jobs:
           run: CI=false npx turbo build --filter=@repo/functions
 
         - name: Deploy to Hosting and Functions
-          run: firebase deploy --only functions --token ${{ secrets.FIREBASE_TOKEN }} --project wealthee-a97ed --force
+          run: firebase deploy --only functions --token ${{ secrets.FIREBASE_TOKEN }} --project wealthee-a97ed --force --debug
 
     Deploy-Production:
       runs-on: ubuntu-latest
@@ -107,4 +107,4 @@ jobs:
             --env API_ROUTE_TEST="${{ secrets.API_ROUTE_TEST }}" \
             --env FIREBASE_PROJECT_ID="${{ secrets.FIREBASE_PROJECT_ID }}" \
             --env FIREBASE_CLIENT_EMAIL="${{ secrets.FIREBASE_CLIENT_EMAIL }}" \
-            --env FIREBASE_PRIVATE_KEY="${{ secrets.FIREBASE_PRIVATE_KEY }}" 
+            --env FIREBASE_PRIVATE_KEY="${{ secrets.FIREBASE_PRIVATE_KEY }}"
