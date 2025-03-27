@@ -160,15 +160,14 @@ export const getAccountPositionsService = async (
 
 /**
  * Gets account orders for a specific SnapTrade account
- *
- * @param userId - SnapTrade user ID
+ * @param userId - Firebase user ID
  * @param userSecret - SnapTrade user secret
  * @param accountId - SnapTrade account ID
- * @param state - Filter orders by state: 'all', 'open', or 'executed'
- * @param days - Number of days in the past to fetch orders (default: 30)
- * @returns Account orders
+ * @param state - Filter by order state (default: 'all')
+ * @param days - Number of days to look back (default: 30)
+ * @returns Promise with account orders data
  */
-export const getAccountOrdersService = async (
+export async function getAccountOrdersService(
   {
     userId,
     userSecret,
@@ -179,16 +178,14 @@ export const getAccountOrdersService = async (
     userId: string,
     userSecret: string,
     accountId: string,
-    state?: "all" | "open" | "executed",
-    days?: number
-  }) => {
-  logger.info(`Getting orders for SnapTrade account ${accountId}`, "SnapTradeAccountService");
+    state: "all" | "open" | "executed",
+    days: number
+  }
+) {
+  logger.info(`Getting account orders for account ${accountId}`, "SnapTradeAccounts");
 
-  // Create SnapTrade client
-  const snaptrade = createSnapTradeClient();
-
-  // Call SnapTrade API
-  const response = await snaptrade.accountInformation.getUserAccountOrders({
+  const client = await createSnapTradeClient();
+  const response = await client.accountInformation.getUserAccountOrders({
     userId,
     userSecret,
     accountId,
@@ -197,4 +194,62 @@ export const getAccountOrdersService = async (
   });
 
   return response.data;
-};
+}
+
+/**
+ * Gets account activities for a specific SnapTrade account
+ * @param params - Request parameters
+ * @param params.userId - Firebase user ID
+ * @param params.userSecret - SnapTrade user secret
+ * @param params.accountId - SnapTrade account ID
+ * @param params.startDate - Start date for activities (optional)
+ * @param params.endDate - End date for activities (optional)
+ * @returns Promise with account activities data
+ */
+export async function getAccountActivitiesService(
+  {
+    userId,
+    userSecret,
+    accountId,
+    startDate,
+    endDate
+  }: {
+    userId: string,
+    userSecret: string,
+    accountId: string,
+    startDate?: string,
+    endDate?: string
+  }
+) {
+  logger.info(`Getting account activities for account ${accountId}`, "SnapTradeAccounts");
+
+  const client = await createSnapTradeClient();
+
+  // Default to last 30 days if dates not provided
+  let formattedStartDate = startDate;
+  let formattedEndDate = endDate;
+
+  if (!formattedStartDate) {
+    const thirtyDaysAgo = new Date();
+    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+    formattedStartDate = thirtyDaysAgo.toISOString().split("T")[0]; // Format as YYYY-MM-DD
+  }
+
+  if (!formattedEndDate) {
+    const today = new Date();
+    formattedEndDate = today.toISOString().split("T")[0]; // Format as YYYY-MM-DD
+  }
+
+  // Create request parameters
+  const params = {
+    userId,
+    userSecret,
+    accountId,
+    startDate: formattedStartDate,
+    endDate: formattedEndDate
+  };
+
+  const response = await client.accountInformation.getAccountActivities(params);
+
+  return response.data;
+}

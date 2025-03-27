@@ -1,12 +1,11 @@
 "use client"
 
-import type React from "react"
-
-import { useState } from "react"
-import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import type React from "react"
+import { useRouter } from "next/navigation"
+import { useState } from "react"
 
 interface PortfolioManager {
   id: string
@@ -24,7 +23,6 @@ export default function EditPortfolioManagerForm({ manager }: { manager: Portfol
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     // Here you would typically send a request to your API to update the manager
-    console.log("Updating manager:", { id: manager.id, name, email })
     // Simulate API call
     await new Promise((resolve) => setTimeout(resolve, 1000))
     router.push("/admin/portfolio-managers")

@@ -36,7 +36,6 @@ export const AccountHoldings = async ({
     );
 
   }
-  console.log(response)
   return (
     <div className="space-y-6">
       {/* Stock Positions */}

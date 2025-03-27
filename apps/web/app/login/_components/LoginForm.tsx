@@ -57,9 +57,7 @@ export const LoginForm = () => {
       if (response.ok) {
         const data = await response.json()
 
-        // Log the custom claims from both client-side and server-side
-        console.log("Client-side custom claims:", customClaims)
-        console.log("Server-side user data:", data.user)
+
 
         // Store user role in localStorage for easy access if needed
         const userRole = data.user?.role || customClaims?.role as UserRole

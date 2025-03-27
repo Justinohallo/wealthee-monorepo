@@ -9,7 +9,6 @@ export default async function PortfolioManagerPage({ params }: { params: { id: s
   const user = await verifySessionAndGetUser();
   const { id } = await params;
   const manager = await getPortfolioManager(user?.token || '', id,)
-  console.log({ manager })
   return (
     <div className="p-8">
       <div className="flex justify-between items-center mb-6">

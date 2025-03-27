@@ -207,6 +207,20 @@ export interface Order {
   symbol: string;
 }
 
+export interface Activity {
+  id: string;
+  account_id: string;
+  date: string;
+  type: string;
+  description: string;
+  symbol?: string;
+  currency: string;
+  amount: number;
+  fee?: number;
+  // For cash flow transactions
+  institution_id?: string;
+}
+
 export interface AccountHoldingsResponse {
   account: SnapTradeAccount;
   balances: Balance[];

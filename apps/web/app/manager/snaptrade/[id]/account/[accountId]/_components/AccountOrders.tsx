@@ -1,6 +1,6 @@
-import { AccountOrdersList } from "@/components/account/AccountOrdersList";
-import { getAccountOrders } from "@/services/snaptrade/accounts";
+import { AccountOrdersList } from "./AccountOrdersList";
 import { Suspense } from "react";
+import { getAccountOrders } from "@/services/snaptrade/accounts";
 
 interface AccountOrdersProps {
     idToken: string;

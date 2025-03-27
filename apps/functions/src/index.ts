@@ -7,7 +7,7 @@ import * as clientFunctions from "./functions/clients";
 import * as portfolioManagerFunctions from "./functions/portfolio-manager";
 import * as snapTradeFunctions from "./functions/snaptrade";
 
-// Export functions by domain
+// Export functions by domain using barrel exports
 export const client = clientFunctions;
 export const snaptrade = snapTradeFunctions;
 export const portfolioManager = portfolioManagerFunctions;

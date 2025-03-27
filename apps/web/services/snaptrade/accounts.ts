@@ -1,7 +1,7 @@
 import { SNAPTRADE } from "@/constants/functionNames";
 import { callFirebaseFunction } from "@/lib/firebase-functions";
-import { type Balance, type Account, type AccountHoldingsAccount, type Position } from "snaptrade-typescript-sdk/dist/models";
-import { type Order } from "@/types/snaptrade";
+import { type Balance, type Account, type AccountHoldingsAccount, type Position, PaginatedUniversalActivity } from "snaptrade-typescript-sdk/dist/models";
+import { type Order, type Activity } from "@/types/snaptrade";
 
 /**
  * List all accounts for a SnapTrade user
@@ -234,6 +234,49 @@ export async function getAccountOrders({
     return response?.data?.orders || [];
   } catch (error) {
     console.error(`Failed to get account orders for account ${accountId}:`, error);
+    throw error; // Re-throw error to allow error boundaries to catch it
+  }
+}
+
+/**
+ * Get account activities
+ */
+export async function getAccountActivities({
+  userId,
+  snapTradeUserId,
+  accountId,
+  idToken,
+  startDate,
+  endDate
+}: {
+  userId: string,
+  snapTradeUserId: string,
+  accountId: string,
+  idToken: string,
+  startDate?: string,
+  endDate?: string
+}) {
+  try {
+    const queryParams: Record<string, string> = {
+      userId,
+      snapTradeUserId,
+      accountId
+    };
+
+    // Add optional parameters if provided
+    if (startDate) queryParams.startDate = startDate;
+    if (endDate) queryParams.endDate = endDate;
+
+    const response = await callFirebaseFunction<{ activities: PaginatedUniversalActivity }>({
+      idToken,
+      functionName: SNAPTRADE.ACCOUNTS.GET_ACCOUNT_ACTIVITIES,
+      queryParams,
+      options: { method: "GET" }
+    });
+
+    return response?.data?.activities || [];
+  } catch (error) {
+    console.error(`Failed to get account activities for account ${accountId}:`, error);
     throw error; // Re-throw error to allow error boundaries to catch it
   }
 }

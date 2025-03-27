@@ -1,0 +1,146 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+# Wealthee Export Patterns
+
+This rule provides standardized export patterns for maintaining a consistent, maintainable codebase.
+
+## Barrel Export Pattern
+
+Wealthee uses the barrel export pattern for organizing and exporting modules. This pattern involves creating index files that re-export the contents of other files in the same directory, making imports cleaner and more manageable.
+
+### Firebase Functions Exports
+
+For Firebase Functions, we use a hierarchical barrel structure:
+
+```typescript
+// apps/functions/src/functions/domain/index.ts - Domain-level barrel file
+export * from './feature1';
+export * from './feature2';
+// ...c
+
+// apps/functions/src/index.ts - Main barrel file
+import * as domainFunctions from './functions/domain';
+export const domain = domainFunctions;
+```
+
+#### ❌ INCORRECT: Direct exports in the main index file
+
+```typescript
+// INCORRECT: Avoid direct exports in the main index file
+import * as domainFunctions from './functions/domain';
+
+export const domain = domainFunctions;
+
+// Don't do this - breaks the barrel pattern
+export { specificFunction } from './functions/domain/feature';
+```
+
+#### ✅ CORRECT: Consistent barrel exports
+
+```typescript
+// CORRECT: Use barrel pattern consistently
+import * as domainFunctions from './functions/domain';
+import * as anotherDomainFunctions from './functions/another-domain';
+
+export const domain = domainFunctions;
+export const anotherDomain = anotherDomainFunctions;
+```
+
+### Web App Exports
+
+For the web application, follow similar patterns:
+
+#### ✅ CORRECT: Component barrel exports
+
+```typescript
+// apps/web/components/ui/index.ts
+export * from './button';
+export * from './card';
+export * from './input';
+
+// Import elsewhere
+import { Button, Card, Input } from '@/components/ui';
+```
+
+#### ✅ CORRECT: Service barrel exports
+
+```typescript
+// apps/web/services/domain/index.ts
+export * from './auth';
+export * from './users';
+
+// Import elsewhere
+import { signIn, getUser } from '@/services/domain';
+```
+
+## Named vs Default Exports
+
+### ❌ INCORRECT: Mixed export styles
+
+```typescript
+// INCORRECT: Avoid mixing default and named exports
+export default function Component() { /* ... */ }
+export function helperFunction() { /* ... */ }
+```
+
+### ✅ CORRECT: Consistent named exports
+
+```typescript
+// CORRECT: Use named exports consistently
+export function Component() { /* ... */ }
+export function helperFunction() { /* ... */ }
+
+// Import elsewhere
+import { Component, helperFunction } from './module';
+```
+
+## Export Best Practices
+
+1. **Organize by Domain**: Group exports by domain or feature area
+2. **Maintain Hierarchical Structure**: Use nested barrel files for complex domains
+3. **Prefer Named Exports**: Use named exports for better discoverability and refactoring
+4. **Keep Paths Clean**: Avoid deep relative paths by using barrel exports
+5. **Be Explicit**: Export only what needs to be public API
+
+## Common Patterns
+
+### Firebase Functions Pattern
+
+```
+src/
+├── functions/
+│   ├── domain1/
+│   │   ├── feature1.ts
+│   │   ├── feature2.ts
+│   │   └── index.ts (exports all features)
+│   ├── domain2/
+│   │   ├── feature1.ts
+│   │   └── index.ts (exports all features)
+│   └── index.ts (exports all domains)
+└── index.ts (main barrel file that exports by domain)
+```
+
+### Web App Pattern
+
+```
+services/
+├── domain1/
+│   ├── feature1.ts
+│   ├── feature2.ts
+│   └── index.ts
+├── domain2/
+│   ├── feature1.ts
+│   └── index.ts
+└── index.ts (optional global barrel)
+```
+
+## When to Create Barrel Files
+
+- Create domain-level barrel files (e.g., `snaptrade/index.ts`) when there are multiple related files in a directory
+- Create component category barrel files (e.g., `ui/index.ts`) for reusable component libraries
+- Avoid creating barrel files for very small feature sets (1-2 files) where the overhead isn't justified
+
+By following these export patterns consistently, we maintain a clean import structure and make refactoring easier across the codebase. 

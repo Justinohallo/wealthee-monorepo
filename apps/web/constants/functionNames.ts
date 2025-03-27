@@ -54,6 +54,10 @@ export const SNAPTRADE = {
      * 'snaptrade-accounts-getAccountOrders'
      */
     GET_ACCOUNT_ORDERS: 'snaptrade-accounts-getAccountOrders',
+    /**
+     * 'snaptrade-accounts-getAccountActivities'
+     */
+    GET_ACCOUNT_ACTIVITIES: 'snaptrade-accounts-getAccountActivities',
   },
 
   CONNECTIONS: {
