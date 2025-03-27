@@ -1,5 +1,5 @@
 import {
-  // getAccountActivitiesService,
+  getAccountActivitiesService,
   getAccountBalancesService,
   getAccountDetailsService,
   getAccountHoldingsService,
@@ -295,49 +295,49 @@ export const getAccountOrders = createHttpFunction({
  * Results are cached for 10 minutes to improve performance. Date ranges can be specified with
  * startDate and endDate parameters (YYYY-MM-DD format). If not provided, defaults to last 30 days.
  */
-// export const getAccountActivitiesV2 = createHttpFunction({
-//   options: {
-//     requireAuth: true,
-//     requiredRole: "portfolioManager",
-//     secrets: snaptradeSecrets,
-//     requiredParams: {
-//       query: ["snapTradeUserId", "accountId"],
-//     }
-//   },
-//   handler: async ({ req, res }) => {
-//     logger.info("Getting account activities", "SnapTradeAccounts");
+export const getAccountActivities = createHttpFunction({
+  options: {
+    requireAuth: true,
+    requiredRole: "portfolioManager",
+    secrets: snaptradeSecrets,
+    requiredParams: {
+      query: ["snapTradeUserId", "accountId"],
+    }
+  },
+  handler: async ({ req, res }) => {
+    logger.info("Getting account activities", "SnapTradeAccounts");
 
-//     // Get query parameters
-//     const { snapTradeUserId, accountId, startDate, endDate } = req.query;
+    // Get query parameters
+    const { snapTradeUserId, accountId, startDate, endDate } = req.query;
 
-//     if (!snapTradeUserId || !accountId) {
-//       throw new ValidationError("Required parameters missing: snapTradeUserId, accountId");
-//     }
+    if (!snapTradeUserId || !accountId) {
+      throw new ValidationError("Required parameters missing: snapTradeUserId, accountId");
+    }
 
-//     // Get the SnapTrade user from the database
-//     const snapTradeUser = await getSnapTradeUser(snapTradeUserId as string, res);
+    // Get the SnapTrade user from the database
+    const snapTradeUser = await getSnapTradeUser(snapTradeUserId as string, res);
 
-//     if (!snapTradeUser) {
-//       // Error response is handled by getSnapTradeUser if res is passed
-//       return;
-//     }
+    if (!snapTradeUser) {
+      // Error response is handled by getSnapTradeUser if res is passed
+      return;
+    }
 
-//     // Get account activities
-//     const activitiesData = await getAccountActivitiesService({
-//       userId: snapTradeUserId as string,
-//       userSecret: snapTradeUser.userSecret,
-//       accountId: accountId as string,
-//       startDate: startDate as string | undefined,
-//       endDate: endDate as string | undefined
-//     });
+    // Get account activities
+    const activitiesData = await getAccountActivitiesService({
+      userId: snapTradeUserId as string,
+      userSecret: snapTradeUser.userSecret,
+      accountId: accountId as string,
+      startDate: startDate as string | undefined,
+      endDate: endDate as string | undefined
+    });
 
-//     // Return success response
-//     res.json({
-//       success: true,
-//       data: {
-//         activities: activitiesData || []
-//       },
-//       timestamp: new Date().toISOString(),
-//     });
-//   },
-// });
+    // Return success response
+    res.json({
+      success: true,
+      data: {
+        activities: activitiesData || []
+      },
+      timestamp: new Date().toISOString(),
+    });
+  },
+});
