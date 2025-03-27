@@ -2,7 +2,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { getSnapTradeBrokerageConnectionURL, listBrokerageConnections } from "@/services/snaptrade/connections";
 
 import AccountsList from "./_components/AccountsList";
-import { BrokerageAuthorization } from "snaptrade-typescript-sdk/dist/models/brokerage-authorization";
+import { BrokerageAuthorization } from "@/types/snaptrade";
 import { Button } from "@/components/ui/button";
 import { DeleteBrokerageConnectionButton } from "./_components/DeleteBrokerageConnectionButton";
 import { DeleteSnapTradeUserButton } from "../@users/_components/DeleteUserButton";

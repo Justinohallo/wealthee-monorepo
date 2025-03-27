@@ -1,7 +1,14 @@
+import {
+  Account,
+  AccountHoldingsAccount,
+  Balance,
+  Order,
+  PaginatedUniversalActivity,
+  Position
+} from "@/types/snaptrade";
+
 import { SNAPTRADE } from "@/constants/functionNames";
 import { callFirebaseFunction } from "@/lib/firebase-functions";
-import { type Balance, type Account, type AccountHoldingsAccount, type Position, PaginatedUniversalActivity } from "snaptrade-typescript-sdk/dist/models";
-import { type Order, type Activity } from "@/types/snaptrade";
 
 /**
  * List all accounts for a SnapTrade user

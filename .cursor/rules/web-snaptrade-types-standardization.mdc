@@ -1,0 +1,112 @@
+# SnapTrade Types Standardization Plan
+
+This document outlines our standardization approach for SnapTrade types throughout the Wealthee application.
+
+## Core Principles
+
+1. **Single Source of Truth**: All SnapTrade types should be imported and re-exported from `apps/web/types/snaptrade.ts` 
+2. **No Direct SDK Imports**: Components should never import types directly from `snaptrade-typescript-sdk`
+3. **Type Consistency**: Our own type definitions should align with SnapTrade SDK types where applicable
+4. **Modification Flexibility**: Re-exporting allows us to modify or extend types when needed
+
+## Implementation Details
+
+### 1. Central Type Repository
+
+The file `apps/web/types/snaptrade.ts` serves as the central repository for all SnapTrade types:
+
+```typescript
+// Import SDK types
+import {
+  AccountSimple,
+  AccountHoldings,
+  Balance,
+  BrokerageAuthorization,
+  // ... other imports
+} from "snaptrade-typescript-sdk";
+
+// Import types from models
+import {
+  Account,
+  AccountHoldingsAccount,
+} from "snaptrade-typescript-sdk/dist/models";
+
+// Re-export types using 'export type' for proper module compatibility
+export type { 
+  Account,
+  Balance,
+  // ... other re-exports
+};
+
+// For backward compatibility with existing code
+export type OptionPosition = OptionsPosition;
+export type OptionSymbol = OptionsSymbol;
+
+// Define custom types where needed
+export interface Order {
+  // Custom implementation
+}
+```
+
+### 2. Import Pattern for Components
+
+All components should import types exclusively from our central type repository:
+
+```typescript
+// CORRECT
+import { PaginatedUniversalActivity } from "@/types/snaptrade";
+
+// INCORRECT - Do not do this
+import { PaginatedUniversalActivity } from "snaptrade-typescript-sdk";
+```
+
+### 3. Type Extension and Aliasing
+
+We use two approaches for handling SDK types:
+
+1. **Direct Re-exports**: For types we use as-is
+   ```typescript
+   export type { AccountSimple, Balance } from "snaptrade-typescript-sdk";
+   ```
+
+2. **Type Aliases**: For types with naming differences to maintain backward compatibility
+   ```typescript
+   export type OptionPosition = OptionsPosition; 
+   ```
+
+3. **Custom Interfaces**: For types not available in the SDK or requiring customization
+   ```typescript
+   export interface Order {
+     // Our implementation
+   }
+   ```
+
+## Benefits of Our Implementation
+
+1. **TypeScript Module Compatibility**: Using `export type` ensures compatibility with TypeScript's `isolatedModules` setting
+2. **Clear Type Origins**: Separating SDK imports from our custom types makes the code more maintainable
+3. **Backward Compatibility**: Type aliases preserve existing code that uses our naming conventions
+4. **Reduced Duplication**: Eliminated redundant type definitions by leveraging SDK types directly
+5. **Future-Proofing**: Changes to the SDK's type structure can be managed in one place
+
+## Verification
+
+To verify that all components are using types from our central repository:
+
+```bash
+# Run the standardization check script
+bash scripts/standardize-snaptrade-types.sh
+```
+
+This script will scan the codebase for direct imports from the SDK and report any files that need to be updated.
+
+## Handling SDK Updates
+
+When the SnapTrade SDK is updated:
+
+1. Review the changes to SDK types in `snaptrade-typescript-sdk`
+2. Update imports and re-exports in `apps/web/types/snaptrade.ts` as needed
+3. If necessary, modify our custom types to match the updated SDK
+4. Run TypeScript checks to ensure compatibility: `npx tsc --noEmit`
+
+This approach allows us to centralize the impact of SDK changes and minimize the effect on our application code. 

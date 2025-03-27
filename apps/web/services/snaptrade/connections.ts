@@ -1,4 +1,4 @@
-import { BrokerageAuthorization } from "snaptrade-typescript-sdk";
+import { BrokerageAuthorization } from "@/types/snaptrade";
 import { SNAPTRADE } from "@/constants/functionNames";
 import { callFirebaseFunction } from "@/lib/firebase-functions";
 

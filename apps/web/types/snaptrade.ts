@@ -1,195 +1,68 @@
 /**
  * SnapTrade Types
  *
- * Comprehensive type definitions for SnapTrade integration
+ * Centralized type definitions for SnapTrade integration
+ * Acts as a buffer between our app and the SDK to allow for easier updates
  */
 
-// Common Interfaces
-export interface Currency {
-  id: string;
-  code: string;
-  name: string;
-}
+// Import types from models
+import {
+  Account,
+  AccountHoldingsAccount,
+} from "snaptrade-typescript-sdk/dist/models";
+// Import SDK types
+import {
+  AccountHoldings,
+  AccountInformationApi,
+  AccountSimple,
+  AccountSyncStatus,
+  AccountUniversalActivity,
+  Balance,
+  BrokerageAuthorization,
+  BrokerageType,
+  Currency,
+  Exchange,
+  OptionsPosition,
+  OptionsSymbol,
+  PaginatedUniversalActivity,
+  Position,
+  SecurityType,
+  UniversalActivity,
+  UniversalSymbol,
+} from "snaptrade-typescript-sdk";
 
-export interface AccountBalance {
-  total: {
-    amount: number;
-    currency: string;
-  };
-}
+// Re-export types using 'export type' for proper module compatibility
+export type {
+  Account,
+  AccountHoldingsAccount,
+  AccountSimple,
+  AccountHoldings,
+  AccountSyncStatus,
+  AccountUniversalActivity,
+  Balance,
+  BrokerageAuthorization,
+  BrokerageType,
+  Currency,
+  Exchange,
+  OptionsPosition,
+  OptionsSymbol,
+  PaginatedUniversalActivity,
+  Position,
+  SecurityType,
+  UniversalActivity,
+  UniversalSymbol,
+};
 
-export interface AccountSyncStatus {
-  holdings: {
-    last_successful_sync: string;
-    initial_sync_completed: boolean;
-  };
-  transactions: {
-    last_successful_sync: string;
-    first_transaction_date: string | null;
-    initial_sync_completed: boolean;
-  };
-}
+// For backward compatibility with existing code
+export type OptionPosition = OptionsPosition;
+export type OptionSymbol = OptionsSymbol;
 
-export interface AccountMeta {
-  type: string;
-  status: "open" | "closed";
-  institution_name: string;
-  unifiedAccountType: string;
-  linked_account_id?: string;
-}
-
-// Brokerage related types
-export interface BrokerageType {
-  id: string;
-  name: string;
-  display_name: string;
-  description: string;
-  aws_s3_logo_url: string;
-  slug: string;
-}
-
-export interface SnapTradeBrokerageAuthorization {
-  id: string;
-  created_date: string;
-  updated_date: string;
-  name: string;
-  type: string;
-  disabled: boolean;
-  brokerage: BrokerageType;
-}
-
-// Account related types
-export interface SnapTradeAccount {
-  id: string;
-  brokerage_authorization: string;
-  portfolio_group: string;
-  name: string;
-  number: string;
-  institution_name: string;
-  meta: AccountMeta;
-  cash_restrictions: unknown[];
-  created_date: string;
-  sync_status: AccountSyncStatus;
-  balance: AccountBalance;
-  raw_data: unknown;
-  raw_type: string;
-}
-
-// User types
-export interface SnapTradeUser {
-  id: string;
-  displayName: string;
-  createdAt: number;
-}
-
-// Balance related types
-export interface Balance {
-  currency: Currency;
-  cash: number;
-  buying_power: number;
-}
-
-// Response types
-export interface SnapTradeAccountsResponse {
-  accounts: SnapTradeAccount[];
-}
-
-export interface SnapTradeLoginResponse {
-  loginResponse: {
-    redirectURI: string;
-  };
-}
-
-export interface SnapTradeAccountDetailsResponse {
-  accountDetails: SnapTradeAccount;
-}
-
-export interface SnapTradeAccountBalancesResponse {
-  balances: Balance[];
-}
-
-export interface SnapTradeUsersResponse {
-  snapTradeUsers: SnapTradeUser[];
-}
-
-export interface SnapTradeBrokerageAuthorizationsResponse {
-  brokerageAuthorizations: SnapTradeBrokerageAuthorization[];
-}
-
-// Holdings related types
-export interface TotalValue {
-  value: number;
-  currency: string;
-}
-
-export interface SecurityType {
-  id: string;
-  code: string;
-  description: string;
-}
-
-export interface UniversalSymbol {
-  id: string;
-  symbol: string;
-  raw_symbol: string;
-  description: string;
-  currency: Currency;
-  exchange?: {
-    id: string;
-    code: string;
-    name: string;
-  };
-  type: SecurityType;
-  figi_code?: string;
-}
-
-export interface SymbolWrapper {
-  symbol: UniversalSymbol;
-  id: string;
-  description: string;
-  local_id?: string;
-  is_quotable?: boolean;
-  is_tradable?: boolean;
-}
-
-export interface Position {
-  symbol: SymbolWrapper;
-  units: number;
-  price: number;
-  open_pnl?: number;
-  average_purchase_price?: number;
-  fractional_units?: number;
-}
-
-export interface OptionSymbol {
-  id: string;
-  ticker: string;
-  option_type: string;
-  strike_price: number;
-  expiration_date: string;
-  is_mini_option: boolean;
-  underlying_symbol: UniversalSymbol;
-}
-
-export interface OptionSymbolWrapper {
-  option_symbol: OptionSymbol;
-  id: string;
-  description: string;
-}
-
-export interface OptionPosition {
-  symbol: OptionSymbolWrapper;
-  price: number;
-  units: number;
-  average_purchase_price: number;
-  currency: Currency;
-}
-
+// Define our own Order type since it's not directly available from the SDK
 export interface Order {
   brokerage_order_id: string;
   status: string;
-  universal_symbol: UniversalSymbol;
-  option_symbol?: OptionSymbol;
+  universal_symbol?: UniversalSymbol;
+  symbol: string;
   action: string;
   total_quantity: number;
   open_quantity: number;
@@ -204,9 +77,54 @@ export interface Order {
   time_updated?: string;
   time_executed?: string;
   expiry_date?: string;
-  symbol: string;
 }
 
+// Response types - these can remain as custom interfaces
+export interface SnapTradeLoginResponse {
+  loginResponse: {
+    redirectURI: string;
+  };
+}
+
+export interface SnapTradeAccountsResponse {
+  accounts: Account[];
+}
+
+export interface SnapTradeAccountDetailsResponse {
+  accountDetails: Account;
+}
+
+export interface SnapTradeAccountBalancesResponse {
+  balances: Balance[];
+}
+
+export interface SnapTradeUsersResponse {
+  snapTradeUsers: {
+    id: string;
+    displayName: string;
+    createdAt: number;
+  }[];
+}
+
+export interface SnapTradeBrokerageAuthorizationsResponse {
+  brokerageAuthorizations: BrokerageAuthorization[];
+}
+
+export interface TotalValue {
+  value: number;
+  currency: string;
+}
+
+export interface AccountHoldingsResponse {
+  account: Account;
+  balances: Balance[];
+  positions: Position[];
+  option_positions: OptionsPosition[];
+  orders: Order[];
+  total_value: TotalValue;
+}
+
+// For activities we'll maintain our own type since we need customizations
 export interface Activity {
   id: string;
   account_id: string;
@@ -217,15 +135,5 @@ export interface Activity {
   currency: string;
   amount: number;
   fee?: number;
-  // For cash flow transactions
   institution_id?: string;
-}
-
-export interface AccountHoldingsResponse {
-  account: SnapTradeAccount;
-  balances: Balance[];
-  positions: Position[];
-  option_positions: OptionPosition[];
-  orders: Order[];
-  total_value: TotalValue;
 }

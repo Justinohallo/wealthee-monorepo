@@ -3,7 +3,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { cn, formatCurrency } from "@/lib/utils";
 
 import { Badge } from "@/components/ui/badge";
-import { PaginatedUniversalActivity } from "snaptrade-typescript-sdk";
+import { PaginatedUniversalActivity } from "@/types/snaptrade";
 
 interface AccountActivitiesListProps {
   activities: PaginatedUniversalActivity;
