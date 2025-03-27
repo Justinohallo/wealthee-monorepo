@@ -11,3 +11,5 @@ If there are more than 2 function arguments, you must use an object.
 Functions should be short and only do one thing. Separate functions into smaller units when necessary. 
 
 Think about writing Functional Code. 
+
+When creating utility functions, determine if one exists in the project you are working on. If not, add it to the utility directory and use it. 

@@ -1,6 +1,7 @@
 import { SNAPTRADE } from "@/constants/functionNames";
 import { callFirebaseFunction } from "@/lib/firebase-functions";
 import { type Balance, type Account, type AccountHoldingsAccount, type Position } from "snaptrade-typescript-sdk/dist/models";
+import { type Order } from "@/types/snaptrade";
 
 /**
  * List all accounts for a SnapTrade user
@@ -191,5 +192,48 @@ export async function fetchSnapTradeAccounts(
   } catch (error) {
     console.error("Error fetching SnapTrade accounts:", error);
     throw error
+  }
+}
+
+/**
+ * Get account orders
+ */
+export async function getAccountOrders({
+  userId,
+  snapTradeUserId,
+  accountId,
+  idToken,
+  state,
+  days
+}: {
+  userId: string,
+  snapTradeUserId: string,
+  accountId: string,
+  idToken: string,
+  state?: 'all' | 'open' | 'executed',
+  days?: number
+}) {
+  try {
+    const queryParams: Record<string, string> = {
+      userId,
+      snapTradeUserId,
+      accountId
+    };
+
+    // Add optional parameters if provided
+    if (state) queryParams.state = state;
+    if (days) queryParams.days = days.toString();
+
+    const response = await callFirebaseFunction<{ orders: Order[] }>({
+      idToken,
+      functionName: SNAPTRADE.ACCOUNTS.GET_ACCOUNT_ORDERS,
+      queryParams,
+      options: { method: "GET" }
+    });
+
+    return response?.data?.orders || [];
+  } catch (error) {
+    console.error(`Failed to get account orders for account ${accountId}:`, error);
+    throw error; // Re-throw error to allow error boundaries to catch it
   }
 }

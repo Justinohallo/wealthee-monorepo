@@ -2,6 +2,7 @@ import {
   getAccountBalancesService,
   getAccountDetailsService,
   getAccountHoldingsService,
+  getAccountOrdersService,
   getAccountPositionsService,
   listUserAccounts as listSnapTradeUserAccounts
 } from "../../services/snaptrade/accounts";
@@ -141,7 +142,6 @@ export const getAccountDetails = createHttpFunction({
 });
 
 
-
 /**
  * Returns a list of balances for the account.
  * Each element of the list has a distinct currency.
@@ -232,6 +232,47 @@ export const getAccountPositions = createHttpFunction({
   },
 });
 
+/**
+ * Returns account orders for a specific SnapTrade account.
+ *
+ * The data returned here is cached and includes orders from the past 30 days by default.
+ * The state parameter can be used to filter orders: 'all', 'open', or 'executed'.
+ */
+export const getAccountOrders = createHttpFunction({
+  options: {
+    requireAuth: true,
+    requiredRole: "portfolioManager",
+    secrets: snaptradeSecrets,
+    requiredParams: {
+      query: ["snapTradeUserId", "accountId"]
+    }
+  },
+  handler: async ({ req, res }) => {
+    // Get query parameters
+    const { snapTradeUserId, accountId, state, days } = req.query;
 
+    // Get the SnapTrade user from the database
+    const snapTradeUser = await getSnapTradeUser(snapTradeUserId as string, res);
 
+    if (!snapTradeUser) {
+      // Error response is handled by getSnapTradeUser if res is passed
+      return;
+    }
 
+    // Get account orders using the service
+    const orders = await getAccountOrdersService({
+      userId: snapTradeUserId as string,
+      userSecret: snapTradeUser.userSecret,
+      accountId: accountId as string,
+      state: state as "all" | "open" | "executed" | undefined,
+      days: days ? parseInt(days as string, 10) : undefined
+    });
+
+    // Return success response
+    res.json({
+      success: true,
+      data: { orders },
+      timestamp: new Date().toISOString(),
+    });
+  },
+});

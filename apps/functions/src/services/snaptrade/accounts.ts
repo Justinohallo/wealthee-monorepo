@@ -157,3 +157,44 @@ export const getAccountPositionsService = async (
 
   return response.data;
 };
+
+/**
+ * Gets account orders for a specific SnapTrade account
+ *
+ * @param userId - SnapTrade user ID
+ * @param userSecret - SnapTrade user secret
+ * @param accountId - SnapTrade account ID
+ * @param state - Filter orders by state: 'all', 'open', or 'executed'
+ * @param days - Number of days in the past to fetch orders (default: 30)
+ * @returns Account orders
+ */
+export const getAccountOrdersService = async (
+  {
+    userId,
+    userSecret,
+    accountId,
+    state = "all",
+    days = 30
+  }: {
+    userId: string,
+    userSecret: string,
+    accountId: string,
+    state?: "all" | "open" | "executed",
+    days?: number
+  }) => {
+  logger.info(`Getting orders for SnapTrade account ${accountId}`, "SnapTradeAccountService");
+
+  // Create SnapTrade client
+  const snaptrade = createSnapTradeClient();
+
+  // Call SnapTrade API
+  const response = await snaptrade.accountInformation.getUserAccountOrders({
+    userId,
+    userSecret,
+    accountId,
+    state,
+    days
+  });
+
+  return response.data;
+};

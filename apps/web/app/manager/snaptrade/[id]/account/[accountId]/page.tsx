@@ -1,6 +1,7 @@
 import { AccountBalances } from "./_components/AccountBalances";
 import { AccountHoldings } from "./_components/AccountHoldings";
 import { AccountPositions } from "./_components/AccountPositions";
+import { AccountOrders } from "./_components/AccountOrders";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { Suspense } from "react";
@@ -126,6 +127,14 @@ export default async function AccountDetailsPage({
 
           {/* Account Positions */}
           <AccountPositions
+            idToken={idToken}
+            userId={userId}
+            snapTradeUserId={snapTradeUserId}
+            accountId={accountId}
+          />
+
+          {/* Account Orders */}
+          <AccountOrders
             idToken={idToken}
             userId={userId}
             snapTradeUserId={snapTradeUserId}

@@ -1,0 +1,127 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+# Fullstack Feature Implementation Guide
+
+This rule provides a high-level workflow for implementing end-to-end features across the Firebase Functions backend and Next.js web application.
+
+## Feature Implementation Workflow
+
+### 1. Planning & Requirements
+
+- [ ] Define clear user stories and acceptance criteria
+- [ ] Identify required data models and API contracts
+- [ ] Consider security requirements (authentication, authorization)
+- [ ] Plan data flow between frontend and backend components
+
+### 2. Firebase Function Implementation
+
+- [ ] Define function name constant in `apps/web/constants/functionNames.ts`
+- [ ] Create service implementation in `apps/functions/src/services/[domain]/`
+  - [ ] Implement core business logic
+  - [ ] Create proper interfaces for input/output
+  - [ ] Add comprehensive error handling
+  - [ ] Include logging at appropriate levels
+- [ ] Create HTTP function wrapper in `apps/functions/src/functions/[domain]/`
+  - [ ] Use `createHttpFunction` utility with proper options
+  - [ ] Define required auth and parameters
+  - [ ] Handle request validation
+  - [ ] Call service function and format response
+- [ ] Add type definitions if needed in `apps/functions/src/types/`
+- [ ] Export function in `apps/functions/src/index.ts`
+- [ ] Test function with appropriate test cases
+- [ ] Run linting: `npm run lint` from the functions directory
+- [ ] Run type checking: `npm run tsc` from the functions directory
+- [ ] Verify function builds: `npm run build` from the functions directory
+
+### 3. Web App Service Implementation
+
+- [ ] Create corresponding service function in `apps/web/services/[domain]/`
+  - [ ] Follow service pattern with proper error handling
+  - [ ] Use object destructuring for 3+ parameters
+  - [ ] Include proper TypeScript types for parameters and return values
+  - [ ] Reference function name from constants
+  - [ ] Throw errors rather than returning null
+  - [ ] Return empty arrays for collection results
+- [ ] Add or update type definitions in `apps/web/types/` if needed
+- [ ] Export service function in domain index file
+- [ ] Run type checking: `npm run tsc` from the web directory
+
+### 4. UI Implementation (Next.js)
+
+- [ ] Identify the appropriate page or component structure
+- [ ] Create server components for data fetching
+  - [ ] Use service functions for data retrieval
+  - [ ] Implement error handling and loading states
+  - [ ] Use Suspense boundaries appropriately
+- [ ] Create client components for interactive elements
+  - [ ] Implement form handling with react-hook-form if needed
+  - [ ] Add client-side validation with zod
+  - [ ] Create handlers for user actions
+- [ ] Style UI using TailwindCSS and the component library
+  - [ ] Ensure responsive design (mobile-first approach)
+  - [ ] Match existing design patterns
+  - [ ] Use appropriate UI components from the library
+- [ ] Implement proper error boundaries
+- [ ] Ensure accessibility compliance
+- [ ] Test across different devices and screen sizes
+- [ ] Run type checking and linting
+
+### 5. Testing & Validation
+
+- [ ] Verify end-to-end functionality works as expected
+- [ ] Test edge cases and error scenarios
+- [ ] Validate against acceptance criteria
+- [ ] Check for any performance issues
+- [ ] Review code for security vulnerabilities
+- [ ] Ensure proper error messages are displayed to users
+
+## Implementation Tips
+
+### Firebase Functions
+
+- Use middleware for cross-cutting concerns
+- Follow the pattern of keeping business logic in services
+- Use typed interfaces for input/output parameters
+- Include proper validation for all inputs
+- Return standardized response objects
+- Handle errors gracefully with appropriate status codes
+
+### Web App Services
+
+- Use the pattern established in `web-app-services.md`
+- Keep service functions focused on data fetching/mutation
+- Handle errors properly to allow React Error Boundaries to catch them
+- Use TypeScript for all parameter and return types
+- Return empty collections rather than null for lists
+
+### React Components
+
+- Separate concerns between server and client components
+- Use server components for data fetching
+- Use client components for interactivity
+- Implement proper loading and error states
+- Follow existing UI patterns for consistency
+
+## Common Pitfalls
+
+- Not handling authentication/authorization consistently
+- Missing error handling in the UI
+- Inconsistent data validation between frontend and backend
+- Not using TypeScript properly for type safety
+- Implementing duplicate business logic across frontend and backend
+- Not testing edge cases and error scenarios
+- Using hardcoded strings instead of constants for function names
+- Not considering mobile viewports in UI design
+
+## Example Feature Flow
+
+1. Create Firebase Function for data operations
+<!-- 2. Test the function directly to ensure it works -->
+3. Create web app service to interact with the function
+4. Build UI components that use the service
+5. Implement proper error handling and loading states
+6. Test the complete feature end-to-end
+7. Fix any issues and refine the implementation 
