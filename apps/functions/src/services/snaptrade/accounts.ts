@@ -124,3 +124,36 @@ export const listUserAccounts = async (
 
   return response.data;
 };
+
+
+/**
+ * Gets positions for a specific SnapTrade account
+ *
+ * @param userId - SnapTrade user ID
+ * @param userSecret - SnapTrade user secret
+ * @param accountId - SnapTrade account ID
+ * @returns Account positions
+ */
+export const getAccountPositionsService = async (
+  { userId,
+    userSecret,
+    accountId,
+  }: {
+    userId: string,
+    userSecret: string,
+    accountId: string
+  }) => {
+  logger.info(`Getting positions for SnapTrade account ${accountId}`, "SnapTradeAccountService");
+
+  // Create SnapTrade client
+  const snaptrade = createSnapTradeClient();
+
+  // Call SnapTrade API
+  const response = await snaptrade.accountInformation.getUserAccountPositions({
+    userId,
+    userSecret,
+    accountId
+  });
+
+  return response.data;
+};

@@ -1,0 +1,289 @@
+# Web App Service Function Guidelines
+
+This rule provides guidelines for implementing service functions in our web application, focusing on:
+- Error handling approaches
+- Parameter patterns
+- Type safety
+- Function structure
+- Naming conventions
+
+## Error Handling
+
+### ❌ INCORRECT: Swallowing errors and returning null
+
+```typescript
+export async function getAccountDetails(params) {
+  try {
+    const response = await callFirebaseFunction({/*...*/});
+    return response?.data || null;
+  } catch (error) {
+    console.error("Failed to get account details:", error);
+    return null; // Error is lost, UI just shows empty state
+  }
+}
+```
+
+### ✅ CORRECT: Re-throw for error boundaries to catch
+
+```typescript
+export async function getAccountDetails(params) {
+  try {
+    const response = await callFirebaseFunction({/*...*/});
+    return response?.data || null;
+  } catch (error) {
+    console.error("Failed to get account details:", error);
+    throw error; // Error bubbles up to nearest error boundary
+  }
+}
+```
+
+## Parameter Patterns
+
+### ❌ INCORRECT: Inconsistent parameter formats
+
+```typescript
+// Inconsistent: Some functions use objects, others use positional parameters
+export async function getAccountDetails(userId, snapTradeUserId, accountId, idToken) {
+  // Implementation
+}
+
+// Inconsistent: No type annotations
+export async function getUser(userId, idToken) {
+  // Implementation
+}
+```
+
+### ✅ CORRECT: Object destructuring for 3+ parameters
+
+```typescript
+export async function getAccountDetails({
+  userId,
+  snapTradeUserId,
+  accountId,
+  idToken,
+}: {
+  userId: string,
+  snapTradeUserId: string,
+  accountId: string,
+  idToken: string
+}) {
+  // Implementation
+}
+```
+
+### ✅ CORRECT: Individual parameters for simpler functions
+
+```typescript
+export async function getUser(
+  userId: string,
+  idToken: string
+): Promise<User | null> {
+  // Implementation
+}
+```
+
+## Return Type Handling
+
+### ❌ INCORRECT: Missing return types
+
+```typescript
+// Missing explicit return type
+export async function getUser(userId, idToken) {
+  // Implementation
+}
+
+// Incorrect: Not using generics with callFirebaseFunction
+const response = await callFirebaseFunction({
+  idToken,
+  functionName: USERS.GET_USER,
+  // ...
+});
+```
+
+### ✅ CORRECT: Clear TypeScript return types
+
+```typescript
+export async function getUser(
+  userId: string,
+  idToken: string
+): Promise<User | null> {
+  // Implementation
+}
+
+// Using generics with callFirebaseFunction
+const response = await callFirebaseFunction<UserResponse>({
+  idToken,
+  functionName: USERS.GET_USER,
+  // ...
+});
+```
+
+## Function Structure
+
+### ❌ INCORRECT: Inconsistent function structure
+
+```typescript
+// Missing try/catch
+export async function getResourceWithoutErrorHandling(params) {
+  const response = await callFirebaseFunction({/*...*/});
+  return response?.data || null;
+}
+
+// Confusing pattern mixing
+export async function inconsistentResourceCall(params) {
+  try {
+    // Missing proper typing
+    const response = await callFirebaseFunction({
+      idToken: params.token, // Inconsistent naming
+      functionName: "hardcoded-string-instead-of-constant",
+      data: { ...params } // Using data instead of queryParams for GET
+    });
+    
+    if (!response) return null;
+    return response.data?.resource;
+  } catch (e) {
+    console.log("Error:", e); // Poor error logging
+    return undefined; // Inconsistent return type (null vs undefined)
+  }
+}
+```
+
+### ✅ CORRECT: Complete function structure
+
+```typescript
+export async function getResourceName(params): Promise<ResourceType | null> {
+  try {
+    // 1. Call Firebase function with proper typing
+    const response = await callFirebaseFunction<ResponseType>({
+      idToken,
+      functionName: CONSTANTS.FUNCTION_NAME,
+      queryParams: { /* relevant params */ },
+      options: {
+        method: "GET",
+        revalidate: 0 // Or appropriate cache duration
+      }
+    });
+
+    // 2. Process and return the data
+    return response?.data?.resource || null;
+  } catch (error) {
+    // 3. Log error for debugging but re-throw for error boundaries
+    console.error("Failed to get resource: ", error);
+    throw error;
+  }
+}
+```
+
+## Error Messages
+
+### ❌ INCORRECT: Inadequate error messages
+
+```typescript
+try {
+  // Implementation
+} catch (error) {
+  console.error(error);
+  throw error;
+}
+```
+
+### ✅ CORRECT: Descriptive error messages
+
+```typescript
+try {
+  // Implementation
+} catch (error) {
+  console.error(`Failed to get account details for account ${accountId}:`, error);
+  throw error;
+}
+```
+
+## Resource Collections
+
+### ❌ INCORRECT: Returning null for empty collections
+
+```typescript
+export async function listUserAccounts(userId: string): Promise<Account[] | null> {
+  try {
+    const response = await callFirebaseFunction<{ accounts: Account[] }>({/*...*/});
+    return response?.data?.accounts || null; // Returns null if no accounts
+  } catch (error) {
+    console.error("Error fetching accounts:", error);
+    return null;
+  }
+}
+```
+
+### ✅ CORRECT: Returning empty arrays for collections
+
+```typescript
+export async function listUserAccounts(userId: string): Promise<Account[]> {
+  try {
+    const response = await callFirebaseFunction<{ accounts: Account[] }>({/*...*/});
+    return response?.data?.accounts || []; // Returns empty array if no accounts
+  } catch (error) {
+    console.error("Error fetching accounts:", error);
+    throw error;
+  }
+}
+```
+
+## Naming Conventions
+
+### ❌ INCORRECT: Inconsistent naming
+
+```typescript
+// Inconsistent verbs: get vs fetch vs retrieve
+export async function getUser(id: string) { /*...*/ }
+export async function fetchAccounts(userId: string) { /*...*/ }
+export async function retrieveTransactions(accountId: string) { /*...*/ }
+
+// Ambiguous names
+export async function data(id: string) { /*...*/ }
+export async function userInfo(userId: string) { /*...*/ }
+```
+
+### ✅ CORRECT: Consistent naming patterns
+
+```typescript
+// Consistent verbs for similar operations
+export async function getUser(id: string) { /*...*/ }
+export async function getAccounts(userId: string) { /*...*/ }
+export async function getTransactions(accountId: string) { /*...*/ }
+
+// Clear action-resource pattern
+export async function createUser(userData: UserData) { /*...*/ }
+export async function updateUserProfile(userId: string, data: Partial<UserProfile>) { /*...*/ }
+export async function deleteAccount(accountId: string) { /*...*/ }
+```
+
+## Best Practices Summary
+
+1. **Error Handling**
+   - Always log errors for debugging purposes
+   - Re-throw errors to allow UI error boundaries to catch them
+   - Avoid swallowing errors with empty returns
+
+2. **Parameter Design**
+   - Use object destructuring for functions with 3+ parameters
+   - Always include type annotations for parameters
+   - Consider required vs optional parameters
+
+3. **Return Types**
+   - Clearly define return types with TypeScript
+   - Use Promise<T | null> pattern for nullable results
+   - Return empty arrays instead of null for collection operations
+
+4. **Firebase Function Calls**
+   - Use the callFirebaseFunction utility consistently with proper generics
+   - Use constants from functionNames.ts for function names
+   - Set appropriate cache control with revalidate option
+
+5. **Error Messages**
+   - Use descriptive error messages that identify the specific operation
+   - Include resource identifiers where appropriate
+
+6. **Naming Conventions**
+   - Use consistent verb prefixes for similar operations (get, create, update, delete)
+   - Follow action-resource naming pattern
+   - Group related functions in domain-specific files 

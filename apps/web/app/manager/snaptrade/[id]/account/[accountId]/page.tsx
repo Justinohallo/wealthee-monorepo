@@ -1,11 +1,12 @@
 import { AccountBalances } from "./_components/AccountBalances";
+import { AccountHoldings } from "./_components/AccountHoldings";
+import { AccountPositions } from "./_components/AccountPositions";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
+import { Suspense } from "react";
 import { fetchAccountDetails } from "@/services/snaptrade/accounts";
 import { formatCurrency } from "@/lib/utils";
 import { verifySessionAndGetUser } from "@/lib/server-auth-utils";
-import { AccountHoldings } from "./_components/AccountHoldings";
-import { Suspense } from "react";
 
 // Format date to a readable string
 function formatDate(dateString: string): string {
@@ -117,6 +118,14 @@ export default async function AccountDetailsPage({
 
           {/* Account Balances */}
           <AccountBalances
+            idToken={idToken}
+            userId={userId}
+            snapTradeUserId={snapTradeUserId}
+            accountId={accountId}
+          />
+
+          {/* Account Positions */}
+          <AccountPositions
             idToken={idToken}
             userId={userId}
             snapTradeUserId={snapTradeUserId}

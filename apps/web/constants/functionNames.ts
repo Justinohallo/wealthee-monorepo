@@ -46,6 +46,10 @@ export const SNAPTRADE = {
      * 'snaptrade-accounts-getAccountHoldings'
      */
     GET_ACCOUNT_HOLDINGS: 'snaptrade-accounts-getAccountHoldings',
+    /**
+     * 'snaptrade-accounts-getAccountPositions'
+     */
+    GET_ACCOUNT_POSITIONS: 'snaptrade-accounts-getAccountPositions',
   },
 
   CONNECTIONS: {
