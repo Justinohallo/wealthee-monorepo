@@ -103,24 +103,3 @@ export const deleteBrokerageConnectionService = async (
   }
 };
 
-/**
- * Get all supported brokerages
- *
- * @return List of supported brokerages
- */
-export const getSupportedBrokerages = async (): Promise<any[]> => {
-  try {
-    const client = createSnapTradeClient();
-    const response = await client.referenceData.listAllBrokerages();
-
-    return Array.isArray(response.data) ? response.data : [];
-  } catch (error) {
-    logger.error(
-      `Failed to get supported brokerages: ${error instanceof Error ?
-        error.message : String(error)}`,
-      "SnapTradeConnectionService",
-      error
-    );
-    throw error;
-  }
-};

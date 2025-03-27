@@ -185,7 +185,12 @@ export const updatePortfolioManager = createHttpFunction({
     const { displayName, email, password, disabled } = req.body;
 
     // Create update object with only provided fields
-    const updateParams: any = {};
+    const updateParams: {
+      displayName?: string;
+      email?: string;
+      password?: string;
+      disabled?: boolean;
+    } = {};
 
     if (displayName !== undefined) updateParams.displayName = displayName;
     if (email !== undefined) updateParams.email = email;

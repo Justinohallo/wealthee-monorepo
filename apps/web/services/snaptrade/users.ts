@@ -24,60 +24,6 @@ export interface RegisterSnapTradeUserParams {
   displayName: string;
   redirectUri: string;
 }
-
-export interface DeleteSnapTradeUserParams {
-  idToken: string;
-  portfolioManagerId: string;
-  snapTradeUserId: string;
-}
-
-/**
- * Register a new SnapTrade user
- */
-export async function registerSnapTradeUser(
-  params: RegisterSnapTradeUserParams,
-  idToken: string
-): Promise<SnapTradeUserResponse | null> {
-  try {
-    const response = await callFirebaseFunction<SnapTradeUserResponse>({
-      idToken,
-      functionName: SNAPTRADE.USERS.REGISTER,
-      options: {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(params)
-      }
-    });
-
-    return response?.data || null;
-  } catch (error) {
-    console.error("Failed to register SnapTrade user:", error);
-    throw error;
-  }
-}
-
-/**
- * Get a SnapTrade user by ID
- */
-export async function getSnapTradeUser(
-  snapTradeUserId: string,
-  idToken: string
-): Promise<SnapTradeUser | null> {
-  try {
-    const response = await callFirebaseFunction<SnapTradeUserResponse>({
-      idToken,
-      functionName: SNAPTRADE.USERS.GET,
-      queryParams: { snapTradeUserId },
-      options: { method: "GET" }
-    });
-
-    return response?.data?.user || null;
-  } catch (error) {
-    console.error("Failed to get SnapTrade user:", error);
-    return null;
-  }
-}
-
 /**
  * List SnapTrade users for a portfolio manager
  */
@@ -110,7 +56,11 @@ export async function deleteSnapTradeUser({
   idToken,
   portfolioManagerId,
   snapTradeUserId,
-}: DeleteSnapTradeUserParams): Promise<{ success: boolean }> {
+}: {
+  idToken: string;
+  portfolioManagerId: string;
+  snapTradeUserId: string;
+}): Promise<{ success: boolean }> {
   try {
     const response = await callFirebaseFunction<{ success: boolean }>({
       idToken,

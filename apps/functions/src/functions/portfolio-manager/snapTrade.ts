@@ -122,14 +122,15 @@ export const checkSnapTradeUserExists = createHttpFunction({
  * each representing a different client or account group.
  */
 export const registerSnaptradeUserWithDisplay = createHttpFunction({
-  handler: async ({ req, res, auth: decodedToken }) => {
+  handler: async ({ req, res }) => {
     // Check for required parameters
     const { userId, displayName } = req.body;
     if (!userId || !displayName) {
       throw new ValidationError("Required body parameters 'userId' and 'displayName' are missing");
     }
 
-    logger.info(`Registering SnapTrade user with display name for portfolio manager: ${userId}`, "PortfolioManagerSnapTrade");
+    logger.info(`Registering SnapTrade user
+      with display name for portfolio manager: ${userId}`, "PortfolioManagerSnapTrade");
 
     // Create reference to the user's snaptrade data in database
     const userRef = db.ref(`portfolioManagers/${userId}/snapTradeUsers`);
@@ -240,7 +241,8 @@ export const loginSnapTradeUser = createHttpFunction({
       throw new ValidationError("Required query parameters 'userId' and 'snapTradeUserId' are missing");
     }
 
-    logger.info(`Logging in SnapTrade user: ${snapTradeUserId} for portfolio manager: ${userId}`, "PortfolioManagerSnapTrade");
+    logger.info(`Logging in SnapTrade user: ${snapTradeUserId}
+      for portfolio manager: ${userId}`, "PortfolioManagerSnapTrade");
 
     // Get SnapTrade user data from database
     const userRef = db.ref(`portfolioManagers/${userId as string}/snapTradeUsers/${snapTradeUserId as string}`);

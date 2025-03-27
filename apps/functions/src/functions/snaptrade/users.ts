@@ -132,8 +132,6 @@ export const deleteUserV2 = createHttpFunction({
     // Get query parameters
     const { portfolioManagerId, snapTradeUserId } = req.query;
 
-
-
     // Validate access
     const hasAccess = await verifyPortfolioManagerAccess(
       portfolioManagerId as string,
@@ -151,7 +149,6 @@ export const deleteUserV2 = createHttpFunction({
       snapTradeUserId as string,
       portfolioManagerId as string
     );
-
 
     // Return success response
     res.json({

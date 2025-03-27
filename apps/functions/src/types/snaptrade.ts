@@ -60,9 +60,6 @@ export interface BrokerageConnectionDTO {
   updated_date: string;
 }
 
-
-
-
 /**
  * SnapTrade account details from API
  */

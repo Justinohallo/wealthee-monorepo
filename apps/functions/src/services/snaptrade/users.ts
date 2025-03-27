@@ -162,7 +162,7 @@ export const getSnapTradeUser = async (
  */
 export const getSnapTradeUsersForPortfolioManager = async (
   portfolioManagerId: string
-): Promise<any[]> => {
+): Promise<SnapTradeUser[]> => {
   logger.info(`Getting all SnapTrade users for portfolio manager: ${portfolioManagerId}`, "SnapTradeUserService");
 
   // Get the list of snapTradeUserIds from the portfolio manager document
@@ -288,7 +288,7 @@ export const deleteSnapTradeUserFromDatabase = async (
 
     const mappings = mappingsSnapshot.val();
     if (mappings) {
-      const promises = Object.keys(mappings).map(key => mappingsRef.child(key).remove());
+      const promises = Object.keys(mappings).map((key) => mappingsRef.child(key).remove());
       await Promise.all(promises);
     }
 
@@ -332,7 +332,8 @@ export const deleteSnapTradeUserFromDb = async (
     // First delete from SnapTrade API
     const apiDeleteSuccess = await deleteSnapTradeUserFromSnaptrade(snapTradeUserId);
     if (!apiDeleteSuccess) {
-      logger.error(`Failed to delete from SnapTrade API, aborting database deletion: ${snapTradeUserId}`, "SnapTradeUserService");
+      logger.error(`Failed to delete from SnapTrade API,
+        aborting database deletion: ${snapTradeUserId}`, "SnapTradeUserService");
       return false;
     }
 

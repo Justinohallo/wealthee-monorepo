@@ -13,25 +13,25 @@ export * from './admin';
 // Portfolio manager exports
 export type { PortfolioManager, CreatePortfolioManagerParams } from './portfolio-manager/users';
 export {
-    createPortfolioManager,
-    listPortfolioManagers,
-    getPortfolioManager,
-    updatePortfolioManager,
+  createPortfolioManager,
+  listPortfolioManagers,
+  getPortfolioManager,
+  updatePortfolioManager,
 } from './portfolio-manager/users';
 
 // SnapTrade-specific exports from portfolio-manager
 export type {
-    SnapTradeLoginResponse as PMSnapTradeLoginResponse,
-    RegisterSnapTradeUserParams as PMRegisterSnapTradeUserParams
+  SnapTradeLoginResponse as PMSnapTradeLoginResponse,
+  RegisterSnapTradeUserParams as PMRegisterSnapTradeUserParams
 } from './portfolio-manager/snapTrade';
 export {
-    checkSnapTradeUserExists,
-    getPrimarySnapTradeUser,
-    getSnapTradeUsers as getPMSnapTradeUsers,
-    loginSnapTradeUser as loginPMSnapTradeUser,
-    registerPrimarySnapTradeUser,
-    registerSnapTradeUserWithDisplay as registerPMSnapTradeUserWithDisplay,
+  checkSnapTradeUserExists,
+  getPrimarySnapTradeUser,
+  getSnapTradeUsers as getPMSnapTradeUsers,
+  loginSnapTradeUser as loginPMSnapTradeUser,
+  registerPrimarySnapTradeUser,
+  registerSnapTradeUserWithDisplay as registerPMSnapTradeUserWithDisplay,
 } from './portfolio-manager/snapTrade';
 
 // Direct SnapTrade exports
-export * from './snapTrade';
+export * from './snaptrade';
