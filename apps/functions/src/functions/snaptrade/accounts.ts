@@ -295,7 +295,7 @@ export const getAccountOrders = createHttpFunction({
  * Results are cached for 10 minutes to improve performance. Date ranges can be specified with
  * startDate and endDate parameters (YYYY-MM-DD format). If not provided, defaults to last 30 days.
  */
-export const getAccountActivities = createHttpFunction({
+export const getAccountActivitiesV2 = createHttpFunction({
   options: {
     requireAuth: true,
     requiredRole: "portfolioManager",
