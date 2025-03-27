@@ -106,7 +106,7 @@ export async function deleteBrokerageConnection(
   idToken: string
 ): Promise<{ success: boolean }> {
   try {
-    const response = await callFirebaseFunction<{ deleted: boolean }>({
+    await callFirebaseFunction<{ deleted: boolean }>({
       idToken,
       functionName: SNAPTRADE.CONNECTIONS.DELETE_BROKERAGE_CONNECTION,
       queryParams: {
@@ -121,9 +121,9 @@ export async function deleteBrokerageConnection(
       }
     });
 
-    return { success: response?.data?.deleted || false };
+    return { success: true };
   } catch (error) {
     console.error("Failed to delete brokerage connection:", error);
-    return { success: false };
+    throw error;
   }
 }

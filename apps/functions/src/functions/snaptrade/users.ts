@@ -119,7 +119,7 @@ export const listUsersForPortfolioManager = createHttpFunction({
 /**
  * Deletes a SnapTrade user
  */
-export const deleteUserV2 = createHttpFunction({
+export const deleteUser = createHttpFunction({
   options: {
     requireAuth: true,
     requiredRole: "portfolioManager",

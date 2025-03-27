@@ -13,11 +13,7 @@ interface DeleteBrokerageConnectionButtonProps {
   redirectUrl?: string; // URL to redirect to after successful deletion
 }
 
-// Match the return type with DeleteConfirmationDialog
-interface DeleteResult {
-  success: boolean;
-  error?: string;
-}
+
 
 export function DeleteBrokerageConnectionButton({
   idToken,
@@ -34,7 +30,7 @@ export function DeleteBrokerageConnectionButton({
     ? brokerageName
     : "this brokerage";
 
-  const handleDelete = async (): Promise<DeleteResult> => {
+  const handleDelete = async () => {
     try {
       const result = await deleteBrokerageConnection(
         snapTradeUserId,
