@@ -1,112 +1,153 @@
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { getSnapTradeBrokerageConnectionURL, listBrokerageConnections } from "@/services/snaptrade/connections";
 
 import AccountsList from "./_components/AccountsList";
 import { BrokerageAuthorization } from "@/types/snaptrade";
 import { Button } from "@/components/ui/button";
+import { ChevronLeft } from "lucide-react";
 import { DeleteBrokerageConnectionButton } from "./_components/DeleteBrokerageConnectionButton";
 import { DeleteSnapTradeUserButton } from "../@users/_components/DeleteUserButton";
 import Image from "next/image";
 import Link from "next/link";
 import { verifySessionAndGetUser } from "@/lib/server-auth-utils";
 
-// Component to display a single brokerage row
-function BrokerageRow({
-  brokerage,
-  snapTradeUserId,
-  idToken,
-
-}: {
-  brokerage: BrokerageAuthorization,
-  snapTradeUserId: string,
-  idToken: string,
-  userId: string
-}) {
-  return (
-    <TableRow key={brokerage.id}>
-      <TableCell>{brokerage.name}</TableCell>
-      <TableCell className="flex items-center">
-        {brokerage.brokerage?.aws_s3_logo_url && (
-          <Image
-            src={brokerage.brokerage.aws_s3_logo_url}
-            alt={brokerage.brokerage.name || 'Brokerage logo'}
-            className="h-6 w-6 mr-2 object-contain"
-            width={24}
-            height={24}
-          />
-        )}
-        {brokerage.brokerage?.display_name || brokerage.brokerage?.name}
-      </TableCell>
-      <TableCell>{brokerage.type}</TableCell>
-      <TableCell>{new Date(brokerage.created_date || '').toLocaleDateString()}</TableCell>
-      <TableCell>
-        <span className={`px-2 py-1 rounded text-xs font-medium ${brokerage.disabled ? 'bg-red-100 text-red-800' : 'bg-green-100 text-green-800'}`}>
-          {brokerage.disabled ? 'Disabled' : 'Active'}
-        </span>
-      </TableCell>
-      <TableCell>
-        <div className="flex items-center space-x-2">
-          <Link href={`/manager/snaptrade/${snapTradeUserId}/brokerage/${brokerage.id}`}>
-            <Button variant="outline" size="sm">
-              View Details
-            </Button>
-          </Link>
-          <DeleteBrokerageConnectionButton
-            idToken={idToken}
-            snapTradeUserId={snapTradeUserId}
-            brokerageId={brokerage.id || ''}
-            brokerageName={brokerage.brokerage?.display_name || brokerage.brokerage?.name || 'Brokerage'}
-          />
-        </div>
-      </TableCell>
-    </TableRow>
-  );
-}
-
-// Component to display the brokerages table
-function BrokeragesTable({
+// Create a responsive version of the brokerages table
+function ResponsiveBrokeragesTable({
   brokerages,
   snapTradeUserId,
   idToken,
-  userId
 }: {
   brokerages: BrokerageAuthorization[],
   snapTradeUserId: string,
   idToken: string,
-  userId: string
 }) {
+  if (brokerages.length === 0) {
+    return (
+      <div className="text-center py-6 px-4 bg-muted/20 rounded-md">
+        <p className="text-muted-foreground">No brokerage connections found</p>
+      </div>
+    );
+  }
+
   return (
-    <Table>
-      <TableHeader>
-        <TableRow>
-          <TableHead>Name</TableHead>
-          <TableHead>Brokerage</TableHead>
-          <TableHead>Type</TableHead>
-          <TableHead>Created Date</TableHead>
-          <TableHead>Status</TableHead>
-          <TableHead>Actions</TableHead>
-        </TableRow>
-      </TableHeader>
-      <TableBody>
-        {brokerages.length > 0 ? (
-          brokerages.map((brokerage) => (
-            <BrokerageRow
-              key={brokerage.id}
-              brokerage={brokerage}
-              snapTradeUserId={snapTradeUserId}
-              idToken={idToken}
-              userId={userId}
-            />
-          ))
-        ) : (
-          <TableRow>
-            <TableCell colSpan={6} className="text-center py-4">
-              No brokerage connections found
-            </TableCell>
-          </TableRow>
-        )}
-      </TableBody>
-    </Table>
+    <div>
+      {/* Mobile view - Card layout */}
+      <div className="md:hidden space-y-4">
+        {brokerages.map((brokerage) => (
+          <Card key={brokerage.id} className="overflow-hidden">
+            <CardContent className="p-0">
+              <div className="p-4 border-b bg-muted/10 flex items-center gap-2">
+                {brokerage.brokerage?.aws_s3_logo_url && (
+                  <Image
+                    src={brokerage.brokerage.aws_s3_logo_url}
+                    alt={brokerage.brokerage.name || 'Brokerage logo'}
+                    className="h-6 w-6 object-contain"
+                    width={24}
+                    height={24}
+                  />
+                )}
+                <div className="flex-1">
+                  <div className="font-medium">{brokerage.name}</div>
+                  <div className="text-sm text-muted-foreground">
+                    {brokerage.brokerage?.display_name || brokerage.brokerage?.name}
+                  </div>
+                </div>
+                <div>
+                  <span className={`px-2 py-1 rounded-full text-xs font-medium ${brokerage.disabled ? 'bg-red-100 text-red-800' : 'bg-green-100 text-green-800'}`}>
+                    {brokerage.disabled ? 'Disabled' : 'Active'}
+                  </span>
+                </div>
+              </div>
+
+              <div className="p-4 space-y-3">
+                <div className="flex justify-between">
+                  <span className="text-sm font-medium text-muted-foreground">Type</span>
+                  <span>{brokerage.type}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-sm font-medium text-muted-foreground">Created</span>
+                  <span>{new Date(brokerage.created_date || '').toLocaleDateString()}</span>
+                </div>
+                <div className="flex flex-col sm:flex-row gap-2 mt-4 pt-3 border-t">
+                  <Link href={`/manager/snaptrade/${snapTradeUserId}/brokerage/${brokerage.id}`} className="w-full sm:w-auto">
+                    <Button variant="outline" size="sm" className="w-full">
+                      View Details
+                    </Button>
+                  </Link>
+                  <div className="w-full sm:w-auto">
+                    <DeleteBrokerageConnectionButton
+                      idToken={idToken}
+                      snapTradeUserId={snapTradeUserId}
+                      brokerageId={brokerage.id || ''}
+                      brokerageName={brokerage.brokerage?.display_name || brokerage.brokerage?.name || 'Brokerage'}
+                      buttonClassName="w-full h-9"
+                    />
+                  </div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        ))}
+      </div>
+
+      {/* Desktop view - Table layout */}
+      <div className="hidden md:block overflow-x-auto">
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>Name</TableHead>
+              <TableHead>Brokerage</TableHead>
+              <TableHead>Type</TableHead>
+              <TableHead>Created Date</TableHead>
+              <TableHead>Status</TableHead>
+              <TableHead>Actions</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {brokerages.map((brokerage) => (
+              <TableRow key={brokerage.id}>
+                <TableCell>{brokerage.name}</TableCell>
+                <TableCell className="flex items-center">
+                  {brokerage.brokerage?.aws_s3_logo_url && (
+                    <Image
+                      src={brokerage.brokerage.aws_s3_logo_url}
+                      alt={brokerage.brokerage.name || 'Brokerage logo'}
+                      className="h-6 w-6 mr-2 object-contain"
+                      width={24}
+                      height={24}
+                    />
+                  )}
+                  {brokerage.brokerage?.display_name || brokerage.brokerage?.name}
+                </TableCell>
+                <TableCell>{brokerage.type}</TableCell>
+                <TableCell>{new Date(brokerage.created_date || '').toLocaleDateString()}</TableCell>
+                <TableCell>
+                  <span className={`px-2 py-1 rounded text-xs font-medium ${brokerage.disabled ? 'bg-red-100 text-red-800' : 'bg-green-100 text-green-800'}`}>
+                    {brokerage.disabled ? 'Disabled' : 'Active'}
+                  </span>
+                </TableCell>
+                <TableCell>
+                  <div className="flex items-center space-x-2">
+                    <Link href={`/manager/snaptrade/${snapTradeUserId}/brokerage/${brokerage.id}`}>
+                      <Button variant="outline" size="sm">
+                        View Details
+                      </Button>
+                    </Link>
+                    <DeleteBrokerageConnectionButton
+                      idToken={idToken}
+                      snapTradeUserId={snapTradeUserId}
+                      brokerageId={brokerage.id || ''}
+                      brokerageName={brokerage.brokerage?.display_name || brokerage.brokerage?.name || 'Brokerage'}
+                    />
+                  </div>
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </div>
+    </div>
   );
 }
 
@@ -129,47 +170,64 @@ export default async function SnaptradeUserPage({ params }: { params: { id: stri
   const loginUrl = await getSnapTradeBrokerageConnectionURL(portfolioManagerId, snaptradeUserId, idToken);
 
   return (
-    <div className="p-8">
-      <div className="flex items-center mb-6">
-        <Link href="/manager/snaptrade">
-          <Button variant="outline" size="sm" className="mr-4">
-            Back to SnapTrade
-          </Button>
-        </Link>
-        <h1 className="text-3xl font-bold">SnapTrade User Details</h1>
-      </div>
-
-      <div className="bg-white rounded-lg shadow overflow-hidden p-6 mb-6">
-        <div className="mb-4">
-          <h2 className="text-lg font-semibold mb-2">User ID</h2>
-          <p className="text-gray-700 p-3 bg-gray-50 rounded-md">{snaptradeUserId}</p>
-        </div>
-
-        <div className="flex space-x-4 mt-4">
-          {loginUrl && (
-            <a href={loginUrl} target="_blank" rel="noopener noreferrer">
-              <Button>Add Brokerage</Button>
-            </a>
-          )}
-
-          <div className="flex-shrink-0 opacity-100">
-            <DeleteSnapTradeUserButton
-              idToken={idToken}
-              portfolioManagerId={portfolioManagerId}
-              snapTradeUserId={snaptradeUserId}
-              displayName="this SnapTrade user"
-              redirectUrl="/manager/snaptrade"
-            />
+    <div className="space-y-6">
+      {/* Header with breadcrumb and title */}
+      <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+        <div className="space-y-2">
+          <div className="flex items-center gap-2">
+            <Link href="/manager/snaptrade" className="inline-flex items-center text-sm font-medium text-primary hover:underline">
+              <ChevronLeft className="mr-1 h-4 w-4" />
+              Back to SnapTrade
+            </Link>
           </div>
+          <h1 className="text-2xl font-bold tracking-tight">SnapTrade User Details</h1>
         </div>
       </div>
 
-      {/* Brokerages Table */}
-      <div className="bg-white rounded-lg shadow overflow-hidden p-6 mb-6">
-        <h2 className="text-xl font-semibold mb-4">Connected Brokerages ({brokerages.length})</h2>
-        <BrokeragesTable brokerages={brokerages} snapTradeUserId={snaptradeUserId} idToken={idToken} userId={portfolioManagerId} />
-      </div>
+      {/* User ID card with buttons */}
+      <Card>
+        <CardContent className="pt-6">
+          <div className="mb-4">
+            <h2 className="text-lg font-semibold mb-2">User ID</h2>
+            <p className="text-sm font-mono text-muted-foreground p-3 bg-muted/30 rounded-md break-all">{snaptradeUserId}</p>
+          </div>
 
+          <div className="flex flex-col sm:flex-row gap-3 mt-6">
+            {loginUrl && (
+              <a href={loginUrl} target="_blank" rel="noopener noreferrer" className="w-full sm:w-auto">
+                <Button className="w-full sm:w-auto">Add Brokerage</Button>
+              </a>
+            )}
+
+            <div className="w-full sm:w-auto">
+              <DeleteSnapTradeUserButton
+                idToken={idToken}
+                portfolioManagerId={portfolioManagerId}
+                snapTradeUserId={snaptradeUserId}
+                displayName="this SnapTrade user"
+                redirectUrl="/manager/snaptrade"
+                buttonClassName="w-full sm:w-auto"
+              />
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Brokerages Card */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Connected Brokerages ({brokerages.length})</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <ResponsiveBrokeragesTable
+            brokerages={brokerages}
+            snapTradeUserId={snaptradeUserId}
+            idToken={idToken}
+          />
+        </CardContent>
+      </Card>
+
+      {/* Accounts List - handled by the AccountsList component */}
       <AccountsList
         idToken={idToken}
         userId={portfolioManagerId}

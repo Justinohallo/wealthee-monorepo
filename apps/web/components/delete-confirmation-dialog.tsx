@@ -28,6 +28,7 @@ interface DeleteConfirmationDialogProps {
   buttonVariant?: ButtonProps["variant"];
   buttonSize?: ButtonProps["size"];
   buttonText?: string;
+  buttonClassName?: string;
   isDisabled?: boolean;
 }
 
@@ -39,6 +40,7 @@ export function DeleteConfirmationDialog({
   buttonVariant = "destructive",
   buttonSize = "sm",
   buttonText = "Delete",
+  buttonClassName,
   isDisabled = false,
 }: DeleteConfirmationDialogProps) {
   const [isOpen, setIsOpen] = useState(false);
@@ -91,6 +93,7 @@ export function DeleteConfirmationDialog({
             variant={buttonVariant}
             size={buttonSize}
             disabled={isDisabled}
+            className={buttonClassName}
           >
             {buttonText}
           </Button>

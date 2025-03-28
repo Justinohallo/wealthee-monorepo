@@ -1,43 +1,38 @@
-import { AccountOrdersList } from "./AccountOrdersList";
+import { AccountOrdersTable } from "./AccountOrdersTable";
 import { Suspense } from "react";
 import { getAccountOrders } from "@/services/snaptrade/accounts";
 
 interface AccountOrdersProps {
-    idToken: string;
-    userId: string;
-    snapTradeUserId: string;
-    accountId: string;
+  idToken: string;
+  userId: string;
+  snapTradeUserId: string;
+  accountId: string;
 }
 
 async function AccountOrdersContent({ idToken, userId, snapTradeUserId, accountId }: AccountOrdersProps) {
-    const orders = await getAccountOrders({
-        userId,
-        snapTradeUserId,
-        accountId,
-        idToken,
-        state: "all",
-        days: 30
-    });
+  // This is a server component, so we can fetch data directly
+  const orders = await getAccountOrders({
+    userId,
+    snapTradeUserId,
+    accountId,
+    idToken,
+  });
 
-    return <AccountOrdersList orders={orders} />;
+  // Return the orders table component (client-side handling of responsive design)
+  return <AccountOrdersTable orders={orders || []} />;
 }
 
 export function AccountOrders(props: AccountOrdersProps) {
-    return (
-        <div className="bg-white rounded-lg shadow overflow-hidden p-6">
-            <h2 className="text-xl font-semibold mb-4">Recent Orders</h2>
-            <Suspense fallback={
-                <div className="p-4 bg-gray-50 rounded-md text-center">
-                    <p className="text-gray-700">Loading account orders...</p>
-                </div>
-            }>
-                <AccountOrdersContent
-                    userId={props.userId}
-                    snapTradeUserId={props.snapTradeUserId}
-                    accountId={props.accountId}
-                    idToken={props.idToken}
-                />
-            </Suspense>
-        </div>
-    );
+  return (
+    <Suspense fallback={
+      <AccountOrdersTable orders={[]} isLoading={true} />
+    }>
+      <AccountOrdersContent
+        userId={props.userId}
+        snapTradeUserId={props.snapTradeUserId}
+        accountId={props.accountId}
+        idToken={props.idToken}
+      />
+    </Suspense>
+  );
 }

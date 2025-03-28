@@ -1,3 +1,4 @@
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Table,
   TableBody,
@@ -24,78 +25,152 @@ export default async function AccountsList({
   const accounts = await fetchSnapTradeAccounts({ snapTradeUserId, idToken });
   if (!accounts.length) {
     return (
-      <div className="bg-white rounded-lg shadow p-6 mb-6">
-        <h2 className="text-xl font-semibold mb-4">Accounts</h2>
-        <div className="p-4 bg-gray-50 rounded-md text-center">
-          No accounts found for this user.
-        </div>
-      </div>
+      <Card>
+        <CardHeader>
+          <CardTitle>Accounts</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="p-4 bg-muted/20 rounded-md text-center">
+            <p className="text-muted-foreground">No accounts found for this user.</p>
+          </div>
+        </CardContent>
+      </Card>
     );
   }
 
   return (
-    <div className="bg-white rounded-lg shadow overflow-hidden p-6 mb-6">
-      <h2 className="text-xl font-semibold mb-4">Accounts ({accounts.length})</h2>
-      <div className="overflow-x-auto">
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Name</TableHead>
-              <TableHead>Account Number</TableHead>
-              <TableHead>Type</TableHead>
-              <TableHead>Status</TableHead>
-              <TableHead>Balance</TableHead>
-              <TableHead>Last Sync</TableHead>
-              <TableHead>Actions</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {accounts.map((account) => (
-              <TableRow key={account.id}>
-                <TableCell className="font-medium">{account.name}</TableCell>
-                <TableCell>{account.number}</TableCell>
-                <TableCell>{account.meta?.unifiedAccountType?.replace(/_/g, " ") || "N/A"}</TableCell>
-                <TableCell>
-                  <span
-                    className={`px-2 py-1 text-xs rounded-full ${account.meta?.status === "open"
-                      ? "bg-green-100 text-green-800"
-                      : "bg-red-100 text-red-800"
-                      }`}
-                  >
-                    {account.meta?.status || "unknown"}
-                  </span>
-                </TableCell>
-                <TableCell>
-                  {account.balance?.total
-                    ? formatCurrency(
-                      account.balance.total.amount ?? 0,
-                      account.balance.total.currency ?? ''
-                    )
-                    : "N/A"
-                  }
-                </TableCell>
-                <TableCell>
-                  {account.sync_status?.holdings?.last_successful_sync
-                    ? new Date(
-                      account.sync_status.holdings.last_successful_sync
-                    ).toLocaleDateString()
-                    : "Never"
-                  }
-                </TableCell>
-                <TableCell>
-                  <Link
-                    href={`/manager/snaptrade/${snapTradeUserId}/account/${account.id}`}
-                  >
-                    <Button variant="outline" size="sm">
-                      View Details
-                    </Button>
-                  </Link>
-                </TableCell>
+    <Card>
+      <CardHeader>
+        <CardTitle>Accounts ({accounts.length})</CardTitle>
+      </CardHeader>
+      <CardContent>
+        {/* Mobile view - Cards */}
+        <div className="md:hidden space-y-4">
+          {accounts.map((account) => (
+            <Card key={account.id} className="overflow-hidden">
+              <CardContent className="p-0">
+                <div className="p-4 border-b bg-muted/10">
+                  <div className="font-medium">{account.name}</div>
+                  <div className="text-sm text-muted-foreground">{account.number}</div>
+                  <div className="mt-2">
+                    <span
+                      className={`px-2 py-1 text-xs rounded-full ${account.meta?.status === "open"
+                        ? "bg-green-100 text-green-800"
+                        : "bg-red-100 text-red-800"
+                        }`}
+                    >
+                      {account.meta?.status || "unknown"}
+                    </span>
+                  </div>
+                </div>
+
+                <div className="p-4 space-y-3">
+                  <div className="flex justify-between">
+                    <span className="text-sm font-medium text-muted-foreground">Type</span>
+                    <span>{account.meta?.unifiedAccountType?.replace(/_/g, " ") || "N/A"}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-sm font-medium text-muted-foreground">Balance</span>
+                    <span>
+                      {account.balance?.total
+                        ? formatCurrency(
+                          account.balance.total.amount ?? 0,
+                          account.balance.total.currency ?? ''
+                        )
+                        : "N/A"
+                      }
+                    </span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-sm font-medium text-muted-foreground">Last Sync</span>
+                    <span>
+                      {account.sync_status?.holdings?.last_successful_sync
+                        ? new Date(
+                          account.sync_status.holdings.last_successful_sync
+                        ).toLocaleDateString()
+                        : "Never"
+                      }
+                    </span>
+                  </div>
+
+                  <div className="pt-3 mt-3 border-t">
+                    <Link
+                      href={`/manager/snaptrade/${snapTradeUserId}/account/${account.id}`}
+                      className="w-full"
+                    >
+                      <Button variant="outline" size="sm" className="w-full">
+                        View Details
+                      </Button>
+                    </Link>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+
+        {/* Desktop view - Table */}
+        <div className="hidden md:block overflow-x-auto">
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Name</TableHead>
+                <TableHead>Account Number</TableHead>
+                <TableHead>Type</TableHead>
+                <TableHead>Status</TableHead>
+                <TableHead>Balance</TableHead>
+                <TableHead>Last Sync</TableHead>
+                <TableHead>Actions</TableHead>
               </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </div>
-    </div>
+            </TableHeader>
+            <TableBody>
+              {accounts.map((account) => (
+                <TableRow key={account.id}>
+                  <TableCell className="font-medium">{account.name}</TableCell>
+                  <TableCell>{account.number}</TableCell>
+                  <TableCell>{account.meta?.unifiedAccountType?.replace(/_/g, " ") || "N/A"}</TableCell>
+                  <TableCell>
+                    <span
+                      className={`px-2 py-1 text-xs rounded-full ${account.meta?.status === "open"
+                        ? "bg-green-100 text-green-800"
+                        : "bg-red-100 text-red-800"
+                        }`}
+                    >
+                      {account.meta?.status || "unknown"}
+                    </span>
+                  </TableCell>
+                  <TableCell>
+                    {account.balance?.total
+                      ? formatCurrency(
+                        account.balance.total.amount ?? 0,
+                        account.balance.total.currency ?? ''
+                      )
+                      : "N/A"
+                    }
+                  </TableCell>
+                  <TableCell>
+                    {account.sync_status?.holdings?.last_successful_sync
+                      ? new Date(
+                        account.sync_status.holdings.last_successful_sync
+                      ).toLocaleDateString()
+                      : "Never"
+                    }
+                  </TableCell>
+                  <TableCell>
+                    <Link
+                      href={`/manager/snaptrade/${snapTradeUserId}/account/${account.id}`}
+                    >
+                      <Button variant="outline" size="sm">
+                        View Details
+                      </Button>
+                    </Link>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </div>
+      </CardContent>
+    </Card>
   );
 }

@@ -11,6 +11,7 @@ interface DeleteBrokerageConnectionButtonProps {
   brokerageId: string;
   brokerageName: string; // Changed to any to bypass TypeScript checks
   redirectUrl?: string; // URL to redirect to after successful deletion
+  buttonClassName?: string; // Additional class for button styling
 }
 
 
@@ -21,6 +22,7 @@ export function DeleteBrokerageConnectionButton({
   brokerageId,
   brokerageName = "this brokerage",
   redirectUrl,
+  buttonClassName,
 }: DeleteBrokerageConnectionButtonProps) {
   const router = useRouter();
   const { toast } = useToast();
@@ -79,6 +81,7 @@ export function DeleteBrokerageConnectionButton({
       buttonText="Delete"
       buttonVariant="destructive"
       buttonSize="sm"
+      buttonClassName={buttonClassName}
     />
   );
 }

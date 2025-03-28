@@ -11,6 +11,7 @@ interface DeleteUserButtonProps {
   snapTradeUserId: string;
   displayName: string;
   redirectUrl?: string; // URL to redirect to after successful deletion
+  buttonClassName?: string; // Additional class name for the button
 }
 
 // Match the return type with DeleteConfirmationDialog
@@ -25,6 +26,7 @@ export function DeleteSnapTradeUserButton({
   snapTradeUserId,
   displayName,
   redirectUrl,
+  buttonClassName,
 }: DeleteUserButtonProps) {
   const router = useRouter();
   const { toast } = useToast();
@@ -78,6 +80,7 @@ export function DeleteSnapTradeUserButton({
       buttonText="Delete SnapTrade User"
       buttonVariant="destructive"
       buttonSize="sm"
+      buttonClassName={buttonClassName}
     />
   );
 }

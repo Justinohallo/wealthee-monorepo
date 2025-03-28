@@ -1,6 +1,6 @@
 ---
-description: 
-globs: 
+description:
+globs:
 alwaysApply: true
 ---
 # Wealthee Export Patterns
@@ -78,23 +78,49 @@ import { signIn, getUser } from '@/services/domain';
 
 ## Named vs Default Exports
 
-### ❌ INCORRECT: Mixed export styles
+### Component Export Rules
+
+- **Always use named exports for components** unless it's a page component in Next.js
+- Page components (files in app directory route handlers) should use default exports as required by Next.js
+- UI components, utilities, hooks, and services should always use named exports
+
+### ❌ INCORRECT: Mixed export styles or default exports for components
 
 ```typescript
-// INCORRECT: Avoid mixing default and named exports
+// INCORRECT: Default export for a non-page component
+export default function Button() { /* ... */ }
+
+// INCORRECT: Mixing default and named exports
 export default function Component() { /* ... */ }
 export function helperFunction() { /* ... */ }
 ```
 
-### ✅ CORRECT: Consistent named exports
+### ✅ CORRECT: Named exports for components
 
 ```typescript
-// CORRECT: Use named exports consistently
-export function Component() { /* ... */ }
-export function helperFunction() { /* ... */ }
+// CORRECT: Named export for component
+export function Button() { /* ... */ }
 
-// Import elsewhere
-import { Component, helperFunction } from './module';
+// CORRECT: Multiple named exports
+export function TextField() { /* ... */ }
+export function Label() { /* ... */ }
+```
+
+### ✅ CORRECT: Default exports for Next.js pages
+
+```typescript
+// CORRECT: Default export for a Next.js page component
+export default function ProductPage() { /* ... */ }
+```
+
+### ✅ CORRECT: Consistent import patterns
+
+```typescript
+// Import components
+import { Button, TextField, Card } from '@/components/ui';
+
+// Import page component (if needed in another context)
+import UserProfilePage from '@/app/user/profile/page';
 ```
 
 ## Export Best Practices
@@ -143,4 +169,4 @@ services/
 - Create component category barrel files (e.g., `ui/index.ts`) for reusable component libraries
 - Avoid creating barrel files for very small feature sets (1-2 files) where the overhead isn't justified
 
-By following these export patterns consistently, we maintain a clean import structure and make refactoring easier across the codebase. 
+By following these export patterns consistently, we maintain a clean import structure and make refactoring easier across the codebase.
