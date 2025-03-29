@@ -1,32 +1,34 @@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 
 import { Card } from "@/components/ui/card";
+import { ReactNode } from "react";
 import { cn } from "@/lib/utils";
 
-export interface Column<T = any> {
+export interface SimpleColumn {
   key: string;
-  label: React.ReactNode;
-  // Optional render function to customize how the value is displayed
-  render?: (value: any, row: T) => React.ReactNode;
-  // Whether to show this column on mobile cards (defaults to true)
-  showOnMobile?: boolean;
-  // Custom class for this column
+  label: ReactNode;
   className?: string;
+  // Simple flag for mobile visibility
+  showOnMobile?: boolean;
 }
 
-interface ResponsiveTableProps<T = any> {
-  data: T[];
-  columns: Column<T>[];
+export interface CellContent {
+  id: string;
+  [key: string]: ReactNode;
+}
+
+interface ResponsiveTableProps {
+  // Pre-formatted data with ReactNodes already prepared
+  cells: CellContent[];
+  columns: SimpleColumn[];
+  // Basic customization
   className?: string;
-  // Optional settings
   cardClassName?: string;
-  emptyMessage?: React.ReactNode;
-  keyField?: string | ((row: T) => string);
+  emptyMessage?: ReactNode;
   rowClassName?: string;
-  // Option to force table or card mode
+  // Display mode control
   forceTableMode?: boolean;
   forceCardMode?: boolean;
-  // Breakpoint where we switch from cards to table (default: md)
   breakpoint?: "sm" | "md" | "lg" | "xl";
 }
 
@@ -35,33 +37,35 @@ interface ResponsiveTableProps<T = any> {
  *
  * @example
  * ```tsx
+ * // Format your data in advance
+ * const cells = data.map(item => ({
+ *   id: item.id,
+ *   name: <span className="font-medium">{item.name}</span>,
+ *   email: item.email,
+ *   status: <Badge>{item.status}</Badge>
+ * }));
+ *
  * const columns = [
  *   { key: 'name', label: 'Name' },
  *   { key: 'email', label: 'Email' },
- *   {
- *     key: 'status',
- *     label: 'Status',
- *     render: (value) => <Badge>{value}</Badge>
- *   }
+ *   { key: 'status', label: 'Status' }
  * ];
  *
- * <ResponsiveTable data={users} columns={columns} />
+ * <ResponsiveTable cells={cells} columns={columns} />
  * ```
  */
-export function ResponsiveTable<T extends Record<string, any>>({
-  data,
+export function ResponsiveTable({
+  cells,
   columns,
   className,
   cardClassName,
   emptyMessage = "No data to display",
-  keyField = "id",
   rowClassName,
   forceTableMode = false,
   forceCardMode = false,
   breakpoint = "md"
-}: ResponsiveTableProps<T>) {
-
-  if (!data || data.length === 0) {
+}: ResponsiveTableProps) {
+  if (!cells || cells.length === 0) {
     return (
       <div className="w-full text-center py-8 text-muted-foreground">
         {emptyMessage}
@@ -72,21 +76,6 @@ export function ResponsiveTable<T extends Record<string, any>>({
   // Determine the display mode based on props
   const cardMode = forceCardMode || (!forceTableMode && true); // In real usage, we'd use a media query
   const tableMode = forceTableMode || (!forceCardMode && true); // In real usage, we'd use a media query
-
-  const getRowKey = (row: T, index: number): string => {
-    if (typeof keyField === 'function') {
-      return keyField(row);
-    }
-    if (row[keyField]) {
-      return String(row[keyField]);
-    }
-    return `row-${index}`;
-  };
-
-  const getColumnValue = (row: T, column: Column<T>) => {
-    const value = row[column.key];
-    return column.render ? column.render(value, row) : value;
-  };
 
   return (
     <div className={className}>
@@ -100,18 +89,18 @@ export function ResponsiveTable<T extends Record<string, any>>({
           <TableHeader>
             <TableRow>
               {columns.map((column) => (
-                <TableHead key={column.key.toString()} className={column.className}>
+                <TableHead key={column.key} className={column.className}>
                   {column.label}
                 </TableHead>
               ))}
             </TableRow>
           </TableHeader>
           <TableBody>
-            {data.map((row, rowIndex) => (
-              <TableRow key={getRowKey(row, rowIndex)} className={rowClassName}>
+            {cells.map((cell) => (
+              <TableRow key={cell.id} className={rowClassName}>
                 {columns.map((column) => (
-                  <TableCell key={`${getRowKey(row, rowIndex)}-${column.key}`} className={column.className}>
-                    {getColumnValue(row, column)}
+                  <TableCell key={`${cell.id}-${column.key}`} className={column.className}>
+                    {cell[column.key]}
                   </TableCell>
                 ))}
               </TableRow>
@@ -126,20 +115,20 @@ export function ResponsiveTable<T extends Record<string, any>>({
         !cardMode && "hidden",
         cardMode && !forceCardMode && `${breakpoint}:hidden`
       )}>
-        {data.map((row, rowIndex) => (
-          <Card key={getRowKey(row, rowIndex)} className={cn("p-4", cardClassName)}>
+        {cells.map((cell) => (
+          <Card key={cell.id} className={cn("p-4", cardClassName)}>
             {columns
               .filter(col => col.showOnMobile !== false)
               .map((column) => (
                 <div
-                  key={`card-${getRowKey(row, rowIndex)}-${column.key}`}
+                  key={`card-${cell.id}-${column.key}`}
                   className="flex justify-between py-2 border-b last:border-b-0"
                 >
                   <span className="font-medium text-sm text-muted-foreground">
                     {column.label}
                   </span>
                   <span className="text-right">
-                    {getColumnValue(row, column)}
+                    {cell[column.key]}
                   </span>
                 </div>
               ))}

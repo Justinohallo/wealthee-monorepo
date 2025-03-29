@@ -2,45 +2,58 @@
 
 import { ReactNode } from "react";
 import { useMediaQuery } from "@/hooks/use-media-query";
-import { ResponsiveTable, type Column } from "@/components/ui/responsive-table";
+import { ResponsiveTable, type SimpleColumn, type CellContent } from "@/components/ui/responsive-table";
 
-interface ResponsiveTableClientProps<T = any> {
-    data: T[];
-    mobileColumns: Column<T>[];
-    desktopColumns: Column<T>[];
-    emptyMessage: ReactNode;
-    keyField: string;
-    rowClassName?: string;
+interface ResponsiveTableClientProps<T = Record<string, unknown>> {
+  data: T[];
+  mobileColumns: SimpleColumn[];
+  desktopColumns: SimpleColumn[];
+  emptyMessage: ReactNode;
+  keyField: string;
+  rowClassName?: string;
 }
 
 /**
  * Client component for responsive tables
  * Handles switching between mobile and desktop column sets
  */
-export function ResponsiveTableClient<T extends Record<string, any>>({
-    data,
-    mobileColumns,
-    desktopColumns,
-    emptyMessage,
-    keyField,
-    rowClassName
+export function ResponsiveTableClient<T extends Record<string, unknown>>({
+  data,
+  mobileColumns,
+  desktopColumns,
+  emptyMessage,
+  keyField,
+  rowClassName
 }: ResponsiveTableClientProps<T>) {
-    const isMobile = useMediaQuery("(max-width: 767px)");
+  const isMobile = useMediaQuery("(max-width: 767px)");
 
-    // Use the appropriate columns based on screen size
-    const columns = isMobile ? mobileColumns : desktopColumns;
+  // Transform data into cell content format - with proper type casting
+  const cells: CellContent[] = data.map(item => {
+    const cell: Record<string, ReactNode> = {
+      id: String(item[keyField] || Math.random().toString())
+    };
 
-    return (
-        <div className="overflow-x-auto -mx-3 px-3 sm:mx-0 sm:px-0">
-            <ResponsiveTable
-                data={data}
-                columns={columns}
-                emptyMessage={emptyMessage}
-                keyField={keyField}
-                rowClassName={rowClassName}
-                forceTableMode={!isMobile}
-                forceCardMode={isMobile}
-            />
-        </div>
-    );
+    // Add all properties that appear in our columns
+    const allColumns = [...mobileColumns, ...desktopColumns];
+    allColumns.forEach(column => {
+      if (item[column.key] !== undefined) {
+        cell[column.key] = item[column.key] as ReactNode;
+      }
+    });
+
+    return cell as CellContent;
+  });
+
+  return (
+    <div className="overflow-x-auto -mx-3 px-3 sm:mx-0 sm:px-0">
+      <ResponsiveTable
+        cells={cells}
+        columns={isMobile ? mobileColumns : desktopColumns}
+        emptyMessage={emptyMessage}
+        rowClassName={rowClassName}
+        forceTableMode={!isMobile}
+        forceCardMode={isMobile}
+      />
+    </div>
+  );
 }

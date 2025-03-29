@@ -4,81 +4,21 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { cn, formatCurrency } from "@/lib/utils";
 import { LineChart } from "lucide-react";
 import { ResponsiveTableClient } from "./ResponsiveTableClient";
-import { type Column } from "@/components/ui/responsive-table";
+import { type SimpleColumn } from "@/components/ui/responsive-table";
 
-// Define column sets outside the component to avoid recreating them on each render
-const MOBILE_COLUMNS: Column<Position>[] = [
-  {
-    key: "symbol",
-    label: "Symbol",
-    className: "font-medium",
-    render: (_, position) => position.symbol?.symbol?.symbol || "N/A"
-  },
-  {
-    key: "units",
-    label: "Qty",
-    className: "text-right",
-    render: (value) => value ? Number(value).toFixed(2) : "N/A"
-  },
-  {
-    key: "market_value",
-    label: "Value",
-    className: "text-right",
-    render: (_, position) => {
-      const marketValue = (position.price || 0) * (position.units || 0);
-      return formatCurrency(marketValue, position.currency?.code || 'USD');
-    }
-  }
+// Define columns with simple structure
+const MOBILE_COLUMNS: SimpleColumn[] = [
+  { key: "symbol", label: "Symbol", className: "font-medium" },
+  { key: "units", label: "Qty", className: "text-right" },
+  { key: "market_value", label: "Value", className: "text-right" }
 ];
 
-const DESKTOP_COLUMNS: Column<Position>[] = [
-  {
-    key: "symbol",
-    label: "Symbol",
-    className: "font-medium",
-    render: (_, position) => position.symbol?.symbol?.symbol || "N/A"
-  },
-  {
-    key: "units",
-    label: "Quantity",
-    className: "text-right",
-    render: (value) => value ? Number(value).toFixed(2) : "N/A"
-  },
-  {
-    key: "price",
-    label: "Price",
-    className: "text-right",
-    render: (value, position) => value
-      ? formatCurrency(value, position.currency?.code || 'USD')
-      : "N/A"
-  },
-  {
-    key: "market_value",
-    label: "Market Value",
-    className: "text-right",
-    render: (_, position) => {
-      const marketValue = (position.price || 0) * (position.units || 0);
-      return formatCurrency(marketValue, position.currency?.code || 'USD');
-    }
-  },
-  {
-    key: "open_pnl",
-    label: "P/L",
-    className: "text-right",
-    render: (value, position) => {
-      if (typeof value !== 'number') return "N/A";
-
-      return (
-        <span className={cn(
-          "font-medium",
-          value > 0 ? "text-green-600" :
-            value < 0 ? "text-red-600" : ""
-        )}>
-          {formatCurrency(value, position.currency?.code || 'USD')}
-        </span>
-      );
-    }
-  }
+const DESKTOP_COLUMNS: SimpleColumn[] = [
+  { key: "symbol", label: "Symbol", className: "font-medium" },
+  { key: "units", label: "Quantity", className: "text-right" },
+  { key: "price", label: "Price", className: "text-right" },
+  { key: "market_value", label: "Market Value", className: "text-right" },
+  { key: "open_pnl", label: "P/L", className: "text-right" }
 ];
 
 const EMPTY_MESSAGE = (
@@ -97,6 +37,37 @@ export function AccountPositionsTable({
   positions,
   isLoading = false
 }: AccountPositionsTableProps) {
+  // Pre-format the positions data
+  const positionData = positions.map((position, index) => {
+    const marketValue = (position.price || 0) * (position.units || 0);
+
+    return {
+      ...position,
+      id: `position-${index}`,
+      _positionIndex: index,
+      // Format the symbol
+      symbol: position.symbol?.symbol?.symbol || "N/A",
+      // Format the units
+      units: position.units ? Number(position.units).toFixed(2) : "N/A",
+      // Format the price
+      price: position.price
+        ? formatCurrency(Number(position.price), position.currency?.code || 'USD')
+        : "N/A",
+      // Format the market value
+      market_value: formatCurrency(marketValue, position.currency?.code || 'USD'),
+      // Format the P/L
+      open_pnl: typeof position.open_pnl === 'number' ? (
+        <span className={cn(
+          "font-medium",
+          position.open_pnl > 0 ? "text-green-600" :
+            position.open_pnl < 0 ? "text-red-600" : ""
+        )}>
+          {formatCurrency(position.open_pnl, position.currency?.code || 'USD')}
+        </span>
+      ) : "N/A"
+    };
+  });
+
   return (
     <Card className="w-full overflow-hidden">
       <CardHeader className="sticky top-0 z-10 bg-background border-b">
@@ -116,11 +87,7 @@ export function AccountPositionsTable({
         ) : (
           // Use our client component for responsive tables
           <ResponsiveTableClient
-            data={positions.map((position, index) => ({
-              ...position,
-              // Add a unique id field if one doesn't exist
-              _positionIndex: index
-            }))}
+            data={positionData}
             mobileColumns={MOBILE_COLUMNS}
             desktopColumns={DESKTOP_COLUMNS}
             emptyMessage={EMPTY_MESSAGE}

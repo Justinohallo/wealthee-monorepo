@@ -1,12 +1,11 @@
+import { ResponsiveAccountSummary } from "@/components/account/responsive-account-summary";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { ResponsiveContainer } from "@/components/ui/responsive-container";
 import { ResponsiveGrid } from "@/components/ui/responsive-grid";
-import { ResponsiveTable, type Column } from "@/components/ui/responsive-table";
-import { StatsGrid } from "@/components/ui/stats-grid";
-import { ResponsiveAccountSummary } from "@/components/account/responsive-account-summary";
-import { Badge } from "@/components/ui/badge";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { ResponsiveTable, type SimpleColumn, type CellContent } from "@/components/ui/responsive-table";
 import { Separator } from "@/components/ui/separator";
-import { Button } from "@/components/ui/button";
+import { StatsGrid } from "@/components/ui/stats-grid";
 import { ArrowUpDown, BarChart3, DollarSign, TrendingDown, TrendingUp, Users } from "lucide-react";
 
 // Example data for demonstration
@@ -29,6 +28,8 @@ const mockAccount = {
   currency: "CAD"
 };
 
+
+
 const mockHoldings = [
   { id: "h1", name: "Apple Inc.", symbol: "AAPL", quantity: 25, price: 174.82, marketValue: 4370.50, change: 2.5 },
   { id: "h2", name: "Microsoft Corporation", symbol: "MSFT", quantity: 12, price: 367.45, marketValue: 4409.40, change: -0.8 },
@@ -37,32 +38,29 @@ const mockHoldings = [
   { id: "h5", name: "NVIDIA Corporation", symbol: "NVDA", quantity: 8, price: 477.76, marketValue: 3822.08, change: 3.7 }
 ];
 
-const holdingsColumns: Column[] = [
+// Pre-format cells for the table
+const holdingCells: CellContent[] = mockHoldings.map(holding => ({
+  id: holding.id,
+  name: holding.name,
+  symbol: holding.symbol,
+  quantity: holding.quantity,
+  price: `$${holding.price.toFixed(2)}`,
+  marketValue: `$${holding.marketValue.toFixed(2)}`,
+  change: (
+    <div className={`flex items-center justify-end ${holding.change > 0 ? 'text-green-600' : 'text-red-600'}`}>
+      {holding.change > 0 ? <TrendingUp className="w-4 h-4 mr-1" /> : <TrendingDown className="w-4 h-4 mr-1" />}
+      {Math.abs(holding.change)}%
+    </div>
+  )
+}));
+
+const holdingsColumns: SimpleColumn[] = [
   { key: "name", label: "Name" },
   { key: "symbol", label: "Symbol" },
   { key: "quantity", label: "Quantity" },
-  {
-    key: "price",
-    label: "Price",
-    render: (value) => `$${value.toFixed(2)}`
-  },
-  {
-    key: "marketValue",
-    label: "Market Value",
-    render: (value) => `$${value.toFixed(2)}`,
-    className: "text-right"
-  },
-  {
-    key: "change",
-    label: "Change",
-    render: (value) => (
-      <div className={`flex items-center justify-end ${value > 0 ? 'text-green-600' : 'text-red-600'}`}>
-        {value > 0 ? <TrendingUp className="w-4 h-4 mr-1" /> : <TrendingDown className="w-4 h-4 mr-1" />}
-        {Math.abs(value)}%
-      </div>
-    ),
-    className: "text-right"
-  }
+  { key: "price", label: "Price" },
+  { key: "marketValue", label: "Market Value", className: "text-right" },
+  { key: "change", label: "Change", className: "text-right" }
 ];
 
 const mockStats = [
@@ -134,7 +132,7 @@ export function MobileDesignGuideExample() {
         </CardHeader>
         <CardContent>
           <ResponsiveTable
-            data={mockHoldings}
+            cells={holdingCells}
             columns={holdingsColumns}
             emptyMessage="No holdings found"
           />
