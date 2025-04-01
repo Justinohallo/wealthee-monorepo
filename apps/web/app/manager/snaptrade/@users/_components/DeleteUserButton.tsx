@@ -1,71 +1,58 @@
 "use client";
 
-import { DeleteConfirmationDialog } from "@/components/delete-confirmation-dialog";
+import { ConfirmationDialog } from "@/components/confirmation-dialog";
 import { deleteSnapTradeUser } from "@/services/snaptrade/users";
 import { useRouter } from "next/navigation";
 import { useToast } from "@/hooks/use-toast";
 
 interface DeleteUserButtonProps {
-  idToken: string;
   portfolioManagerId: string;
   snapTradeUserId: string;
-  displayName: string;
-  redirectUrl?: string; // URL to redirect to after successful deletion
-  buttonClassName?: string; // Additional class name for the button
+  userName: string;
+  idToken: string;
+  buttonClassName?: string;
 }
 
-// Match the return type with DeleteConfirmationDialog
-interface DeleteResult {
-  success: boolean;
-  error?: string;
-}
-
-export function DeleteSnapTradeUserButton({
-  idToken,
+export function DeleteUserButton({
   portfolioManagerId,
   snapTradeUserId,
-  displayName,
-  redirectUrl,
+  userName,
+  idToken,
   buttonClassName,
 }: DeleteUserButtonProps) {
   const router = useRouter();
   const { toast } = useToast();
 
-  const handleDelete = async (): Promise<DeleteResult> => {
+  const handleDelete = async () => {
     try {
-      const { success } = await deleteSnapTradeUser({
+      const response = await deleteSnapTradeUser({
         idToken,
         portfolioManagerId,
         snapTradeUserId,
       });
 
-      if (success) {
+      if (response.success) {
         toast({
-          title: "User deleted successfully",
-          description: `SnapTrade user "${displayName}" has been deleted.`,
+          title: "User deleted",
+          description: `Successfully deleted SnapTrade user ${userName}.`,
         });
 
-        // Navigate to redirectUrl if provided, otherwise refresh the current page
-        if (redirectUrl) {
-          router.push(redirectUrl);
-        } else {
-          router.refresh();
-        }
-
+        // Redirect to the users list
+        router.push("/manager/snaptrade/@users");
         return { success: true };
       } else {
         toast({
-          title: "Failed to delete user",
-          description: "An error occurred while deleting the user. Please try again.",
+          title: "Error deleting user",
+          description: "Failed to delete the user. Please try again.",
           variant: "destructive",
         });
-        return { success: false, error: "Failed to delete user" };
+        return { success: false, error: "Delete operation failed" };
       }
     } catch (error) {
       console.error("Error deleting user:", error);
       toast({
         title: "Error",
-        description: "An unexpected error occurred. Please try again later.",
+        description: "An unexpected error occurred. Please try again.",
         variant: "destructive",
       });
       return { success: false, error: "An unexpected error occurred" };
@@ -73,14 +60,14 @@ export function DeleteSnapTradeUserButton({
   };
 
   return (
-    <DeleteConfirmationDialog
+    <ConfirmationDialog
       title="Delete SnapTrade User"
-      description={`Are you sure you want to delete "${displayName}"? This action cannot be undone and will remove all associated data from SnapTrade.`}
-      onDelete={handleDelete}
-      buttonText="Delete SnapTrade User"
+      description={`Are you sure you want to delete the SnapTrade user "${userName}"? This will permanently remove all connected brokerages and data. This action cannot be undone.`}
+      onConfirm={handleDelete}
       buttonVariant="destructive"
-      buttonSize="sm"
+      buttonText="Delete User"
       buttonClassName={buttonClassName}
+      confirmText="Delete"
     />
   );
 }

@@ -1,87 +1,79 @@
 "use client";
 
-import { DeleteConfirmationDialog } from "@/components/delete-confirmation-dialog";
+import { ConfirmationDialog } from "@/components/confirmation-dialog";
 import { deleteBrokerageConnection } from "@/services/snaptrade/connections";
 import { useRouter } from "next/navigation";
 import { useToast } from "@/hooks/use-toast";
 
 interface DeleteBrokerageConnectionButtonProps {
-  idToken: string;
   snapTradeUserId: string;
   brokerageId: string;
-  brokerageName: string; // Changed to any to bypass TypeScript checks
-  redirectUrl?: string; // URL to redirect to after successful deletion
-  buttonClassName?: string; // Additional class for button styling
+  brokerageName: string;
+  idToken: string;
+  redirectUrl?: string;
+  buttonClassName?: string;
 }
-
-
 
 export function DeleteBrokerageConnectionButton({
   idToken,
   snapTradeUserId,
   brokerageId,
-  brokerageName = "this brokerage",
+  brokerageName,
   redirectUrl,
   buttonClassName,
 }: DeleteBrokerageConnectionButtonProps) {
   const router = useRouter();
   const { toast } = useToast();
 
-  // Ensure brokerageName is actually a string
-  const displayName = typeof brokerageName === 'string'
-    ? brokerageName
-    : "this brokerage";
+  // Ensure brokerage name is a string
+  const displayName = String(brokerageName);
 
   const handleDelete = async () => {
     try {
-      const result = await deleteBrokerageConnection(
+      await deleteBrokerageConnection(
         snapTradeUserId,
         brokerageId,
         idToken
       );
 
-      if (result.success) {
-        toast({
-          title: "Brokerage connection deleted",
-          description: `Connection to "${displayName}" has been successfully removed.`,
-        });
+      toast({
+        title: "Connection deleted",
+        description: `Successfully deleted connection to ${displayName}.`,
+      });
 
-        // Navigate to redirectUrl if provided, otherwise refresh the current page
-        if (redirectUrl) {
-          router.push(redirectUrl);
-        } else {
-          router.refresh();
-        }
-
-        return { success: true };
+      // Redirect if URL is provided, otherwise refresh
+      if (redirectUrl) {
+        router.push(redirectUrl);
       } else {
-        toast({
-          title: "Failed to delete connection",
-          description: "An error occurred while deleting the brokerage connection. Please try again.",
-          variant: "destructive",
-        });
-        return { success: false, error: "Failed to delete brokerage connection" };
+        router.refresh();
       }
+
+      return { success: true };
     } catch (error) {
       console.error("Error deleting brokerage connection:", error);
+
       toast({
         title: "Error",
-        description: "An unexpected error occurred. Please try again later.",
+        description: "Failed to delete the brokerage connection.",
         variant: "destructive",
       });
-      return { success: false, error: "An unexpected error occurred" };
+
+      return {
+        success: false,
+        error: "Failed to delete the brokerage connection"
+      };
     }
   };
 
   return (
-    <DeleteConfirmationDialog
-      title="Delete Brokerage Connection"
-      description={`Are you sure you want to delete the connection to "${displayName}"? This action cannot be undone and will remove access to all accounts linked to this brokerage.`}
-      onDelete={handleDelete}
-      buttonText="Delete"
+    <ConfirmationDialog
+      title="Delete Connection"
+      description={`Are you sure you want to delete the connection to ${displayName}? This action cannot be undone.`}
+      onConfirm={handleDelete}
       buttonVariant="destructive"
-      buttonSize="sm"
+      buttonText="Delete"
       buttonClassName={buttonClassName}
+      confirmText="Delete"
     />
   );
 }

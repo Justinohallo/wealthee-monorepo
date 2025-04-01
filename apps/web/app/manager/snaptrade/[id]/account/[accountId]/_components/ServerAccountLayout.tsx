@@ -8,6 +8,7 @@ import Link from "next/link";
 import { ResponsiveAccountSummary } from "@/components/account/responsive-account-summary";
 import { ResponsiveContainer } from "@/components/ui/responsive-container";
 import { ResponsiveTabsClient } from "./ResponsiveTabsClient";
+import { SetPrimaryAccountButton } from "@/components/snaptrade/SetPrimaryAccountButton";
 
 interface ServerAccountLayoutProps {
   account: Account;
@@ -15,6 +16,8 @@ interface ServerAccountLayoutProps {
   userId: string;
   snapTradeUserId: string;
   accountId: string;
+  isPrimary: boolean;
+  portfolioManagerId: string;
 }
 
 /**
@@ -29,7 +32,9 @@ export function ServerAccountLayout({
   idToken,
   userId,
   snapTradeUserId,
-  accountId
+  accountId,
+  isPrimary,
+  portfolioManagerId,
 }: ServerAccountLayoutProps) {
   // Transform account data to match the format expected by ResponsiveAccountSummary
   const accountData = {
@@ -83,14 +88,22 @@ export function ServerAccountLayout({
 
   return (
     <ResponsiveContainer>
-      {/* Back button */}
-      <div className="mb-4">
+      {/* Back button and Set Primary Button (aligned) */}
+      <div className="mb-4 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
         <Link href={`/manager/snaptrade/${snapTradeUserId}`}>
           <Button variant="outline" size="sm" className="flex items-center gap-1 min-h-[44px] sm:min-h-[32px]">
             <ChevronLeft className="h-4 w-4" />
             Back to Accounts
           </Button>
         </Link>
+        <SetPrimaryAccountButton
+          snapTradeUserId={snapTradeUserId}
+          accountId={accountId}
+          accountName={account.name || "Account"}
+          isPrimary={isPrimary}
+          idToken={idToken}
+          portfolioManagerId={portfolioManagerId}
+        />
       </div>
 
       {/* Account Summary */}

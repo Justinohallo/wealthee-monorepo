@@ -3,6 +3,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { ServerAccountLayout } from "./_components/ServerAccountLayout";
 import { Suspense } from "react";
 import { fetchAccountDetails } from "@/services/snaptrade/accounts";
+import { getPrimaryAccount } from "@/services/portfolioManager/primaryAccount";
 import { verifySessionAndGetUser } from "@/lib/server-auth-utils";
 
 export default async function AccountDetailsPage({
@@ -22,15 +23,21 @@ export default async function AccountDetailsPage({
   }
 
   const idToken = session.token || '';
-  const userId = session.decodedClaims.uid;
+  const portfolioManagerId = session.decodedClaims.uid;
 
-  // Fetch the account details
-  const account = await fetchAccountDetails({
-    userId,
+  // Fetch the account details and primary account ID concurrently
+  const accountDetailsPromise = fetchAccountDetails({
+    userId: portfolioManagerId,
     snapTradeUserId,
     accountId,
     idToken
   });
+  const primaryAccountIdPromise = getPrimaryAccount(portfolioManagerId, idToken);
+
+  const [account, primaryAccountId] = await Promise.all([
+    accountDetailsPromise,
+    primaryAccountIdPromise,
+  ]);
 
   if (!account) {
     return (
@@ -52,9 +59,11 @@ export default async function AccountDetailsPage({
       <ServerAccountLayout
         account={account}
         idToken={idToken}
-        userId={userId}
+        userId={portfolioManagerId}
         snapTradeUserId={snapTradeUserId}
         accountId={accountId}
+        isPrimary={accountId === primaryAccountId}
+        portfolioManagerId={portfolioManagerId}
       />
     </Suspense>
   );

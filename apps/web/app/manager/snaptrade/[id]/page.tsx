@@ -7,9 +7,10 @@ import { BrokerageAuthorization } from "@/types/snaptrade";
 import { Button } from "@/components/ui/button";
 import { ChevronLeft } from "lucide-react";
 import { DeleteBrokerageConnectionButton } from "./_components/DeleteBrokerageConnectionButton";
-import { DeleteSnapTradeUserButton } from "../@users/_components/DeleteUserButton";
+import { DeleteUserButton } from "../@users/_components/DeleteUserButton";
 import Image from "next/image";
 import Link from "next/link";
+import { getPrimaryAccount } from "@/services/portfolioManager/primaryAccount";
 import { verifySessionAndGetUser } from "@/lib/server-auth-utils";
 
 // Create a responsive version of the brokerages table
@@ -164,10 +165,20 @@ export default async function SnaptradeUserPage({ params }: { params: { id: stri
   const snaptradeUserId = awaitedParams.id
 
   // Fetch brokerage authorizations
-  const brokerages = await listBrokerageConnections(snaptradeUserId, idToken);
+  const brokeragesPromise = listBrokerageConnections(snaptradeUserId, idToken);
 
   // Get SnapTrade login URL
-  const loginUrl = await getSnapTradeBrokerageConnectionURL(portfolioManagerId, snaptradeUserId, idToken);
+  const loginUrlPromise = getSnapTradeBrokerageConnectionURL(portfolioManagerId, snaptradeUserId, idToken);
+
+  // Fetch the primary account ID for the portfolio manager
+  const primaryAccountIdPromise = getPrimaryAccount(portfolioManagerId, idToken);
+
+  // Wait for all fetches to complete
+  const [brokerages, loginUrl, primaryAccountId] = await Promise.all([
+    brokeragesPromise,
+    loginUrlPromise,
+    primaryAccountIdPromise,
+  ]);
 
   return (
     <div className="space-y-6">
@@ -200,13 +211,12 @@ export default async function SnaptradeUserPage({ params }: { params: { id: stri
             )}
 
             <div className="w-full sm:w-auto">
-              <DeleteSnapTradeUserButton
+              <DeleteUserButton
                 idToken={idToken}
                 portfolioManagerId={portfolioManagerId}
-                snapTradeUserId={snaptradeUserId}
-                displayName="this SnapTrade user"
-                redirectUrl="/manager/snaptrade"
-                buttonClassName="w-full sm:w-auto"
+                snapTradeUserId={params.id}
+                userName="SnapTrade User"
+                buttonClassName="w-full"
               />
             </div>
           </div>
@@ -232,6 +242,8 @@ export default async function SnaptradeUserPage({ params }: { params: { id: stri
         idToken={idToken}
         userId={portfolioManagerId}
         snapTradeUserId={snaptradeUserId}
+        primaryAccountId={primaryAccountId}
+        portfolioManagerId={portfolioManagerId}
       />
     </div>
   );

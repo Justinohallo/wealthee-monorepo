@@ -4,7 +4,7 @@ import { SnapTradeUser } from "@/services/snaptrade/users";
 import { useMediaQuery } from "@/hooks/use-media-query";
 import { ResponsiveTable, type SimpleColumn, type CellContent } from "@/components/ui/responsive-table";
 import Link from "next/link";
-import { DeleteSnapTradeUserButton } from "../@users/_components/DeleteUserButton";
+import { DeleteUserButton } from "../@users/_components/DeleteUserButton";
 import { Button } from "@/components/ui/button";
 
 interface SnapTradeUsersTableProps {
@@ -55,11 +55,11 @@ export function SnapTradeUsersTable({
             View Details
           </Link>
         </Button>
-        <DeleteSnapTradeUserButton
+        <DeleteUserButton
           idToken={idToken}
           portfolioManagerId={portfolioManagerId}
           snapTradeUserId={user.id}
-          displayName={user.displayName}
+          userName={user.displayName}
           buttonClassName="h-8 text-xs w-full"
         />
       </div>
@@ -75,11 +75,11 @@ export function SnapTradeUsersTable({
             View Details
           </Link>
         </Button>
-        <DeleteSnapTradeUserButton
+        <DeleteUserButton
           idToken={idToken}
           portfolioManagerId={portfolioManagerId}
           snapTradeUserId={user.id}
-          displayName={user.displayName}
+          userName={user.displayName}
           buttonClassName="h-8 px-2 text-xs"
         />
       </div>

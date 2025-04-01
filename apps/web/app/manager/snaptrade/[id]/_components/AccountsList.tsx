@@ -10,18 +10,27 @@ import {
 
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
+import { SetPrimaryAccountButton } from "@/components/snaptrade/SetPrimaryAccountButton";
 import { fetchSnapTradeAccounts } from "@/services/snaptrade/accounts";
 import { formatCurrency } from "@/lib/utils";
+
+// Define props interface
+interface AccountsListProps {
+  idToken: string;
+  snapTradeUserId: string;
+  userId: string;
+  primaryAccountId: string | null;
+  portfolioManagerId: string;
+}
 
 // The main component that fetches data
 export default async function AccountsList({
   idToken,
   snapTradeUserId,
-}: {
-  idToken: string;
-  userId: string;
-  snapTradeUserId: string;
-}) {
+  userId,
+  primaryAccountId,
+  portfolioManagerId,
+}: AccountsListProps) {
   const accounts = await fetchSnapTradeAccounts({ snapTradeUserId, idToken });
   if (!accounts.length) {
     return (
@@ -93,15 +102,26 @@ export default async function AccountsList({
                     </span>
                   </div>
 
-                  <div className="pt-3 mt-3 border-t">
+                  <div className="pt-3 mt-3 border-t flex flex-col gap-2 sm:flex-row">
                     <Link
                       href={`/manager/snaptrade/${snapTradeUserId}/account/${account.id}`}
-                      className="w-full"
+                      className="w-full sm:w-auto flex-1"
                     >
                       <Button variant="outline" size="sm" className="w-full">
                         View Details
                       </Button>
                     </Link>
+                    <div className="w-full sm:w-auto flex-1">
+                      <SetPrimaryAccountButton
+                        snapTradeUserId={snapTradeUserId}
+                        accountId={account.id!}
+                        accountName={account.name || "Account"}
+                        isPrimary={account.id === primaryAccountId}
+                        idToken={idToken}
+                        portfolioManagerId={portfolioManagerId}
+                        variant="secondary"
+                      />
+                    </div>
                   </div>
                 </div>
               </CardContent>
@@ -157,13 +177,23 @@ export default async function AccountsList({
                     }
                   </TableCell>
                   <TableCell>
-                    <Link
-                      href={`/manager/snaptrade/${snapTradeUserId}/account/${account.id}`}
-                    >
-                      <Button variant="outline" size="sm">
-                        View Details
-                      </Button>
-                    </Link>
+                    <div className="flex items-center space-x-2">
+                      <Link
+                        href={`/manager/snaptrade/${snapTradeUserId}/account/${account.id}`}
+                      >
+                        <Button variant="outline" size="sm">
+                          View Details
+                        </Button>
+                      </Link>
+                      <SetPrimaryAccountButton
+                        snapTradeUserId={snapTradeUserId}
+                        accountId={account.id!}
+                        accountName={account.name || "Account"}
+                        isPrimary={account.id === primaryAccountId}
+                        idToken={idToken}
+                        portfolioManagerId={portfolioManagerId}
+                      />
+                    </div>
                   </TableCell>
                 </TableRow>
               ))}

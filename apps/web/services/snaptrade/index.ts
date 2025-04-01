@@ -5,6 +5,6 @@
  * Each file corresponds to a specific domain within SnapTrade.
  */
 
-export * from './users';
-export * from './connections';
 export * from './accounts';
+export * from './connections';
+export * from './users';

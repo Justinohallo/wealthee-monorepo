@@ -10,3 +10,6 @@ export * as users from "./users";
 
 // Export SnapTrade integration functions
 export * as snapTrade from "./snapTrade";
+
+// Export primary account functions
+export * as primaryAccount from "./primaryAccount";

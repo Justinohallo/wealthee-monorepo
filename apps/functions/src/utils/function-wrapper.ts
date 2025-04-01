@@ -86,7 +86,6 @@ function validateRequestParams(
   requiredParams: HttpFunctionOptions["requiredParams"]
 ): void {
   if (!requiredParams) return;
-
   // Validate body parameters
   if (requiredParams.body && requiredParams.body.length > 0) {
     for (const param of requiredParams.body) {

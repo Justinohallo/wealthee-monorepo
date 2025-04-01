@@ -24,6 +24,11 @@ export const PORTFOLIO_MANAGER = {
     LOGIN_USER: 'portfolioManager-snapTrade-loginSnapTradeUser',
     REGISTER_PRIMARY_USER: 'portfolioManager-snapTrade-registerPrimarySnaptradeUser',
     REGISTER_USER_WITH_DISPLAY: 'portfolioManager-snapTrade-registerSnaptradeUserWithDisplay',
+  },
+
+  PRIMARY_ACCOUNT: {
+    SET: "portfolioManager-primaryAccount-setPrimaryAccountHandler",
+    GET: "portfolioManager-primaryAccount-getPrimaryAccountHandler",
   }
 };
 
@@ -96,8 +101,11 @@ export const SNAPTRADE = {
     GET_USER_ACCOUNT_DETAILS: 'portfoliomanager-getsnaptradeuseraccountdetails',
     GET_USER_ACCOUNT_BALANCES: 'portfoliomanager-getsnaptradeuseraccountbalances',
     GET_USER_HOLDINGS: 'portfoliomanager-getsnaptradeuserholdings',
-  }
-};
+  },
+
+  // SET_PRIMARY_ACCOUNT: 'snaptrade-setPrimaryAccount', // Removed: Moved to PORTFOLIO_MANAGER.ACCOUNTS
+  // GET_PRIMARY_ACCOUNT: 'snaptrade-getPrimaryAccount', // Removed: Moved to PORTFOLIO_MANAGER.ACCOUNTS
+} as const;
 
 // Client functions
 export const CLIENT = {

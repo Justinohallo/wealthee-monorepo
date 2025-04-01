@@ -1,3 +1,8 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
 # Web App Service Function Guidelines
 
 This rule provides guidelines for implementing service functions in our web application, focusing on:
