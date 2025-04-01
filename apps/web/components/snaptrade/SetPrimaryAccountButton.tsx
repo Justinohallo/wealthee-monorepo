@@ -43,7 +43,7 @@ export function SetPrimaryAccountButton({
 
       router.refresh();
       return { success: true };
-    } catch (error) {
+    } catch {
       toast({
         title: "Error setting primary account",
         description: "There was an error. Please try again.",

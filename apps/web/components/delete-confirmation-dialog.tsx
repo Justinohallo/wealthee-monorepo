@@ -10,7 +10,7 @@ import { ConfirmationDialog } from "./confirmation-dialog";
 export interface DeleteConfirmationDialogProps {
   title: string;
   description: string;
-  onDelete: () => Promise<any>;
+  onDelete: () => Promise<{ success: boolean; error?: string } | void>;
   trigger?: React.ReactNode;
   buttonVariant?: "default" | "destructive" | "outline" | "secondary" | "ghost" | "link";
   buttonSize?: "default" | "sm" | "lg" | "icon";

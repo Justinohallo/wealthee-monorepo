@@ -240,7 +240,6 @@ export default async function SnaptradeUserPage({ params }: { params: { id: stri
       {/* Accounts List - handled by the AccountsList component */}
       <AccountsList
         idToken={idToken}
-        userId={portfolioManagerId}
         snapTradeUserId={snaptradeUserId}
         primaryAccountId={primaryAccountId}
         portfolioManagerId={portfolioManagerId}

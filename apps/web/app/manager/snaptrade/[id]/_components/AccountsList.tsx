@@ -18,7 +18,6 @@ import { formatCurrency } from "@/lib/utils";
 interface AccountsListProps {
   idToken: string;
   snapTradeUserId: string;
-  userId: string;
   primaryAccountId: string | null;
   portfolioManagerId: string;
 }
@@ -27,7 +26,6 @@ interface AccountsListProps {
 export default async function AccountsList({
   idToken,
   snapTradeUserId,
-  userId,
   primaryAccountId,
   portfolioManagerId,
 }: AccountsListProps) {
