@@ -17,7 +17,8 @@ export async function setPrimaryAccount({ portfolioManagerId, accountId }: SetPr
 
   const managerRef = db.ref(`portfolioManagers/${portfolioManagerId}`); // Using RTDB ref
 
-  logger.info(`Setting primary account to ${accountId || "NULL"} for Portfolio Manager: ${portfolioManagerId}`, "PortfolioManagerPrimaryAccount");
+  logger.info(`Setting primary account to ${accountId || "NULL"}
+     for Portfolio Manager: ${portfolioManagerId}`, "PortfolioManagerPrimaryAccount");
 
   try {
     await managerRef.update({

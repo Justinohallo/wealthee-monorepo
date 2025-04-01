@@ -1,3 +1,8 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
 Guidelines for calling Firebase Cloud Functions from the web app
 # Wealthee Firebase Function Calls
 

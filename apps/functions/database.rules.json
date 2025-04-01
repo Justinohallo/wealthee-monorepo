@@ -50,14 +50,25 @@
       }
     },
 
+    "portfolioManager_client_mappings": {
+      ".read": "auth != null && auth.token.role === 'admin'",
+      ".write": "auth != null && auth.token.role === 'admin'",
+
+      "$mappingId": {
+        ".read": "auth != null && (auth.token.role === 'admin' || (auth.token.role === 'portfolioManager' && data.child('portfolioManagerId').val() === auth.uid))",
+        ".write": "auth != null && (auth.token.role === 'admin' || (auth.token.role === 'portfolioManager' && data.child('portfolioManagerId').val() === auth.uid))",
+        ".validate": "newData.hasChildren(['portfolioManagerId', 'clientId', 'createdAt'])"
+      }
+    },
+
     "clients": {
       ".read": "auth != null && auth.token.role === 'admin'",
       ".write": "auth != null && auth.token.role === 'admin'",
 
       "$clientId": {
-        ".read": "auth != null && (auth.token.role === 'admin' || auth.uid === $clientId || (auth.token.role === 'portfolioManager' && root.child('portfolioManagers').child(auth.uid).child('clients').child($clientId).exists()))",
-        ".write": "auth != null && (auth.token.role === 'admin' || auth.uid === $clientId || (auth.token.role === 'portfolioManager' && root.child('portfolioManagers').child(auth.uid).child('clients').child($clientId).exists()))",
-        ".validate": "newData.hasChildren(['_id', 'email', 'firstName', 'lastName', 'dateCreated'])"
+        ".read": "auth != null && (auth.token.role === 'admin' || auth.uid === $clientId || (auth.token.role === 'portfolioManager' && root.child('portfolioManager_client_mappings').orderByChild('clientId').equalTo($clientId).orderByChild('portfolioManagerId').equalTo(auth.uid).exists()))",
+        ".write": "auth != null && (auth.token.role === 'admin' || auth.uid === $clientId || (auth.token.role === 'portfolioManager' && root.child('portfolioManager_client_mappings').orderByChild('clientId').equalTo($clientId).orderByChild('portfolioManagerId').equalTo(auth.uid).exists()))",
+        ".validate": "newData.hasChildren(['email', 'firstName', 'lastName', 'createdAt'])"
       }
     }
   }

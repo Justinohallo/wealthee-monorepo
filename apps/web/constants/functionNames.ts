@@ -103,9 +103,7 @@ export const SNAPTRADE = {
     GET_USER_HOLDINGS: 'portfoliomanager-getsnaptradeuserholdings',
   },
 
-  // SET_PRIMARY_ACCOUNT: 'snaptrade-setPrimaryAccount', // Removed: Moved to PORTFOLIO_MANAGER.ACCOUNTS
-  // GET_PRIMARY_ACCOUNT: 'snaptrade-getPrimaryAccount', // Removed: Moved to PORTFOLIO_MANAGER.ACCOUNTS
-} as const;
+}
 
 // Client functions
 export const CLIENT = {

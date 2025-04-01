@@ -1,0 +1,176 @@
+"use client";
+
+import { ChangeEvent, FormEvent, useState } from "react";
+import { Check, LoaderCircle } from "lucide-react";
+
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { addClient } from "@/services/client/users";
+import { useRouter } from "next/navigation";
+
+interface ClientFormProps {
+  portfolioManagerId: string;
+  idToken: string;
+}
+
+export default function ClientForm({ portfolioManagerId, idToken }: ClientFormProps) {
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isSuccess, setIsSuccess] = useState(false);
+  const [errors, setErrors] = useState<Record<string, string>>({});
+  const [formData, setFormData] = useState({
+    firstName: "",
+    lastName: "",
+    email: "",
+  });
+  const router = useRouter();
+
+  const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+
+    // Clear error when field is edited
+    if (errors[name]) {
+      setErrors((prev) => {
+        const newErrors = { ...prev };
+        delete newErrors[name];
+        return newErrors;
+      });
+    }
+  };
+
+  const validateForm = (): boolean => {
+    const newErrors: Record<string, string> = {};
+
+    if (formData.firstName.trim().length < 2) {
+      newErrors.firstName = "First name must be at least 2 characters";
+    }
+
+    if (formData.lastName.trim().length < 2) {
+      newErrors.lastName = "Last name must be at least 2 characters";
+    }
+
+    // Basic email validation regex
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(formData.email)) {
+      newErrors.email = "Please enter a valid email address";
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  const handleSubmit = async (e: FormEvent) => {
+    e.preventDefault();
+
+    if (!validateForm()) {
+      return;
+    }
+
+    try {
+      setIsSubmitting(true);
+      setIsSuccess(false);
+
+      // Call the addClient service function
+      await addClient(formData, idToken, portfolioManagerId);
+      // Show success message
+      setIsSuccess(true);
+
+      // Refresh server data and redirect after a brief delay
+      setTimeout(() => {
+        router.refresh();
+        router.push("/manager/clients");
+      }, 1500);
+    } catch (error) {
+      console.error("Error adding client:", error);
+      // Show error in UI
+      setErrors({
+        form: error instanceof Error ? error.message : "An unexpected error occurred"
+      });
+      setIsSubmitting(false);
+    }
+  };
+
+  return (
+    <form onSubmit={handleSubmit} className="space-y-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="space-y-2">
+          <Label htmlFor="firstName">First Name</Label>
+          <Input
+            id="firstName"
+            name="firstName"
+            placeholder="John"
+            value={formData.firstName}
+            onChange={handleChange}
+            disabled={isSubmitting || isSuccess}
+          />
+          {errors.firstName && (
+            <p className="text-sm text-red-500">{errors.firstName}</p>
+          )}
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="lastName">Last Name</Label>
+          <Input
+            id="lastName"
+            name="lastName"
+            placeholder="Doe"
+            value={formData.lastName}
+            onChange={handleChange}
+            disabled={isSubmitting || isSuccess}
+          />
+          {errors.lastName && (
+            <p className="text-sm text-red-500">{errors.lastName}</p>
+          )}
+        </div>
+      </div>
+
+      <div className="space-y-2">
+        <Label htmlFor="email">Email</Label>
+        <Input
+          id="email"
+          name="email"
+          type="email"
+          placeholder="client@example.com"
+          value={formData.email}
+          onChange={handleChange}
+          disabled={isSubmitting || isSuccess}
+        />
+        <p className="text-sm text-muted-foreground">
+          A temporary password will be sent to this email address.
+        </p>
+        {errors.email && (
+          <p className="text-sm text-red-500">{errors.email}</p>
+        )}
+      </div>
+
+      {errors.form && (
+        <div className="p-3 rounded bg-red-50 border border-red-200 text-red-800">
+          {errors.form}
+        </div>
+      )}
+
+      <div className="flex justify-end">
+        <Button
+          type="submit"
+          disabled={isSubmitting || isSuccess}
+          className="min-w-[120px]"
+        >
+          {isSubmitting ? (
+            <>
+              <LoaderCircle className="mr-2 h-4 w-4 animate-spin" />
+              Adding...
+            </>
+          ) : isSuccess ? (
+            <>
+              <Check className="mr-2 h-4 w-4" />
+              Added
+            </>
+          ) : (
+            "Add Client"
+          )}
+        </Button>
+      </div>
+    </form>
+  );
+}
