@@ -1,5 +1,6 @@
+import * as primaryAccountService from "../../services/portfolioManager/primaryAccount";
+
 import { Request, Response } from "express";
-import { getPrimaryAccount, setPrimaryAccount } from "../../services/portfolioManager/primaryAccount";
 
 import { createHttpFunction } from "../../utils/function-wrapper";
 import { logger } from "../../utils/logger";
@@ -14,7 +15,7 @@ interface PrimaryAccountHandlerContext {
  * Sets a specific account as the primary account for a Portfolio Manager.
  * Requires portfolioManagerId and accountId in the request body.
  */
-export const setPrimaryAccountHandler = createHttpFunction({
+export const setPrimaryAccount = createHttpFunction({
   handler: async (context: PrimaryAccountHandlerContext) => {
     const { req, res } = context;
     const { portfolioManagerId, accountId } = req.body;
@@ -22,7 +23,7 @@ export const setPrimaryAccountHandler = createHttpFunction({
     logger.info(`Request received to set primary account to ${accountId || "NULL"}
       for Portfolio Manager: ${portfolioManagerId}`, "SetPrimaryAccountHandler");
 
-    await setPrimaryAccount({ portfolioManagerId, accountId });
+    await primaryAccountService.setPrimaryAccount({ portfolioManagerId, accountId });
 
     res.json({
       success: true,
@@ -46,7 +47,7 @@ export const setPrimaryAccountHandler = createHttpFunction({
  * Gets the primary account ID for a Portfolio Manager.
  * Requires portfolioManagerId in query params.
  */
-export const getPrimaryAccountHandler = createHttpFunction({
+export const getPrimaryAccount = createHttpFunction({
   handler: async (context: PrimaryAccountHandlerContext) => {
     const { req, res } = context;
     const { portfolioManagerId } = req.query;
@@ -54,7 +55,7 @@ export const getPrimaryAccountHandler = createHttpFunction({
     logger.info(`Request received to get primary account for Portfolio Manager: ${portfolioManagerId}`,
       "GetPrimaryAccountHandler");
 
-    const primaryAccountId = await getPrimaryAccount(portfolioManagerId as string);
+    const primaryAccountId = await primaryAccountService.getPrimaryAccount(portfolioManagerId as string);
 
     res.json({
       success: true,

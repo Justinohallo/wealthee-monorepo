@@ -27,8 +27,8 @@ export const PORTFOLIO_MANAGER = {
   },
 
   PRIMARY_ACCOUNT: {
-    SET: "portfolioManager-primaryAccount-setPrimaryAccountHandler",
-    GET: "portfolioManager-primaryAccount-getPrimaryAccountHandler",
+    SET: "portfolioManager-primaryAccount-setPrimaryAccount",
+    GET: "portfolioManager-primaryAccount-getPrimaryAccount",
   }
 };
 
