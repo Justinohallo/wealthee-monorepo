@@ -1,4 +1,7 @@
+'use server'
+
 import { AddClientFormData, AddClientResult, Client, UpdateClientParams } from "@/types/client";
+import { revalidatePath, revalidateTag } from "next/cache";
 
 import { CLIENT } from "@/constants/functionNames";
 import { callFirebaseFunction } from "@/lib/firebase-functions";
@@ -30,7 +33,7 @@ export async function addClient(
         }),
       },
     });
-
+    revalidateTag('clients')
     return response?.data || {
       clientId: "",
       status: "conflict",
@@ -91,6 +94,9 @@ export async function listClients(
       functionName: CLIENT.USERS.LIST,
       idToken,
       queryParams: { portfolioManagerId },
+      options: {
+        tags: ['clients']
+      }
     });
     return response?.data?.clients || [];
   } catch (error) {

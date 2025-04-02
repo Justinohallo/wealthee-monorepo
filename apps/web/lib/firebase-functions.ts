@@ -2,13 +2,13 @@
  * Utility functions for calling Firebase Cloud Functions
  */
 
-import { apiMonitor } from './api-monitor';
 
 type FetchOptions = {
   revalidate?: number;
   headers?: HeadersInit;
   method?: string;
   body?: string | FormData;
+  tags?: string[];
 };
 
 /**
@@ -154,8 +154,6 @@ export async function callFirebaseFunction<T = unknown>({
   const functionUrl = buildFunctionUrl(functionName, queryParams);
   console.log(`Calling Firebase function '${functionName}' at: ${functionUrl}`);
 
-  // Start monitoring the API call
-  apiMonitor.startCall(functionName);
 
   let lastError: unknown;
   let attempt = 0;
@@ -173,6 +171,7 @@ export async function callFirebaseFunction<T = unknown>({
 
       // Default revalidation to 60 seconds if not specified
       const revalidate = options.revalidate ?? 60;
+      const tags = options.tags ?? undefined
 
       const fetchOptions: RequestInit & { next?: { revalidate: number } } = {
         method: options.method || 'GET',
@@ -180,7 +179,7 @@ export async function callFirebaseFunction<T = unknown>({
           ...options.headers,
         },
         body: options.body,
-        next: { revalidate }
+        next: { revalidate, tags }
       };
 
       // Only add Authorization header if idToken is provided
@@ -210,8 +209,6 @@ export async function callFirebaseFunction<T = unknown>({
       // Parse JSON response
       const result = await response.json();
 
-      // End monitoring with success
-      apiMonitor.endCallSuccess(functionName);
 
       return result;
 
@@ -223,13 +220,6 @@ export async function callFirebaseFunction<T = unknown>({
         // Log the error with context
         logFunctionError(error, functionName);
 
-        // Mark the API call as failed in the monitor
-        apiMonitor.endCallError(functionName, {
-          message: error instanceof Error ? error.message : String(error),
-          statusCode: error instanceof FirebaseFunctionError ? error.statusCode : undefined,
-          responseData: error instanceof FirebaseFunctionError ? error.responseData : undefined,
-          functionName
-        });
 
         // Re-throw with a Firebase-specific error class
         throw new FirebaseFunctionError(
@@ -248,13 +238,6 @@ export async function callFirebaseFunction<T = unknown>({
   // If we get here, we've exhausted our retries
   logFunctionError(lastError!, functionName);
 
-  // Mark the API call as failed in the monitor
-  apiMonitor.endCallError(functionName, {
-    message: lastError instanceof Error ? lastError.message : String(lastError),
-    statusCode: lastError instanceof FirebaseFunctionError ? lastError.statusCode : undefined,
-    responseData: lastError instanceof FirebaseFunctionError ? lastError.responseData : undefined,
-    functionName
-  });
 
   throw new FirebaseFunctionError(
     `Failed to call Firebase function '${functionName}' after ${maxAttempts} attempts: ${lastError instanceof Error ? lastError.message : String(lastError)}`,

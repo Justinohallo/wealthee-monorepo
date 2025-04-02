@@ -38,7 +38,6 @@ export async function listSnapTradeUsersForPortfolioManager(
       queryParams: { portfolioManagerId },
       options: {
         method: "GET",
-        revalidate: 0 // Don't cache this data
       }
     });
 

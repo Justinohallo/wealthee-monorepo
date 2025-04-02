@@ -1,7 +1,7 @@
 "use client";
 
 import { ChangeEvent, FormEvent, useState } from "react";
-import { Check, LoaderCircle } from "lucide-react";
+import { Check, Eye, EyeOff, LoaderCircle } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -18,13 +18,14 @@ export default function ClientForm({ portfolioManagerId, idToken }: ClientFormPr
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [showPassword, setShowPassword] = useState(false);
   const [formData, setFormData] = useState({
     firstName: "",
     lastName: "",
     email: "",
+    password: "",
   });
   const router = useRouter();
-
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
@@ -54,6 +55,11 @@ export default function ClientForm({ portfolioManagerId, idToken }: ClientFormPr
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(formData.email)) {
       newErrors.email = "Please enter a valid email address";
+    }
+
+    // Password validation
+    if (formData.password.length < 8) {
+      newErrors.password = "Password must be at least 8 characters";
     }
 
     setErrors(newErrors);
@@ -163,11 +169,42 @@ export default function ClientForm({ portfolioManagerId, idToken }: ClientFormPr
           onChange={handleChange}
           disabled={isSubmitting || isSuccess}
         />
-        <p className="text-sm text-muted-foreground">
-          A temporary password will be sent to this email address.
-        </p>
         {errors.email && (
           <p className="text-sm text-red-500">{errors.email}</p>
+        )}
+      </div>
+
+      <div className="space-y-2">
+        <Label htmlFor="password">Password</Label>
+        <div className="relative">
+          <Input
+            id="password"
+            name="password"
+            type={showPassword ? "text" : "password"}
+            placeholder="Enter client password"
+            value={formData.password}
+            onChange={handleChange}
+            disabled={isSubmitting || isSuccess}
+            className="pr-10"
+          />
+          <button
+            type="button"
+            className="absolute inset-y-0 right-0 px-3 flex items-center"
+            onClick={() => setShowPassword(!showPassword)}
+            tabIndex={-1}
+          >
+            {showPassword ? (
+              <EyeOff className="h-4 w-4 text-muted-foreground" />
+            ) : (
+              <Eye className="h-4 w-4 text-muted-foreground" />
+            )}
+          </button>
+        </div>
+        <p className="text-sm text-muted-foreground">
+          Set a secure password for the client.
+        </p>
+        {errors.password && (
+          <p className="text-sm text-red-500">{errors.password}</p>
         )}
       </div>
 

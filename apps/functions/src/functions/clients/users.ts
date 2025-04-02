@@ -12,7 +12,7 @@ import { logger } from "../../utils/logger";
  */
 export const addClient = createHttpFunction({
   handler: async ({ req, res }) => {
-    const { portfolioManagerId, firstName, lastName, email } = req.body;
+    const { portfolioManagerId, firstName, lastName, email, password } = req.body;
 
     logger.info(`Adding client ${email} for portfolio manager ${portfolioManagerId}`, "ClientUserManagement");
 
@@ -20,7 +20,8 @@ export const addClient = createHttpFunction({
       portfolioManagerId,
       firstName,
       lastName,
-      email
+      email,
+      password
     });
 
     // Handle different result statuses with appropriate HTTP status codes
@@ -78,7 +79,7 @@ export const addClient = createHttpFunction({
     requireAuth: true,
     requiredRole: "portfolioManager",
     requiredParams: {
-      body: ["portfolioManagerId", "firstName", "lastName", "email"]
+      body: ["portfolioManagerId", "firstName", "lastName", "email", "password"]
     }
   }
 });

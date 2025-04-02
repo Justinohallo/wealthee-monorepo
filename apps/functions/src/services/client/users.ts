@@ -1,6 +1,5 @@
 import * as admin from "firebase-admin";
 
-import { generateTemporaryPassword } from "../../utils/password-utils";
 import { logger } from "../../utils/logger";
 
 /**
@@ -11,6 +10,7 @@ interface AddClientParams {
   firstName: string;
   lastName: string;
   email: string;
+  password: string;
 }
 
 /**
@@ -119,13 +119,18 @@ async function isClientAssociatedWithAnyManager(clientId: string): Promise<boole
  * @param email User email
  * @param firstName User first name
  * @param lastName User last name
+ * @param password User password
  * @returns Created user record
  */
-async function createFirebaseUser(email: string, firstName: string, lastName: string): Promise<admin.auth.UserRecord> {
-  const tempPassword = generateTemporaryPassword();
+async function createFirebaseUser(
+  email: string,
+  firstName: string,
+  lastName: string,
+  password: string
+): Promise<admin.auth.UserRecord> {
   const userRecord = await admin.auth().createUser({
     email,
-    password: tempPassword,
+    password,
     displayName: `${firstName} ${lastName}`,
     disabled: false
   });
@@ -203,7 +208,7 @@ export interface AddClientResult {
  * @returns Result object with client ID and status information
  */
 export async function addClient(params: AddClientParams): Promise<AddClientResult> {
-  const { portfolioManagerId, firstName, lastName, email } = params;
+  const { portfolioManagerId, firstName, lastName, email, password } = params;
 
   try {
     // Step 1: Check if user already exists in Firebase Auth
@@ -247,7 +252,7 @@ export async function addClient(params: AddClientParams): Promise<AddClientResul
       logger.info(`Creating new client with email ${email}`, "addClient");
 
       // Step 4: Create Firebase Auth user
-      const newUser = await createFirebaseUser(email, firstName, lastName);
+      const newUser = await createFirebaseUser(email, firstName, lastName, password);
 
       // Step 5: Store client data
       await createClientData(newUser.uid, params);
@@ -299,7 +304,6 @@ export async function listClients(portfolioManagerId: string): Promise<Client[]>
     if (clientIds.length === 0) {
       return [];
     }
-    console.log(clientIds);
     // Fetch each client's full data from the clients collection
     const clientPromises = clientIds.map(async (clientId) => {
       const clientSnapshot = await admin.database()
