@@ -349,7 +349,6 @@ export async function getClient(clientId: string): Promise<Client | null> {
     }
 
     const clientData = clientSnapshot.val();
-
     return {
       id: clientId,
       ...clientData

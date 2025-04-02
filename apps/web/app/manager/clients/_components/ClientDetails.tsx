@@ -1,65 +1,43 @@
-"use client"
+"use server"
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { useEffect, useState } from "react"
 
 import { Button } from "@/components/ui/button"
-import { Skeleton } from "@/components/ui/skeleton"
-import { useRouter } from "next/navigation"
-import { useToast } from "@/hooks/use-toast"
+import { ClientStatusBadge } from "./ClientStatusBadge"
+import { Link } from "lucide-react"
+import { getClient } from "@/services/client/users"
 
-interface Client {
-  id: string
-  name: string
-  email: string
-  aum: string
-  lastContact: string
-  portfolioPerformance: string
+interface ClientDetailsProps {
+  id: string;
+  token: string;
 }
-
-export default function ClientDetails({ id }: { id: string }) {
-  const [client, setClient] = useState<Client | null>(null)
-  const [loading, setLoading] = useState(true)
-  const router = useRouter()
-  const { toast } = useToast()
-
-  useEffect(() => {
-    const fetchClient = async () => {
-      setLoading(true)
-      try {
-        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/clients/${id}`)
-        if (!response.ok) {
-          throw new Error("Failed to fetch client data")
-        }
-        const data = await response.json()
-        setClient(data)
-      } catch (error) {
-        console.error("Error fetching client:", error)
-        toast({
-          title: "Error",
-          description: "Failed to load client data. Please try again.",
-          variant: "destructive",
-        })
-      } finally {
-        setLoading(false)
-      }
-    }
-
-    fetchClient()
-  }, [id, toast])
-
-  if (loading) {
-    return <ClientDetailsSkeleton />
-  }
-
+const formatDate = (dateString: string) => {
+  return new Date(dateString).toLocaleDateString(undefined, {
+    year: "numeric",
+    month: "long",
+    day: "numeric"
+  });
+};
+export default async function ClientDetails({ id, token }: ClientDetailsProps) {
+  const client = await getClient(id, token);
   if (!client) {
-    return <div>Client not found</div>
+    return (
+      <div className="p-8 text-center">
+        <h3 className="text-xl font-semibold mb-2">Client not found</h3>
+        <p className="text-muted-foreground mb-4">The client you requested does not exist or you do not have permission to view it.</p>
+        <Button variant="outline" asChild>
+          <Link href="/manager/clients">Back to Clients</Link>
+        </Button>
+      </div>
+    );
   }
+
+
 
   return (
     <Card>
       <CardHeader>
-        <CardTitle>{client.name}</CardTitle>
+        <CardTitle>{client.firstName} {client.lastName}</CardTitle>
       </CardHeader>
       <CardContent>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -68,50 +46,30 @@ export default function ClientDetails({ id }: { id: string }) {
             <p>{client.email}</p>
           </div>
           <div>
-            <h3 className="font-semibold">Assets Under Management</h3>
-            <p>{client.aum}</p>
+            <h3 className="font-semibold">Status</h3>
+            <p><ClientStatusBadge status={client.status} /></p>
           </div>
           <div>
-            <h3 className="font-semibold">Last Contact</h3>
-            <p>{client.lastContact}</p>
+            <h3 className="font-semibold">Created On</h3>
+            <p>{formatDate(client.createdAt)}</p>
           </div>
           <div>
-            <h3 className="font-semibold">Portfolio Performance</h3>
-            <p>{client.portfolioPerformance}</p>
+            <h3 className="font-semibold">Last Updated</h3>
+            <p>{formatDate(client.updatedAt)}</p>
           </div>
         </div>
         <div className="mt-6 flex justify-end space-x-4">
-          <Button variant="outline" onClick={() => router.push("/manager/clients")}>
-            Back to Clients
+          <Button variant="outline" asChild>
+            <Link href="/manager/clients">Back to Clients</Link>
           </Button>
-          <Button>Edit Client</Button>
+          <Button asChild>
+            <Link href={`/manager/clients/${client.id}/edit`}>Edit Client</Link>
+          </Button>
         </div>
       </CardContent>
     </Card>
-  )
+  );
 }
 
-function ClientDetailsSkeleton() {
-  return (
-    <Card>
-      <CardHeader>
-        <Skeleton className="h-8 w-[200px]" />
-      </CardHeader>
-      <CardContent>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {[...Array(4)].map((_, index) => (
-            <div key={index}>
-              <Skeleton className="h-4 w-[100px] mb-2" />
-              <Skeleton className="h-4 w-[150px]" />
-            </div>
-          ))}
-        </div>
-        <div className="mt-6 flex justify-end space-x-4">
-          <Skeleton className="h-10 w-[120px]" />
-          <Skeleton className="h-10 w-[120px]" />
-        </div>
-      </CardContent>
-    </Card>
-  )
-}
+
 

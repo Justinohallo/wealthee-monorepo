@@ -90,11 +90,11 @@ export const addClient = createHttpFunction({
 export const getClient = createHttpFunction({
   handler: async ({ req, res }) => {
     // Check for required path parameter
-    const { clientId } = req.params;
+    const { clientId } = req.query;
 
     logger.info(`Getting client with ID: ${clientId}`, "ClientUserManagement");
 
-    const client = await clientService.getClient(clientId);
+    const client = await clientService.getClient(clientId as string);
 
     if (!client) {
       res.status(404).json({
@@ -110,7 +110,7 @@ export const getClient = createHttpFunction({
     // Return success response
     res.json({
       success: true,
-      data: client,
+      data: { client },
       timestamp: new Date().toISOString(),
     });
   },

@@ -69,6 +69,12 @@ export async function getClient(
       functionName: CLIENT.USERS.GET,
       idToken,
       queryParams: { clientId },
+      options: {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      }
     });
     return response?.data?.client || null;
   } catch (error) {

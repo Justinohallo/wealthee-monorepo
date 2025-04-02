@@ -2,6 +2,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { PlusIcon, UsersIcon } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
+import { ClientStatusBadge } from "./ClientStatusBadge";
 import Link from "next/link";
 import { listClients } from "@/services/client/users";
 
@@ -60,12 +61,7 @@ export default async function ClientList({ portfolioManagerId, token }: ClientLi
                 <td className="p-2">{`${client.firstName} ${client.lastName}`}</td>
                 <td className="p-2">{client.email}</td>
                 <td className="p-2">
-                  <span className={`px-2 py-1 rounded-full text-xs ${client.status === "active" ? "bg-green-100 text-green-800" :
-                    client.status === "pending" ? "bg-yellow-100 text-yellow-800" :
-                      "bg-red-100 text-red-800"
-                    }`}>
-                    {client.status.charAt(0).toUpperCase() + client.status.slice(1)}
-                  </span>
+                  <ClientStatusBadge status={client.status} />
                 </td>
                 <td className="p-2">{new Date(client.createdAt).toLocaleDateString()}</td>
                 <td className="p-2 text-right">
