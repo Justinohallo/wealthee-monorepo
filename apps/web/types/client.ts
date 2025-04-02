@@ -30,6 +30,16 @@ export interface AddClientFormData {
 }
 
 /**
+ * Result of adding a client
+ */
+export interface AddClientResult {
+  clientId: string;
+  status: "created" | "existing" | "conflict";
+  message: string;
+  alreadyExists?: boolean;
+}
+
+/**
  * Parameters for updating a client
  */
 export interface UpdateClientParams {

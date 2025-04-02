@@ -12,14 +12,14 @@ export const metadata = {
   description: "Manage your clients",
 };
 
-
-
 export default async function ClientsPage() {
   const session = await verifySessionAndGetUser();
   if (!session) {
     redirect("/login");
   }
+
   const clients = await listClients(session.decodedClaims.uid, session.token ?? '');
+
   return (
     <div className="container mx-auto py-8">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
@@ -27,7 +27,7 @@ export default async function ClientsPage() {
           <h1 className="text-2xl font-bold">Clients</h1>
           <p className="text-muted-foreground">Manage your clients</p>
         </div>
-        <Link href="/manager/clients/new">
+        <Link href="/manager/clients/create">
           <Button>
             <PlusIcon className="h-4 w-4 mr-2" />
             Add Client
@@ -48,7 +48,7 @@ export default async function ClientsPage() {
             </CardDescription>
           </CardHeader>
           <CardContent className="flex justify-center">
-            <Link href="/manager/clients/new">
+            <Link href="/manager/clients/create">
               <Button>
                 <PlusIcon className="h-4 w-4 mr-2" />
                 Add Your First Client

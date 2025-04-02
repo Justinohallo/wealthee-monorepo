@@ -1,4 +1,4 @@
-import { AddClientFormData, Client, UpdateClientParams } from "@/types/client";
+import { AddClientFormData, AddClientResult, Client, UpdateClientParams } from "@/types/client";
 
 import { CLIENT } from "@/constants/functionNames";
 import { callFirebaseFunction } from "@/lib/firebase-functions";
@@ -8,29 +8,47 @@ import { callFirebaseFunction } from "@/lib/firebase-functions";
  * @param data Form data for adding a client
  * @param idToken Authentication token
  * @param portfolioManagerId Portfolio manager ID
- * @returns The ID of the newly created client
+ * @returns Result object with client information and status
  */
 export async function addClient(
   data: AddClientFormData,
   idToken: string,
   portfolioManagerId: string
-): Promise<{ clientId: string }> {
-  const response = await callFirebaseFunction<{ clientId: string }>({
-    functionName: CLIENT.USERS.ADD,
-    idToken,
-    options: {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
+): Promise<AddClientResult> {
+  try {
+    const response = await callFirebaseFunction<AddClientResult>({
+      functionName: CLIENT.USERS.ADD,
+      idToken,
+      options: {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          ...data,
+          portfolioManagerId,
+        }),
       },
-      body: JSON.stringify({
-        ...data,
-        portfolioManagerId,
-      }),
-    },
-  });
+    });
 
-  return response?.data || { clientId: "" };
+    return response?.data || {
+      clientId: "",
+      status: "conflict",
+      message: "Failed to add client"
+    };
+  } catch (error) {
+    // Handle conflict error (409)
+    if (error instanceof Error && error.message.includes("already associated with another portfolio manager")) {
+      return {
+        clientId: "",
+        status: "conflict",
+        message: "Client is already associated with another portfolio manager"
+      };
+    }
+
+    // Re-throw other errors
+    throw error;
+  }
 }
 
 /**
@@ -74,7 +92,6 @@ export async function listClients(
       idToken,
       queryParams: { portfolioManagerId },
     });
-    console.log(response?.data?.clients)
     return response?.data?.clients || [];
   } catch (error) {
     console.error("Error listing clients:", error);

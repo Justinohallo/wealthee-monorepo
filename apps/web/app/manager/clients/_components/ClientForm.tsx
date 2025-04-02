@@ -72,15 +72,42 @@ export default function ClientForm({ portfolioManagerId, idToken }: ClientFormPr
       setIsSuccess(false);
 
       // Call the addClient service function
-      await addClient(formData, idToken, portfolioManagerId);
-      // Show success message
-      setIsSuccess(true);
+      const result = await addClient(formData, idToken, portfolioManagerId);
 
-      // Refresh server data and redirect after a brief delay
-      setTimeout(() => {
-        router.refresh();
-        router.push("/manager/clients");
-      }, 1500);
+      // Handle different result statuses
+      switch (result.status) {
+        case "created":
+          setIsSuccess(true);
+          // Refresh server data and redirect after a brief delay
+          setTimeout(() => {
+            router.refresh();
+            router.push("/manager/clients");
+          }, 1500);
+          break;
+
+        case "existing":
+          // Show existing client error in UI
+          setErrors({
+            form: "A client with this email already exists"
+          });
+          setIsSubmitting(false);
+          break;
+
+        case "conflict":
+          // Show conflict error in UI
+          setErrors({
+            form: result.message || "Client is already associated with another portfolio manager"
+          });
+          setIsSubmitting(false);
+          break;
+
+        default:
+          // Unexpected status
+          setErrors({
+            form: "An unexpected error occurred"
+          });
+          setIsSubmitting(false);
+      }
     } catch (error) {
       console.error("Error adding client:", error);
       // Show error in UI

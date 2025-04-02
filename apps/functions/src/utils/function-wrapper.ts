@@ -1,3 +1,4 @@
+import { ALLOWED_ORIGINS, SECURITY_HEADERS } from "../constants/security";
 import { AuthError, ForbiddenError, ValidationError, handleError } from "./error-handling";
 /**
  * Function wrapper for standardizing Cloud Function implementation
@@ -24,6 +25,13 @@ interface HttpFunctionOptions {
     body?: string[];
     query?: string[];
   };
+  /** Rate limiting configuration */
+  rateLimit?: {
+    maxRequests: number;
+    windowMs: number;
+  };
+  /** Allowed HTTP methods */
+  methods?: ("GET" | "POST" | "PUT" | "DELETE" | "OPTIONS")[];
 }
 
 /**
@@ -106,6 +114,34 @@ function validateRequestParams(
 }
 
 /**
+ * Validates the request origin
+ */
+function validateOrigin(req: Request): void {
+  const origin = req.headers.origin;
+  if (origin && !ALLOWED_ORIGINS.includes(origin)) {
+    throw new ForbiddenError(`Origin not allowed: ${origin}`);
+  }
+}
+
+/**
+ * Validates the request method
+ */
+function validateMethod(req: Request, allowedMethods?: HttpFunctionOptions["methods"]): void {
+  if (allowedMethods && !allowedMethods.includes(req.method as "GET" | "POST" | "PUT" | "DELETE" | "OPTIONS")) {
+    throw new ForbiddenError(`Method ${req.method} not allowed`);
+  }
+}
+
+/**
+ * Sets security headers on the response
+ */
+function setSecurityHeaders(res: Response): void {
+  Object.entries(SECURITY_HEADERS).forEach(([header, value]) => {
+    res.setHeader(header, value);
+  });
+}
+
+/**
  * Creates a standardized HTTP function with built-in error handling and validation
  *
  * @param handler - Function handler implementation
@@ -121,8 +157,20 @@ export function createHttpFunction(
     options?: HttpFunctionOptions;
   }
 ) {
-  return onRequest({ secrets: options.secrets || [] }, async (req, res) => {
+  return onRequest({
+    secrets: options.secrets || [],
+    cors: ALLOWED_ORIGINS,
+  }, async (req, res) => {
     try {
+      // Set security headers
+      setSecurityHeaders(res);
+
+      // Validate origin
+      validateOrigin(req);
+
+      // Validate HTTP method
+      validateMethod(req, options.methods);
+
       // Authenticate if required
       let authToken;
       if (options.requireAuth) {

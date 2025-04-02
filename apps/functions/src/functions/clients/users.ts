@@ -16,22 +16,63 @@ export const addClient = createHttpFunction({
 
     logger.info(`Adding client ${email} for portfolio manager ${portfolioManagerId}`, "ClientUserManagement");
 
-    const { clientId } = await clientService.addClient({
+    const result = await clientService.addClient({
       portfolioManagerId,
       firstName,
       lastName,
       email
     });
 
-    // Return success response
-    res.json({
-      success: true,
-      data: {
-        message: "Client added successfully",
-        clientId,
-      },
-      timestamp: new Date().toISOString(),
-    });
+    // Handle different result statuses with appropriate HTTP status codes
+    switch (result.status) {
+      case "created":
+        // 201 Created - Brand new client was created
+        res.status(201).json({
+          success: true,
+          data: {
+            status: "created",
+            message: result.message,
+            clientId: result.clientId,
+          },
+          timestamp: new Date().toISOString(),
+        });
+        break;
+
+      case "existing":
+        // 200 OK - Existing client, no errors
+        res.status(200).json({
+          success: true,
+          data: {
+            status: "existing",
+            message: result.message,
+            clientId: result.clientId,
+            alreadyExists: true
+          },
+          timestamp: new Date().toISOString(),
+        });
+        break;
+
+      case "conflict":
+        // 409 Conflict - Client exists but can't be used
+        res.status(409).json({
+          success: false,
+          data: {
+            status: "conflict",
+            message: result.message,
+            alreadyExists: true
+          },
+          timestamp: new Date().toISOString(),
+        });
+        break;
+
+      default:
+        // Unexpected status
+        res.status(500).json({
+          success: false,
+          error: "Unexpected result status",
+          timestamp: new Date().toISOString(),
+        });
+    }
   },
   options: {
     requireAuth: true,
