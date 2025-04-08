@@ -29,6 +29,14 @@ export default async function ClientDashboardPage() {
   // Fetch the portfolio manager's primary account
   const managerAccount = await getManagerPrimaryAccount(decodedClaims.uid, idToken);
 
+  if (!managerAccount) {
+    return (
+      <div>
+        <h1>No account found</h1>
+      </div>
+    )
+  }
+
   const user = {
     name: decodedClaims.name,
     email: decodedClaims.email,
