@@ -2,12 +2,26 @@ import { ManagerSidebar, navigationLinks } from "./_components/ManagerSidebar"
 
 import { BottomNavigation } from "./_components/BottomNavigation"
 import type React from "react"
+import { redirect } from "next/navigation"
+import { verifySessionAndGetUser } from "@/lib/server-auth-utils"
 
-export default function ManagerLayout({
+export default async function ManagerLayout({
   children,
 }: {
   children: React.ReactNode
 }) {
+  const session = await verifySessionAndGetUser();
+
+  // Redirect to login if no session
+  if (!session) {
+    redirect("/login");
+  }
+
+  // Verify user is a portfolio manager
+  if (session.decodedClaims.role !== "portfolioManager" && session.decodedClaims.role !== "admin") {
+    redirect("/");
+  }
+
   return (
     <div className="flex min-h-screen bg-muted/20">
       {/* Desktop sidebar */}
