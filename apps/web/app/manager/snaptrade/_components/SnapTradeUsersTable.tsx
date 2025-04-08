@@ -48,7 +48,7 @@ export function SnapTradeUsersTable({
         <Button
           variant="outline"
           size="sm"
-          asChild
+          asChild={true}
           className="h-8 text-xs justify-center w-full"
         >
           <Link href={`/manager/snaptrade/${user.id}`}>
@@ -68,7 +68,7 @@ export function SnapTradeUsersTable({
         <Button
           variant="outline"
           size="sm"
-          asChild
+          asChild={true}
           className="h-8 px-2 text-xs"
         >
           <Link href={`/manager/snaptrade/${user.id}`}>

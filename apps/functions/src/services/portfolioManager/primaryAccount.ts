@@ -4,25 +4,49 @@ import { logger } from "../../utils/logger";
 interface SetPrimaryAccountParams {
   portfolioManagerId: string;
   accountId: string;
+  snapTradeUserId: string;
+}
+
+interface PrimaryAccountData {
+  accountId: string;
+  snapTradeUserId: string;
+  updatedAt: string;
 }
 
 /**
  * Sets the specified account as the primary account for a Portfolio Manager.
- * Stores the accountId directly on the portfolioManager object.
+ * Stores both the accountId and snapTradeUserId to facilitate fetching account details.
  */
-export async function setPrimaryAccount({ portfolioManagerId, accountId }: SetPrimaryAccountParams): Promise<void> {
+export async function setPrimaryAccount({
+  portfolioManagerId,
+  accountId,
+  snapTradeUserId }: SetPrimaryAccountParams): Promise<void> {
   if (!portfolioManagerId) {
     throw new Error("Portfolio Manager ID is required");
   }
 
+  if (!accountId) {
+    throw new Error("Account ID is required");
+  }
+
+  if (!snapTradeUserId) {
+    throw new Error("SnapTrade User ID is required");
+  }
+
   const managerRef = db.ref(`portfolioManagers/${portfolioManagerId}`); // Using RTDB ref
 
-  logger.info(`Setting primary account to ${accountId || "NULL"}
-     for Portfolio Manager: ${portfolioManagerId}`, "PortfolioManagerPrimaryAccount");
+  logger.info(`Setting primary account ${accountId} from SnapTrade user
+    ${snapTradeUserId} for Portfolio Manager: ${portfolioManagerId}`, "PortfolioManagerPrimaryAccount");
 
   try {
+    const primaryAccountData: PrimaryAccountData = {
+      accountId,
+      snapTradeUserId,
+      updatedAt: new Date().toISOString()
+    };
+
     await managerRef.update({
-      primaryAccountId: accountId || null, // Set to null if accountId is empty/falsy
+      primaryAccount: primaryAccountData,
       updatedAt: new Date().toISOString()
     });
     logger.info(`Successfully updated primary account for ${portfolioManagerId}.`);
@@ -34,27 +58,31 @@ export async function setPrimaryAccount({ portfolioManagerId, accountId }: SetPr
 }
 
 /**
- * Gets the primary account ID for a Portfolio Manager.
+ * Gets the primary account data for a Portfolio Manager.
+ * Returns both the accountId and snapTradeUserId to simplify fetching account details.
  */
-export async function getPrimaryAccount(portfolioManagerId: string): Promise<string | null> {
+export async function getPrimaryAccount(portfolioManagerId: string): Promise<PrimaryAccountData | null> {
   if (!portfolioManagerId) {
     throw new Error("Portfolio Manager ID is required");
   }
 
   const managerRef = db.ref(`portfolioManagers/${portfolioManagerId}`); // Using RTDB ref
-  logger.info(`Fetching primary account for Portfolio Manager: ${portfolioManagerId}`, "PortfolioManagerPrimaryAccount");
+  logger.info(`Fetching primary account for
+  Portfolio Manager: ${portfolioManagerId}`, "PortfolioManagerPrimaryAccount");
 
   try {
     const snapshot = await managerRef.once("value");
     if (!snapshot.exists()) {
       logger.warn(`Portfolio Manager with ID ${portfolioManagerId} not found.`);
-      return null; // Or throw? Returning null seems safer.
+      return null;
     }
 
     const managerData = snapshot.val();
-    const primaryAccountId = managerData?.primaryAccountId || null;
-    logger.info(`Found primary account ID ${primaryAccountId} for ${portfolioManagerId}.`);
-    return primaryAccountId;
+    // Check if the new structure exist
+    logger.info(`Found primary account ID ${managerData.primaryAccount.accountId}
+       with SnapTrade user ${managerData.primaryAccount.snapTradeUserId} for ${portfolioManagerId}.`);
+
+    return managerData.primaryAccount;
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : String(error);
     logger.error(`Failed to fetch primary account for ${portfolioManagerId}:`, errorMessage);

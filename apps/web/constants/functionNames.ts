@@ -112,6 +112,10 @@ export const CLIENT = {
     GET: 'client-users-getClient',
     LIST: 'client-users-listClients',
     UPDATE: 'client-users-updateClient',
+  },
+
+  DASHBOARD: {
+    GET_MANAGER_PRIMARY_ACCOUNT: 'client-dashboard-getManagerPrimaryAccountV2'
   }
 };
 

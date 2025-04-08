@@ -32,11 +32,11 @@ export default async function AccountDetailsPage({
     accountId,
     idToken
   });
-  const primaryAccountIdPromise = getPrimaryAccount(portfolioManagerId, idToken);
+  const primaryAccountPromise = getPrimaryAccount(portfolioManagerId, idToken);
 
-  const [account, primaryAccountId] = await Promise.all([
+  const [account, primaryAccount] = await Promise.all([
     accountDetailsPromise,
-    primaryAccountIdPromise,
+    primaryAccountPromise,
   ]);
 
   if (!account) {
@@ -53,6 +53,10 @@ export default async function AccountDetailsPage({
     );
   }
 
+  // Check if this account is the primary account
+  const isPrimary = primaryAccount !== null &&
+    accountId === primaryAccount.accountId
+
   // Using our server-side layout component that handles data fetching in nested components
   return (
     <Suspense fallback={<div>Loading account details...</div>}>
@@ -62,7 +66,7 @@ export default async function AccountDetailsPage({
         userId={portfolioManagerId}
         snapTradeUserId={snapTradeUserId}
         accountId={accountId}
-        isPrimary={accountId === primaryAccountId}
+        isPrimary={isPrimary}
         portfolioManagerId={portfolioManagerId}
       />
     </Suspense>

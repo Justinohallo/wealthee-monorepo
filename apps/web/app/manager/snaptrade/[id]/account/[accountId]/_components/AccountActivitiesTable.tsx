@@ -1,6 +1,7 @@
 'use client'
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { cn, formatCurrency } from "@/lib/utils";
+import { cn } from "@/lib/utils";
+import { formatCurrency } from "@/lib/format-currency";
 import { Badge } from "@/components/ui/badge";
 import { ActivitySquare } from "lucide-react";
 import { PaginatedUniversalActivity } from "@/types/snaptrade";

@@ -8,7 +8,7 @@ import {
 } from "@/components/ui/table";
 
 import { Suspense } from "react";
-import { formatCurrency } from "@/lib/utils";
+import { formatCurrency } from "@/lib/format-currency";
 import { getAccountBalances } from "@/services/snaptrade/accounts";
 
 interface AccountBalancesProps {

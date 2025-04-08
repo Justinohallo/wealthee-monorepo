@@ -1,11 +1,11 @@
-import js from "@eslint/js";
-import eslintConfigPrettier from "eslint-config-prettier";
-import tseslint from "typescript-eslint";
-import pluginReactHooks from "eslint-plugin-react-hooks";
-import pluginReact from "eslint-plugin-react";
-import globals from "globals";
-import pluginNext from "@next/eslint-plugin-next";
 import { config as baseConfig } from "./base.js";
+import eslintConfigPrettier from "eslint-config-prettier";
+import globals from "globals";
+import js from "@eslint/js";
+import pluginNext from "@next/eslint-plugin-next";
+import pluginReact from "eslint-plugin-react";
+import pluginReactHooks from "eslint-plugin-react-hooks";
+import tseslint from "typescript-eslint";
 
 /**
  * A custom ESLint configuration for libraries that use Next.js.
@@ -44,6 +44,8 @@ export const nextJsConfig = [
       ...pluginReactHooks.configs.recommended.rules,
       // React scope no longer necessary with new JSX transform.
       "react/react-in-jsx-scope": "off",
+      // Disable unescaped entities warning
+      "react/no-unescaped-entities": "off",
     },
   },
 ];

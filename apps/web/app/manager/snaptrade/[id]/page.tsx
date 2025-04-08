@@ -170,14 +170,14 @@ export default async function SnaptradeUserPage({ params }: { params: { id: stri
   // Get SnapTrade login URL
   const loginUrlPromise = getSnapTradeBrokerageConnectionURL(portfolioManagerId, snaptradeUserId, idToken);
 
-  // Fetch the primary account ID for the portfolio manager
-  const primaryAccountIdPromise = getPrimaryAccount(portfolioManagerId, idToken);
+  // Fetch the primary account data for the portfolio manager
+  const primaryAccountPromise = getPrimaryAccount(portfolioManagerId, idToken);
 
   // Wait for all fetches to complete
-  const [brokerages, loginUrl, primaryAccountId] = await Promise.all([
+  const [brokerages, loginUrl, primaryAccount] = await Promise.all([
     brokeragesPromise,
     loginUrlPromise,
-    primaryAccountIdPromise,
+    primaryAccountPromise,
   ]);
 
   return (
@@ -214,7 +214,7 @@ export default async function SnaptradeUserPage({ params }: { params: { id: stri
               <DeleteUserButton
                 idToken={idToken}
                 portfolioManagerId={portfolioManagerId}
-                snapTradeUserId={params.id}
+                snapTradeUserId={snaptradeUserId}
                 userName="SnapTrade User"
                 buttonClassName="w-full"
               />
@@ -241,7 +241,7 @@ export default async function SnaptradeUserPage({ params }: { params: { id: stri
       <AccountsList
         idToken={idToken}
         snapTradeUserId={snaptradeUserId}
-        primaryAccountId={primaryAccountId}
+        primaryAccount={primaryAccount}
         portfolioManagerId={portfolioManagerId}
       />
     </div>

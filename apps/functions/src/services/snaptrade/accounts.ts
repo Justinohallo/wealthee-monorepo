@@ -4,6 +4,7 @@
  * Provides functions for interacting with SnapTrade accounts
  */
 
+import { Account } from "snaptrade-typescript-sdk";
 import { createSnapTradeClient } from "./client";
 import { logger } from "../../utils/logger";
 
@@ -24,7 +25,7 @@ export const getAccountDetailsService = async (
     userSecret: string,
     accountId: string
   }
-) => {
+): Promise<Account> => {
   logger.info(`Getting account details for SnapTrade account ${accountId}`, "SnapTradeAccountService");
 
   // Create SnapTrade client
@@ -184,7 +185,7 @@ export async function getAccountOrdersService(
 ) {
   logger.info(`Getting account orders for account ${accountId}`, "SnapTradeAccounts");
 
-  const client = await createSnapTradeClient();
+  const client = createSnapTradeClient();
   const response = await client.accountInformation.getUserAccountOrders({
     userId,
     userSecret,
@@ -223,7 +224,7 @@ export async function getAccountActivitiesService(
 ) {
   logger.info(`Getting account activities for account ${accountId}`, "SnapTradeAccounts");
 
-  const client = await createSnapTradeClient();
+  const client = createSnapTradeClient();
 
   // Default to last 30 days if dates not provided
   let formattedStartDate = startDate;

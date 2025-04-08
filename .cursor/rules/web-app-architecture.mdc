@@ -1,0 +1,126 @@
+# Wealthee Web App Architecture
+
+## Environment Variables
+
+The application uses both build-time and runtime environment variables, which behave differently:
+
+### Build-time Variables (`NEXT_PUBLIC_` prefix)
+- Used for client-side code (browser environment)
+- Must be prefixed with `NEXT_PUBLIC_`
+- Embedded into JavaScript bundles during build
+- Cannot be changed after deployment without rebuilding
+- Examples: `NEXT_PUBLIC_FIREBASE_API_KEY`, `NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN`
+
+### Runtime Variables (no `NEXT_PUBLIC_` prefix)
+- Only available in server environments (API routes, Server Components, Server Actions)
+- Never exposed to the client
+- Can be updated without rebuilding the application
+- Examples: `FIREBASE_PROJECT_ID`, `FIREBASE_CLIENT_EMAIL`, `FIREBASE_PRIVATE_KEY`
+
+## Firebase Admin SDK Usage
+
+For server-side Firebase operations, we use a singleton pattern to initialize Firebase Admin:
+
+```typescript
+// Import the initialization file (once) in server-side code:
+import '@/lib/firebase-admin'
+import { getFirestore } from 'firebase-admin/firestore'
+
+// Now you can use Firebase Admin services
+const db = getFirestore()
+```
+
+For API routes that depend on server environment variables, use:
+```typescript
+export const dynamic = 'force-dynamic' // Ensures runtime access to variables
+```
+
+## User Roles and Relationships
+
+The application has three user types with specific relationships:
+
+1. **Admin**
+   - Can create and manage Portfolio Managers
+   - Has access to all system data
+
+2. **Portfolio Manager**
+   - Created by Admins
+   - Can create and manage Clients (1:many relationship)
+   - Can create multiple SnapTrade connections
+
+3. **Client**
+   - Created by a Portfolio Manager
+   - Has a 1:1 relationship with their Portfolio Manager
+   - Can create a single SnapTrade connection (1:1)
+
+## Directory Structure
+
+```
+app/
+├── admin/                       # Admin dashboard (admin only)
+│   ├── page.tsx                 # Admin overview
+│   ├── portfolio-managers/      # Manage all portfolio managers
+│   │   ├── page.tsx             # List all portfolio managers
+│   │   ├── create/              # Create new portfolio manager
+│   │   └── [id]/                # Single portfolio manager view
+│   └── settings/                # Admin settings
+│
+├── manager/                     # Portfolio manager area
+│   ├── page.tsx                 # Manager dashboard
+│   ├── clients/                 # Client management
+│   │   ├── page.tsx             # List all clients
+│   │   ├── create/              # Create new client
+│   │   └── [id]/                # Single client view
+│   ├── snaptrade/               # Manager's SnapTrade connections
+│   │   ├── page.tsx             # List all connections
+│   │   ├── create/              # Create new connection
+│   │   └── [id]/                # Single connection details
+│   └── settings/                # Manager settings
+│
+├── client/                      # Client area
+│   ├── page.tsx                 # Client dashboard
+│   ├── snaptrade/               # Client's SnapTrade connection
+│   │   ├── page.tsx             # Connection details
+│   │   └── connect/             # Create connection
+│   └── settings/                # Client settings
+│
+├── api/                         # API routes
+│   ├── admin/                   # Admin-only endpoints
+│   ├── manager/                 # Manager endpoints
+│   ├── client/                  # Client endpoints
+│   └── snaptrade/               # SnapTrade API integration
+│
+└── auth/                        # Authentication pages
+    ├── login/
+    └── signup/
+```
+
+## Access Control Strategy
+
+- Top-level role separation with `/admin`, `/manager`, and `/client` routes
+- Flat structure where possible for better navigation
+- Nested routes for clear parent-child relationships
+- ID-based routes for specific resources
+- Middleware for role-based access control
+
+## Best Practices
+
+1. **Server Components**
+   - Use Server Components whenever possible for data fetching
+   - Keep authentication and authorization on the server
+   - Minimize client-side fetching for better performance
+
+2. **Client Components**
+   - Mark with "use client" directive at the top of the file
+   - Use for interactive elements with user events
+   - Keep state local and minimal
+
+3. **Environment Variables**
+   - Never expose sensitive keys to the client
+   - Use NEXT_PUBLIC_ prefix only when necessary
+   - Access server-side variables only in server components
+
+4. **Access Control**
+   - Validate permissions on both client and server
+   - Redirect unauthorized users to appropriate pages
+   - Use middleware for protecting route groups

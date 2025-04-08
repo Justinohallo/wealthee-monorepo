@@ -1,7 +1,8 @@
 'use client'
 import { Position } from "@/types/snaptrade";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { cn, formatCurrency } from "@/lib/utils";
+import { cn } from "@/lib/utils";
+import { formatCurrency } from "@/lib/format-currency";
 import { LineChart } from "lucide-react";
 import { ResponsiveTableClient } from "./ResponsiveTableClient";
 import { type SimpleColumn } from "@/components/ui/responsive-table";

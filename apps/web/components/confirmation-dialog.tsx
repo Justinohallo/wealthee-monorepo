@@ -89,7 +89,7 @@ export function ConfirmationDialog({
         }
       }
     }}>
-      <AlertDialogTrigger asChild>
+      <AlertDialogTrigger asChild={true}>
         {trigger || (
           <Button
             variant={buttonVariant}

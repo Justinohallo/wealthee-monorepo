@@ -7,3 +7,4 @@
 
 // Export client user management functions
 export * as users from "./users";
+export * as dashboard from "./dashboard";

@@ -23,6 +23,7 @@ export function SetPrimaryAccountButton({
   isPrimary,
   idToken,
   portfolioManagerId,
+  snapTradeUserId,
   variant = "outline"
 }: SetPrimaryAccountButtonProps) {
   const router = useRouter();
@@ -33,6 +34,7 @@ export function SetPrimaryAccountButton({
       await setPrimaryAccount({
         portfolioManagerId,
         accountId,
+        snapTradeUserId,
         idToken,
       });
 

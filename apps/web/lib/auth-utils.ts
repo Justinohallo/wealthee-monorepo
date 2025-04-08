@@ -12,10 +12,10 @@ export const getDashboardUrl = (role: UserRole): string => {
     case "portfolioManager":
       return "/manager"
     case "client":
-      return "/client"
+      return "/client/dashboard"
     default:
       console.warn("Unknown user role:", role)
-      return "/client" // Default fallback
+      return "/" // Default fallback
   }
 }
 

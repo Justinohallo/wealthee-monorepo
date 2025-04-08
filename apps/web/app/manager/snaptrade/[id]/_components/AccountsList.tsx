@@ -10,15 +10,16 @@ import {
 
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
+import { PrimaryAccountData } from "@/services/portfolioManager/primaryAccount";
 import { SetPrimaryAccountButton } from "@/components/snaptrade/SetPrimaryAccountButton";
 import { fetchSnapTradeAccounts } from "@/services/snaptrade/accounts";
-import { formatCurrency } from "@/lib/utils";
+import { formatCurrency } from "@/lib/format-currency";
 
 // Define props interface
 interface AccountsListProps {
   idToken: string;
   snapTradeUserId: string;
-  primaryAccountId: string | null;
+  primaryAccount: PrimaryAccountData | null;
   portfolioManagerId: string;
 }
 
@@ -26,7 +27,7 @@ interface AccountsListProps {
 export default async function AccountsList({
   idToken,
   snapTradeUserId,
-  primaryAccountId,
+  primaryAccount,
   portfolioManagerId,
 }: AccountsListProps) {
   const accounts = await fetchSnapTradeAccounts({ snapTradeUserId, idToken });
@@ -44,7 +45,6 @@ export default async function AccountsList({
       </Card>
     );
   }
-
   return (
     <Card>
       <CardHeader>
@@ -114,7 +114,7 @@ export default async function AccountsList({
                         snapTradeUserId={snapTradeUserId}
                         accountId={account.id!}
                         accountName={account.name || "Account"}
-                        isPrimary={account.id === primaryAccountId}
+                        isPrimary={account.id === primaryAccount?.accountId}
                         idToken={idToken}
                         portfolioManagerId={portfolioManagerId}
                         variant="secondary"
@@ -187,7 +187,7 @@ export default async function AccountsList({
                         snapTradeUserId={snapTradeUserId}
                         accountId={account.id!}
                         accountName={account.name || "Account"}
-                        isPrimary={account.id === primaryAccountId}
+                        isPrimary={account.id === primaryAccount?.accountId}
                         idToken={idToken}
                         portfolioManagerId={portfolioManagerId}
                       />

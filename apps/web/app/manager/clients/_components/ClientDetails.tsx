@@ -62,7 +62,7 @@ export default async function ClientDetails({ id, token }: ClientDetailsProps) {
           <Button variant="outline" asChild>
             <Link href="/manager/clients">Back to Clients</Link>
           </Button>
-          <Button asChild>
+          <Button asChild={true}>
             <Link href={`/manager/clients/${client.id}/edit`}>Edit Client</Link>
           </Button>
         </div>

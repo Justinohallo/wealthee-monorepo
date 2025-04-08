@@ -4,6 +4,7 @@ import { Request, Response } from "express";
 
 import { createHttpFunction } from "../../utils/function-wrapper";
 import { logger } from "../../utils/logger";
+import { snaptradeSecrets } from "../../config";
 
 // Define the basic handler context without auth
 interface PrimaryAccountHandlerContext {
@@ -13,24 +14,27 @@ interface PrimaryAccountHandlerContext {
 
 /**
  * Sets a specific account as the primary account for a Portfolio Manager.
- * Requires portfolioManagerId and accountId in the request body.
+ * Requires portfolioManagerId, accountId, and snapTradeUserId in the request body.
  */
 export const setPrimaryAccount = createHttpFunction({
   handler: async (context: PrimaryAccountHandlerContext) => {
     const { req, res } = context;
-    const { portfolioManagerId, accountId } = req.body;
+    const { portfolioManagerId, accountId, snapTradeUserId } = req.body;
 
-    logger.info(`Request received to set primary account to ${accountId || "NULL"}
-      for Portfolio Manager: ${portfolioManagerId}`, "SetPrimaryAccountHandler");
+    logger.info(`Request received to set primary account to ${accountId}
+      from SnapTrade user ${snapTradeUserId} for Portfolio Manager: ${portfolioManagerId}`, "SetPrimaryAccountHandler");
 
-    await primaryAccountService.setPrimaryAccount({ portfolioManagerId, accountId });
+    await primaryAccountService.setPrimaryAccount({ portfolioManagerId, accountId, snapTradeUserId });
 
     res.json({
       success: true,
       data: {
         message: "Primary account updated successfully",
         portfolioManagerId,
-        primaryAccountId: accountId || null
+        primaryAccount: {
+          accountId,
+          snapTradeUserId
+        }
       },
       timestamp: new Date().toISOString(),
     });
@@ -38,13 +42,13 @@ export const setPrimaryAccount = createHttpFunction({
   options: {
     requireAuth: true,
     requiredParams: {
-      body: ["accountId", "portfolioManagerId",] // Both params required in body
+      body: ["accountId", "portfolioManagerId", "snapTradeUserId"] // All params required in body
     },
   }
 });
 
 /**
- * Gets the primary account ID for a Portfolio Manager.
+ * Gets the primary account data for a Portfolio Manager.
  * Requires portfolioManagerId in query params.
  */
 export const getPrimaryAccount = createHttpFunction({
@@ -55,13 +59,13 @@ export const getPrimaryAccount = createHttpFunction({
     logger.info(`Request received to get primary account for Portfolio Manager: ${portfolioManagerId}`,
       "GetPrimaryAccountHandler");
 
-    const primaryAccountId = await primaryAccountService.getPrimaryAccount(portfolioManagerId as string);
+    const primaryAccountData = await primaryAccountService.getPrimaryAccount(portfolioManagerId as string);
 
     res.json({
       success: true,
       data: {
         portfolioManagerId,
-        primaryAccountId: primaryAccountId // Will be null if not set
+        primaryAccount: primaryAccountData // Will be null if not set
       },
       timestamp: new Date().toISOString(),
     });
@@ -71,5 +75,6 @@ export const getPrimaryAccount = createHttpFunction({
     requiredParams: {
       query: ["portfolioManagerId"] // Required query param
     },
+    secrets: snaptradeSecrets
   }
 });

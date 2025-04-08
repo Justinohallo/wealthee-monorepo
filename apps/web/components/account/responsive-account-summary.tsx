@@ -1,9 +1,10 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { cn, formatCurrency } from "@/lib/utils";
 
 import { Badge } from "@/components/ui/badge";
 import { ResponsiveGrid } from "@/components/ui/responsive-grid";
 import { StatItem } from "@/components/ui/stats-grid";
+import { cn } from "@/lib/utils";
+import { formatCurrency } from "@/lib/format-currency";
 
 interface AccountSummaryProps {
   account: {

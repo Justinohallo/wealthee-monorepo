@@ -7,29 +7,26 @@
 
 // Import types from models
 import {
-  Account,
-  AccountHoldingsAccount,
+  type Account,
+  type AccountHoldings,
+  type AccountHoldingsAccount,
+  type AccountSimple,
+  type AccountSyncStatus,
+  type AccountUniversalActivity,
+  type Balance,
+  type BrokerageAuthorization,
+  type BrokerageType,
+  type Currency,
+  type Exchange,
+  type OptionsPosition,
+  type OptionsSymbol,
+  type PaginatedUniversalActivity,
+  type Position,
+  type SecurityType,
+  type UniversalActivity,
+  type UniversalSymbol,
 } from "snaptrade-typescript-sdk/dist/models";
 // Import SDK types
-import {
-  AccountHoldings,
-  AccountInformationApi,
-  AccountSimple,
-  AccountSyncStatus,
-  AccountUniversalActivity,
-  Balance,
-  BrokerageAuthorization,
-  BrokerageType,
-  Currency,
-  Exchange,
-  OptionsPosition,
-  OptionsSymbol,
-  PaginatedUniversalActivity,
-  Position,
-  SecurityType,
-  UniversalActivity,
-  UniversalSymbol,
-} from "snaptrade-typescript-sdk";
 
 // Re-export types using 'export type' for proper module compatibility
 export type {
@@ -53,9 +50,6 @@ export type {
   UniversalSymbol,
 };
 
-// For backward compatibility with existing code
-export type OptionPosition = OptionsPosition;
-export type OptionSymbol = OptionsSymbol;
 
 // Define our own Order type since it's not directly available from the SDK
 export interface Order {
@@ -79,61 +73,5 @@ export interface Order {
   expiry_date?: string;
 }
 
-// Response types - these can remain as custom interfaces
-export interface SnapTradeLoginResponse {
-  loginResponse: {
-    redirectURI: string;
-  };
-}
 
-export interface SnapTradeAccountsResponse {
-  accounts: Account[];
-}
 
-export interface SnapTradeAccountDetailsResponse {
-  accountDetails: Account;
-}
-
-export interface SnapTradeAccountBalancesResponse {
-  balances: Balance[];
-}
-
-export interface SnapTradeUsersResponse {
-  snapTradeUsers: {
-    id: string;
-    displayName: string;
-    createdAt: number;
-  }[];
-}
-
-export interface SnapTradeBrokerageAuthorizationsResponse {
-  brokerageAuthorizations: BrokerageAuthorization[];
-}
-
-export interface TotalValue {
-  value: number;
-  currency: string;
-}
-
-export interface AccountHoldingsResponse {
-  account: Account;
-  balances: Balance[];
-  positions: Position[];
-  option_positions: OptionsPosition[];
-  orders: Order[];
-  total_value: TotalValue;
-}
-
-// For activities we'll maintain our own type since we need customizations
-export interface Activity {
-  id: string;
-  account_id: string;
-  date: string;
-  type: string;
-  description: string;
-  symbol?: string;
-  currency: string;
-  amount: number;
-  fee?: number;
-  institution_id?: string;
-}

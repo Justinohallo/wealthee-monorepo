@@ -27,25 +27,6 @@ export interface Client {
 }
 
 /**
- * Interface for parameters required to update a client
- */
-interface UpdateClientParams {
-  clientId: string;
-  firstName?: string;
-  lastName?: string;
-  status?: "active" | "inactive" | "pending";
-}
-
-/**
- * Interface for mapping between portfolio manager and client
- */
-interface PortfolioManagerClientMapping {
-  portfolioManagerId: string;
-  clientId: string;
-  createdAt: string;
-}
-
-/**
  * Client data without the ID
  */
 type ClientData = Omit<Client, "id">;
@@ -108,7 +89,8 @@ async function isClientAssociatedWithAnyManager(clientId: string): Promise<boole
 
     return mappingsSnapshot.exists();
   } catch (error) {
-    logger.error(`Error checking if client ${clientId} is associated with any manager: ${error instanceof Error ? error.message : String(error)}`,
+    logger.error(`Error checking if client ${clientId}
+      is associated with any manager: ${error instanceof Error ? error.message : String(error)}`,
       "isClientAssociatedWithAnyManager", error);
     throw error;
   }
@@ -134,6 +116,11 @@ async function createFirebaseUser(
     displayName: `${firstName} ${lastName}`,
     disabled: false
   });
+  // Set custom claims to assign the role "portfolioManager"
+  await admin.auth().setCustomUserClaims(
+    userRecord.uid,
+    { role: "client" }
+  );
   logger.info(`Created new Firebase user with ID ${userRecord.uid}`, "createFirebaseUser");
   return userRecord;
 }
@@ -177,7 +164,11 @@ async function createManagerClientMapping(
   clientId: string
 ): Promise<string> {
   const timestamp = new Date().toISOString();
-  const mapping: PortfolioManagerClientMapping = {
+  const mapping: {
+    portfolioManagerId: string;
+    clientId: string;
+    createdAt: string;
+  } = {
     portfolioManagerId,
     clientId,
     createdAt: timestamp
@@ -364,7 +355,12 @@ export async function getClient(clientId: string): Promise<Client | null> {
  * Update a client's information
  * @param params Parameters for updating a client
  */
-export async function updateClient(params: UpdateClientParams): Promise<void> {
+export async function updateClient(params: {
+  clientId: string;
+  firstName?: string;
+  lastName?: string;
+  status?: "active" | "inactive" | "pending";
+}): Promise<void> {
   const { clientId, ...updateData } = params;
 
   try {

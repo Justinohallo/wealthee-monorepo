@@ -71,13 +71,3 @@ export const requireRole = async (allowedRoles: UserRole[]): Promise<void> => {
   }
 }
 
-/**
- * Redirects to the appropriate dashboard based on user role
- * Use this in pages that should redirect to the dashboard if the user is already logged in
- */
-export const redirectToDashboardIfAuthenticated = async (): Promise<void> => {
-  if (await isAuthenticated()) {
-    const role = await getUserRole()
-    redirect(getDashboardUrl(role))
-  }
-}
