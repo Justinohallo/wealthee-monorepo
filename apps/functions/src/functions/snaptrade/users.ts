@@ -20,7 +20,7 @@ import { snaptradeSecrets } from "../../config";
 /**
  * Registers a new SnapTrade user
  */
-export const registerUser = createHttpFunction({
+export const register = createHttpFunction({
   handler: async ({ req, res }) => {
     const { displayName, portfolioManagerId } = req.body;
 
@@ -52,7 +52,7 @@ export const registerUser = createHttpFunction({
 /**
  * Get SnapTrade user details
  */
-export const getUser = createHttpFunction({
+export const get = createHttpFunction({
   handler: async ({ req, res }) => {
     const { snapTradeUserId } = req.query;
 
@@ -92,7 +92,7 @@ export const getUser = createHttpFunction({
 /**
  * List all SnapTrade users for a portfolio manager
  */
-export const listUsersForPortfolioManager = createHttpFunction({
+export const listForPortfolioManager = createHttpFunction({
   handler: async ({ req, res }) => {
     const { portfolioManagerId } = req.query;
 
@@ -119,7 +119,7 @@ export const listUsersForPortfolioManager = createHttpFunction({
 /**
  * Deletes a SnapTrade user
  */
-export const deleteUser = createHttpFunction({
+export const delete_ = createHttpFunction({
   options: {
     requireAuth: true,
     requiredRole: "portfolioManager",
@@ -158,5 +158,3 @@ export const deleteUser = createHttpFunction({
     });
   },
 });
-
-

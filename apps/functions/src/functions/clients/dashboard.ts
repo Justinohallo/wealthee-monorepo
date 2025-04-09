@@ -97,7 +97,6 @@ export const getManagerPrimaryAccountV2 = createHttpFunction({
         accountId: primaryAccountData.accountId
       });
 
-      console.log("accountDetails", accountDetails);
 
       // Return the account data in a consistent response format
       res.json({

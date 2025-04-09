@@ -1,4 +1,3 @@
-import { ValidationError } from "../../utils/error-handling";
 import { auth } from "../../config/firebase";
 /**
  * Portfolio Manager user management functions
@@ -9,13 +8,8 @@ import { logger } from "../../utils/logger";
 /**
  * Creates a new portfolio manager user
  */
-export const createPortfolioManager = createHttpFunction({
+export const create = createHttpFunction({
   handler: async ({ req, res }) => {
-    // Validate required parameters
-    if (!req.body.email || !req.body.password) {
-      throw new ValidationError("Required body parameters 'email' and 'password' are missing");
-    }
-
     // Extract fields from request body
     const { email, password, displayName } = req.body;
 
@@ -56,7 +50,7 @@ export const createPortfolioManager = createHttpFunction({
 /**
  * Lists all portfolio manager users
  */
-export const listPortfolioManagers = createHttpFunction({
+export const list = createHttpFunction({
   handler: async ({ res }) => {
     logger.info("Listing all portfolio manager users", "PortfolioManagerUsers");
 
@@ -97,23 +91,22 @@ export const listPortfolioManagers = createHttpFunction({
   }
 });
 
+// Export the old function name as an alias for backward compatibility
 /**
  * Gets a portfolio manager by ID
  */
-export const getPortfolioManager = createHttpFunction({
+export const get = createHttpFunction({
   handler: async ({ req, res }) => {
     // Check for required query parameter
     const { uid } = req.query;
-    if (!uid) {
-      throw new ValidationError("Required path parameter 'uid' is missing");
-    }
+
 
     logger.info(`Getting portfolio manager with ID: ${uid}`, "PortfolioManagerUsers");
     // Get user from Firebase Auth
-    const user = await auth.getUser(uid as string);
+    const portfolioManager = await auth.getUser(uid as string);
 
     // Verify that the user is a portfolio manager
-    if (!user.customClaims || user.customClaims.role !== "portfolioManager") {
+    if (!portfolioManager.customClaims || portfolioManager.customClaims.role !== "portfolioManager") {
       res.status(404).json({
         success: false,
         error: "Portfolio manager not found",
@@ -122,30 +115,12 @@ export const getPortfolioManager = createHttpFunction({
       return;
     }
 
-    // Format the user data
-    const formattedUser = {
-      uid: user.uid,
-      email: user.email,
-      displayName: user.displayName,
-      photoURL: user.photoURL,
-      disabled: user.disabled,
-      emailVerified: user.emailVerified,
-      providerData: user.providerData,
-      metadata: {
-        creationTime: user.metadata.creationTime,
-        lastSignInTime: user.metadata.lastSignInTime,
-        lastRefreshTime: user.metadata.lastRefreshTime,
-        tokensValidAfterTime: user.tokensValidAfterTime,
-      },
-      customClaims: user.customClaims
-    };
-
     logger.info(`Portfolio manager retrieved successfully: ${uid}`, "PortfolioManagerUsers");
 
     // Return success response
     res.json({
       success: true,
-      data: formattedUser,
+      data: { portfolioManager },
       timestamp: new Date().toISOString(),
     });
   },
@@ -155,16 +130,15 @@ export const getPortfolioManager = createHttpFunction({
   }
 });
 
+
 /**
  * Updates a portfolio manager's account
  */
-export const updatePortfolioManager = createHttpFunction({
+export const update = createHttpFunction({
   handler: async ({ req, res }) => {
     // Check for required parameters
     const { uid } = req.params;
-    if (!uid) {
-      throw new ValidationError("Required path parameter 'uid' is missing");
-    }
+
 
     logger.info(`Updating portfolio manager with ID: ${uid}`, "PortfolioManagerUsers");
 
@@ -217,3 +191,48 @@ export const updatePortfolioManager = createHttpFunction({
     requiredRole: "admin"
   }
 });
+/**
+ * Deletes a portfolio manager's account
+ */
+export const delete_ = createHttpFunction({
+  handler: async ({ req, res }) => {
+    // Check for required parameters
+    const { uid } = req.params;
+
+
+    logger.info(`Deleting portfolio manager with ID: ${uid}`, "PortfolioManagerUsers");
+
+    // Get user from Firebase Auth
+    const user = await auth.getUser(uid);
+
+    // Verify that the user is a portfolio manager
+    if (!user.customClaims || user.customClaims.role !== "portfolioManager") {
+      res.status(404).json({
+        success: false,
+        error: "Portfolio manager not found",
+        timestamp: new Date().toISOString(),
+      });
+      return;
+    }
+
+    // Delete the user in Firebase Auth
+    await auth.deleteUser(uid);
+
+    logger.info(`Portfolio manager deleted successfully: ${uid}`, "PortfolioManagerUsers");
+
+    // Return success response
+    res.json({
+      success: true,
+      data: {
+        message: "Portfolio manager deleted successfully",
+        uid
+      },
+      timestamp: new Date().toISOString(),
+    });
+  },
+  options: {
+    requireAuth: true,
+    requiredRole: "admin"
+  }
+});
+

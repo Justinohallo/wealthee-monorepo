@@ -16,7 +16,7 @@ interface PrimaryAccountHandlerContext {
  * Sets a specific account as the primary account for a Portfolio Manager.
  * Requires portfolioManagerId, accountId, and snapTradeUserId in the request body.
  */
-export const setPrimaryAccount = createHttpFunction({
+export const set = createHttpFunction({
   handler: async (context: PrimaryAccountHandlerContext) => {
     const { req, res } = context;
     const { portfolioManagerId, accountId, snapTradeUserId } = req.body;
@@ -51,7 +51,7 @@ export const setPrimaryAccount = createHttpFunction({
  * Gets the primary account data for a Portfolio Manager.
  * Requires portfolioManagerId in query params.
  */
-export const getPrimaryAccount = createHttpFunction({
+export const get = createHttpFunction({
   handler: async (context: PrimaryAccountHandlerContext) => {
     const { req, res } = context;
     const { portfolioManagerId } = req.query;
@@ -78,3 +78,4 @@ export const getPrimaryAccount = createHttpFunction({
     secrets: snaptradeSecrets
   }
 });
+

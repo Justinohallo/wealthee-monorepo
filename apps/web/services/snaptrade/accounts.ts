@@ -154,7 +154,7 @@ export async function fetchAccountDetails(
   try {
     const response = await callFirebaseFunction<{ accountDetails: Account }>({
       idToken,
-      functionName: 'snaptrade-accounts-getAccountDetails',
+      functionName: SNAPTRADE.ACCOUNTS.GET_DETAILS,
       queryParams: {
         userId,
         snapTradeUserId,

@@ -10,7 +10,7 @@ import { logger } from "../../utils/logger";
 /**
  * Adds a new client to the system
  */
-export const addClient = createHttpFunction({
+export const add = createHttpFunction({
   handler: async ({ req, res }) => {
     const { portfolioManagerId, firstName, lastName, email, password } = req.body;
 
@@ -87,7 +87,7 @@ export const addClient = createHttpFunction({
 /**
  * Gets a client by ID
  */
-export const getClient = createHttpFunction({
+export const get = createHttpFunction({
   handler: async ({ req, res }) => {
     // Check for required path parameter
     const { clientId } = req.query;
@@ -123,7 +123,7 @@ export const getClient = createHttpFunction({
 /**
  * Lists all clients for a portfolio manager
  */
-export const listClients = createHttpFunction({
+export const list = createHttpFunction({
   handler: async ({ req, res }) => {
     // Check for required query parameter
     const { portfolioManagerId } = req.query;
@@ -152,7 +152,7 @@ export const listClients = createHttpFunction({
 /**
  * Updates a client's information
  */
-export const updateClient = createHttpFunction({
+export const update = createHttpFunction({
   handler: async ({ req, res }) => {
     // Check for required parameters
     const { clientId } = req.params;

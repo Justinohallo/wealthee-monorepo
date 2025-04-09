@@ -75,7 +75,7 @@ export async function fetchBrokerageAuthorization(
   try {
     const response = await callFirebaseFunction<{ brokerageAuthorization: BrokerageAuthorization }>({
       idToken,
-      functionName: SNAPTRADE.CONNECTIONS.DETAIL_BROKERAGE_AUTHORIZATION,
+      functionName: SNAPTRADE.CONNECTIONS.GET,
       queryParams: {
         userId,
         authorizationId: brokerageId,

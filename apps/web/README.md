@@ -150,4 +150,62 @@ app/
 - ID-based routes for specific resources
 - Middleware for role-based access control
 
+# Wealthee Web App
+
+## Firebase Function Naming Convention
+
+We use a domain-based hierarchical naming structure for Firebase Functions with an emphasis on brevity to ensure consistency, clarity, and avoid Cloud Run URL limitations.
+
+### Pattern
+
+Functions follow this pattern:
+```
+domain.subdomain.action
+```
+
+We use abbreviated domains and concise action names:
+
+For example:
+- `snap.accounts.getDetails` (for SnapTrade)
+- `pm.users.create` (for Portfolio Manager)
+- `admin.settings.update`
+
+### Abbreviations
+
+Common abbreviations:
+- `pm` instead of `portfolioManager`
+- `snap` instead of `snaptrade`
+- `connect` instead of `connections`
+- `dash` instead of `dashboard`
+
+### Exports
+
+Functions are exported following our barrel pattern:
+1. Individual function files contain the implementations
+2. Domain-level index files re-export all functions from that domain
+3. The main index.ts exports all domain-level functions
+
+### Client/Server Integration
+
+1. Function names are defined as constants in `apps/web/constants/functionNames.ts`
+2. Service functions in `apps/web/services/` use these constants to call the functions
+3. The `callFirebaseFunction` utility handles API calls with proper formatting
+
+### Cloud Run URL Format
+
+Our Cloud Run URLs follow this pattern:
+```
+https://[FUNCTION_NAME]-[PROJECT_NUMBER].[REGION].run.app
+```
+
+Shorter function names ensure proper DNS resolution and minimize URL length.
+
+### Validation
+
+The `callFirebaseFunction` utility validates function names against the required pattern.
+
+### Migration Notes
+
+All function names have been updated to follow this convention. The legacy hyphenated format is no longer supported.
+
 

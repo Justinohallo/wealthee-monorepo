@@ -22,7 +22,6 @@ export async function getManagerPrimaryAccount(
         revalidate: 60 // Cache for 60 seconds
       }
     });
-    console.log("response", response?.data?.accountDetails);
     return response?.data?.accountDetails || null;
   } catch (error) {
     console.error("Error fetching manager's primary account:", error);

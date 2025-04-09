@@ -8,7 +8,6 @@ import {
   listUserAccounts as listSnapTradeUserAccounts
 } from "../../services/snaptrade/accounts";
 
-import { ValidationError } from "../../utils/error-handling";
 import { createHttpFunction } from "../../utils/function-wrapper";
 import { getSnapTradeUser } from "../../services/snaptrade/users";
 import { logger } from "../../utils/logger";
@@ -20,7 +19,7 @@ import { snaptradeSecrets } from "../../config/secrets";
 /**
  * Lists all accounts for a specific SnapTrade user
  */
-export const listUserAccounts = createHttpFunction({
+export const list = createHttpFunction({
   options: {
     requireAuth: true,
     requiredRole: "portfolioManager",
@@ -59,7 +58,7 @@ export const listUserAccounts = createHttpFunction({
 The data returned here is always cached and refreshed once a day.
 If you need real-time data, please use the manual refresh endpoint.
  */
-export const getAccountHoldings = createHttpFunction({
+export const getHoldings = createHttpFunction({
   options: {
     requireAuth: true,
     requiredRole: "portfolioManager",
@@ -103,7 +102,7 @@ export const getAccountHoldings = createHttpFunction({
 The data returned here is always cached and refreshed once a day.
 If you need real-time data, please use the manual refresh endpoint.
  */
-export const getAccountDetails = createHttpFunction({
+export const getDetails = createHttpFunction({
   options:
   {
     requireAuth: true,
@@ -154,7 +153,7 @@ The data returned here is cached. How long the data is cached for varies by brok
 Check the brokerage integrations doc and look for "Cache Expiry Time" to see the exact value for a specific brokerage.
 If you need real-time data, please use the manual refresh endpoint.
  */
-export const getAccountBalances = createHttpFunction({
+export const getBalances = createHttpFunction({
   options: {
     requireAuth: true,
     requiredRole: "portfolioManager",
@@ -191,14 +190,10 @@ export const getAccountBalances = createHttpFunction({
   },
 });
 
-
 /**
  * Returns a list of positions for the account.
- *
- *
- *
  */
-export const getAccountPositions = createHttpFunction({
+export const getPositions = createHttpFunction({
   options: {
     requireAuth: true,
     requiredRole: "portfolioManager",
@@ -241,7 +236,7 @@ export const getAccountPositions = createHttpFunction({
  * The data returned here is cached and includes orders from the past 30 days by default.
  * The state parameter can be used to filter orders: 'all', 'open', or 'executed'.
  */
-export const getAccountOrders = createHttpFunction({
+export const getOrders = createHttpFunction({
   options: {
     requireAuth: true,
     requiredRole: "portfolioManager",
@@ -255,11 +250,6 @@ export const getAccountOrders = createHttpFunction({
 
     // Get query parameters
     const { snapTradeUserId, accountId, state, days } = req.query;
-
-    if (!snapTradeUserId || !accountId) {
-      throw new ValidationError("Required parameters missing: snapTradeUserId, accountId");
-    }
-
     // Get the SnapTrade user from the database
     const snapTradeUser = await getSnapTradeUser(snapTradeUserId as string, res);
 
@@ -295,7 +285,7 @@ export const getAccountOrders = createHttpFunction({
  * Results are cached for 10 minutes to improve performance. Date ranges can be specified with
  * startDate and endDate parameters (YYYY-MM-DD format). If not provided, defaults to last 30 days.
  */
-export const getAccountActivities = createHttpFunction({
+export const getActivities = createHttpFunction({
   options: {
     requireAuth: true,
     requiredRole: "portfolioManager",
@@ -310,9 +300,6 @@ export const getAccountActivities = createHttpFunction({
     // Get query parameters
     const { snapTradeUserId, accountId, startDate, endDate } = req.query;
 
-    if (!snapTradeUserId || !accountId) {
-      throw new ValidationError("Required parameters missing: snapTradeUserId, accountId");
-    }
 
     // Get the SnapTrade user from the database
     const snapTradeUser = await getSnapTradeUser(snapTradeUserId as string, res);
@@ -341,3 +328,5 @@ export const getAccountActivities = createHttpFunction({
     });
   },
 });
+
+

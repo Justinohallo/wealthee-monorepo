@@ -15,7 +15,7 @@ import { snaptradeSecrets } from "../../config";
 /**
  * Authenticates a SnapTrade user and returns the Connection Portal URL used for connecting brokerage accounts.
  */
-export const generateConnectionUrl = createHttpFunction({
+export const getUrl = createHttpFunction({
   handler: async ({ req, res }) => {
     const { snapTradeUserId, broker, redirectUri } = req.query;
 
@@ -46,7 +46,7 @@ export const generateConnectionUrl = createHttpFunction({
 /**
  * List all brokerage connections for a SnapTrade user
  */
-export const listBrokerageConnections = createHttpFunction({
+export const list = createHttpFunction({
   options: {
     requireAuth: true,
     requiredRole: "portfolioManager",
@@ -87,7 +87,7 @@ export const listBrokerageConnections = createHttpFunction({
 /**
  * Get details for a specific brokerage authorization
  */
-export const detailBrokerageAuthorization = createHttpFunction({
+export const get = createHttpFunction({
   options: {
     requireAuth: true,
     requiredRole: "portfolioManager",
@@ -129,7 +129,7 @@ export const detailBrokerageAuthorization = createHttpFunction({
 /**
  * Delete a brokerage connection
  */
-export const deleteBrokerageConnection = createHttpFunction({
+export const delete_ = createHttpFunction({
   options: {
     requireAuth: true,
     requiredRole: "portfolioManager",
@@ -167,3 +167,5 @@ export const deleteBrokerageConnection = createHttpFunction({
     });
   }
 });
+
+

@@ -5,4 +5,4 @@
  * Each file corresponds to a specific domain within Portfolio Management.
  */
 
-export * from './snapTrade';
+export * from './users';

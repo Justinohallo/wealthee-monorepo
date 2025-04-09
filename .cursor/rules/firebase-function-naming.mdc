@@ -1,0 +1,125 @@
+# Firebase Function Naming Convention
+
+## Overview
+
+We use a concise function naming approach for Firebase Cloud Functions that follows these principles:
+- Clear domain boundaries from directory names
+- Hyphen-separated parts
+- Non-redundant action names
+
+## Function Name Structure
+
+### Pattern
+
+Functions follow this pattern:
+```
+domain-subdomain-action
+```
+
+Where:
+- `domain` matches the domain name (e.g., `snaptrade`, `portfolioManager`)
+- `subdomain` matches the feature area (e.g., `accounts`, `connections`)
+- `action` is a concise verb or operation name (e.g., `list`, `get`, `delete`)
+
+The implementation should use short, descriptive names:
+
+```typescript
+// In apps/functions/src/functions/snaptrade/connections.ts
+export const getUrl = createHttpFunction({ /* ... */ });
+export const list = createHttpFunction({ /* ... */ });
+export const getBrokerAuth = createHttpFunction({ /* ... */ });
+export const delete_ = createHttpFunction({ /* ... */ });
+```
+
+### Action Naming Rules
+
+1. **Don't repeat the subdomain in the action**:
+   - Good: `snaptrade-accounts-get`
+   - Bad: `snaptrade-accounts-getAccount`
+
+2. **Use concise verbs**:
+   - `get` - Retrieve a single resource
+   - `list` - Retrieve multiple resources
+   - `create` - Create a new resource
+   - `update` - Update an existing resource
+   - `delete_` - Delete a resource (note underscore to avoid JS keyword)
+   - `set` - Set a value or status
+
+3. **Use camelCase for compound actions**:
+   - `getPrimary`
+   - `regWithDisplay`
+   - `listForPm`
+
+## Backward Compatibility
+
+When shortening existing function names, maintain backward compatibility:
+
+```typescript
+// Short name - primary export
+export const list = createHttpFunction({ /* ... */ });
+
+// Legacy name for backward compatibility
+export const listBrokerageConnections = list;
+```
+
+## URL Construction
+
+The function name determines the Cloud Run URL:
+```
+https://[FUNCTION_NAME]-[PROJECT_NUMBER].[REGION].run.app
+```
+
+Shorter function names help with URL length limits.
+
+## Examples
+
+### Good Names
+
+```typescript
+// Non-redundant action names
+'snaptrade-accounts-list'          // Not 'listAccounts'
+'snaptrade-connections-getBrokerAuth'  // Specific action
+'portfolioManager-primaryAccount-set'  // Not 'setPrimaryAccount'
+'admin-settings-reset'             // Not 'resetSettings'
+```
+
+### Bad Names
+
+```typescript
+// Incorrect: Redundant subdomain in action
+'snaptrade-accounts-getAccount'  // ❌ Repeats 'account' in action
+'admin-settings-resetSettings'   // ❌ Repeats 'Settings' in action
+
+// Too verbose
+'portfolioManager-snapTrade-registerPrimarySnaptradeUser'  // ❌ Too long
+```
+
+## Implementation Guidelines
+
+1. Group related functions in domain-specific files
+2. Use barrel exports for clean imports
+3. Keep function handler code focused on a single responsibility
+4. Document the function purpose with JSDoc comments
+5. Use backward compatibility exports for existing function names
+6. Always use short, non-redundant action names
+
+## Directory Structure
+
+Follow this pattern for organizing Firebase functions:
+```
+apps/functions/src/
+├── functions/
+│   ├── snaptrade/
+│   │   ├── accounts.ts       // Exports: list, getDetails, getBalances
+│   │   ├── connections.ts    // Exports: list, getUrl, getBrokerAuth
+│   │   ├── users.ts          // Exports: get, register, listForPm
+│   │   └── index.ts          // Re-exports all modules
+│   ├── portfolio-manager/
+│   │   ├── primaryAccount.ts // Exports: setPrimary, getPrimary
+│   │   └── index.ts
+│   ├── clients/
+│   │   └── ...
+│   └── admin/
+│       └── ...
+└── index.ts                  // Main exports by domain
+```
