@@ -44,12 +44,12 @@ export function SnapTradeUsersTable({
       </div>
     ),
     actions: isMobile ? (
-      <div className="flex flex-col space-y-2 py-1">
+      <div className="flex flex-row space-x-2 py-1 justify-between">
         <Button
           variant="outline"
           size="sm"
           asChild={true}
-          className="h-8 text-xs justify-center w-full"
+          className="h-11 text-sm justify-center flex-1 min-w-[120px] py-4"
         >
           <Link href={`/manager/snaptrade/${user.id}`}>
             View Details
@@ -60,7 +60,7 @@ export function SnapTradeUsersTable({
           portfolioManagerId={portfolioManagerId}
           snapTradeUserId={user.id}
           userName={user.displayName}
-          buttonClassName="h-8 text-xs w-full"
+          buttonClassName="h-11 text-sm flex-1 min-w-[120px] py-4"
         />
       </div>
     ) : (
@@ -69,7 +69,7 @@ export function SnapTradeUsersTable({
           variant="outline"
           size="sm"
           asChild={true}
-          className="h-8 px-2 text-xs"
+          className="h-9 px-3 text-xs"
         >
           <Link href={`/manager/snaptrade/${user.id}`}>
             View Details
@@ -80,7 +80,7 @@ export function SnapTradeUsersTable({
           portfolioManagerId={portfolioManagerId}
           snapTradeUserId={user.id}
           userName={user.displayName}
-          buttonClassName="h-8 px-2 text-xs"
+          buttonClassName="h-9 px-3 text-xs"
         />
       </div>
     )
@@ -90,7 +90,7 @@ export function SnapTradeUsersTable({
   const mobileColumns: SimpleColumn[] = [
     { key: "displayName", label: "Name" },
     { key: "createdAt", label: "Created" },
-    { key: "actions", label: "Actions" }
+    { key: "actions", label: "Actions", isCardFooter: true }
   ];
 
   const desktopColumns: SimpleColumn[] = [
@@ -101,16 +101,18 @@ export function SnapTradeUsersTable({
   ];
 
   return (
-    <div className="bg-card text-card-foreground rounded-md border shadow-sm overflow-hidden">
-      <ResponsiveTable
-        cells={cells}
-        columns={isMobile ? mobileColumns : desktopColumns}
-        emptyMessage="No SnapTrade users found"
-        forceTableMode={!isMobile}
-        forceCardMode={isMobile}
-        className="w-full"
-        cardClassName="p-4 border-0 shadow-none last:mb-0 bg-background"
-      />
+    <div className="rounded-md overflow-hidden">
+      <div className="overflow-x-auto">
+        <ResponsiveTable
+          cells={cells}
+          columns={isMobile ? mobileColumns : desktopColumns}
+          emptyMessage="No SnapTrade users found"
+          forceTableMode={!isMobile}
+          forceCardMode={isMobile}
+          className="w-full"
+          cardClassName="p-4 border shadow-sm bg-background mb-4"
+        />
+      </div>
     </div>
   );
 }

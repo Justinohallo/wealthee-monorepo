@@ -10,6 +10,8 @@ export interface SimpleColumn {
   className?: string;
   // Simple flag for mobile visibility
   showOnMobile?: boolean;
+  // Flag to render this column as a footer in card view
+  isCardFooter?: boolean;
 }
 
 export interface CellContent {
@@ -48,7 +50,8 @@ interface ResponsiveTableProps {
  * const columns = [
  *   { key: 'name', label: 'Name' },
  *   { key: 'email', label: 'Email' },
- *   { key: 'status', label: 'Status' }
+ *   { key: 'status', label: 'Status' },
+ *   { key: 'actions', label: 'Actions', isCardFooter: true }
  * ];
  *
  * <ResponsiveTable cells={cells} columns={columns} />
@@ -74,8 +77,8 @@ export function ResponsiveTable({
   }
 
   // Determine the display mode based on props
-  const cardMode = forceCardMode || (!forceTableMode && true); // In real usage, we'd use a media query
-  const tableMode = forceTableMode || (!forceCardMode && true); // In real usage, we'd use a media query
+  const cardMode = forceCardMode || (!forceTableMode && true);
+  const tableMode = forceTableMode || (!forceCardMode && true);
 
   return (
     <div className={className}>
@@ -111,27 +114,54 @@ export function ResponsiveTable({
 
       {/* Mobile Card View */}
       <div className={cn(
-        "space-y-4",
+        "space-y-6", // Increased space between cards
         !cardMode && "hidden",
         cardMode && !forceCardMode && `${breakpoint}:hidden`
       )}>
-        {cells.map((cell) => (
-          <Card key={cell.id} className={cn("p-4", cardClassName)}>
-            {columns
-              .filter(col => col.showOnMobile !== false)
-              .map((column) => (
-                <div
-                  key={`card-${cell.id}-${column.key}`}
-                  className="flex justify-between py-2 border-b last:border-b-0"
-                >
-                  <span className="font-medium text-sm text-muted-foreground">
-                    {column.label}
-                  </span>
-                  <span className="text-right">
-                    {cell[column.key]}
-                  </span>
-                </div>
-              ))}
+        {cells.map((cell, cardIndex) => (
+          <Card
+            key={cell.id}
+            className={cn(
+              "border bg-card shadow-sm",
+              cardIndex < cells.length - 1 ? "mb-4" : "",
+              cardClassName
+            )}
+          >
+            {/* Regular card content */}
+            <div className="p-4">
+              {columns
+                .filter(col => col.showOnMobile !== false && !col.isCardFooter)
+                .map((column, index, arr) => (
+                  <div
+                    key={`card-${cell.id}-${column.key}`}
+                    className={cn(
+                      "flex justify-between py-2",
+                      // Only add border if not the last item
+                      index < arr.length - 1 ? "border-b" : ""
+                    )}
+                  >
+                    <span className="font-medium text-sm text-muted-foreground">
+                      {column.label}
+                    </span>
+                    <span className="text-right">
+                      {cell[column.key]}
+                    </span>
+                  </div>
+                ))}
+            </div>
+
+            {/* Footer actions if any columns are marked as isCardFooter */}
+            {columns.some(col => col.isCardFooter) && (
+              <div className="px-4 pt-2 pb-4 border-t">
+                {columns
+                  .filter(col => col.isCardFooter)
+                  .map((column) => (
+                    <div key={`footer-${cell.id}-${column.key}`} className="w-full">
+                      {cell[column.key]}
+                    </div>
+                  ))}
+              </div>
+            )}
           </Card>
         ))}
       </div>

@@ -38,7 +38,7 @@ export function DeleteUserButton({
         });
 
         // Redirect to the users list
-        router.push("/manager/snaptrade/@users");
+        router.push("/manager/snaptrade/users");
         return { success: true };
       } else {
         toast({
