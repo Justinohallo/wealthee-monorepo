@@ -1,3 +1,8 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
 # Firebase Function Naming Convention
 
 ## Overview
@@ -28,7 +33,7 @@ The implementation should use short, descriptive names:
 export const getUrl = createHttpFunction({ /* ... */ });
 export const list = createHttpFunction({ /* ... */ });
 export const getBrokerAuth = createHttpFunction({ /* ... */ });
-export const delete_ = createHttpFunction({ /* ... */ });
+export const delete = createHttpFunction({ /* ... */ });
 ```
 
 ### Action Naming Rules
@@ -42,7 +47,7 @@ export const delete_ = createHttpFunction({ /* ... */ });
    - `list` - Retrieve multiple resources
    - `create` - Create a new resource
    - `update` - Update an existing resource
-   - `delete_` - Delete a resource (note underscore to avoid JS keyword)
+   - `remove` - Delete a resource (note underscore to avoid JS keyword)
    - `set` - Set a value or status
 
 3. **Use camelCase for compound actions**:

@@ -78,9 +78,9 @@ export const SNAPTRADE = {
      */
     LIST_BROKERAGE_CONNECTIONS: 'snaptrade-connections-list',
     /**
-     * 'snaptrade-connections-delete'
+     * 'snaptrade-connections-remove'
      */
-    DELETE_BROKERAGE_CONNECTION: 'snaptrade-connections-delete_',
+    DELETE_BROKERAGE_CONNECTION: 'snaptrade-connections-remove',
     /**
      * 'snaptrade-connections-getUrl'
      */
@@ -92,7 +92,7 @@ export const SNAPTRADE = {
     GET: 'snaptrade-users-get',
     LIST_FOR_PORTFOLIO_MANAGER: 'snaptrade-users-listForPortfolioManager',
     LOGIN: 'snaptrade-users-login',
-    DELETE: 'snaptrade-users-delete',
+    DELETE: 'snaptrade-users-remove',
   },
 
 };

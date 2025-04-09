@@ -129,7 +129,7 @@ export const get = createHttpFunction({
 /**
  * Delete a brokerage connection
  */
-export const delete_ = createHttpFunction({
+export const remove = createHttpFunction({
   options: {
     requireAuth: true,
     requiredRole: "portfolioManager",

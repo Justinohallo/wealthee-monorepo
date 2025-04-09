@@ -37,8 +37,8 @@ export const regPrimary = createHttpFunction({ /* ... */ });
 | Domain | Subdomain | Action Pattern |
 |--------|-----------|----------------|
 | `snaptrade` | `accounts` | `list`, `getDetails`, `getHoldings`, etc. |
-| `snaptrade` | `connections` | `getUrl`, `list`, `getBrokerAuth`, `delete_` |
-| `snaptrade` | `users` | `register`, `get`, `listForPm`, `delete_` |
+| `snaptrade` | `connections` | `getUrl`, `list`, `getBrokerAuth`, `remove` |
+| `snaptrade` | `users` | `register`, `get`, `listForPm`, `remove` |
 | `portfolio-manager` | `snapTrade` | `checkUser`, `regPrimary`, `getPrimary` |
 | `portfolio-manager` | `primaryAccount` | `setPrimary`, `getPrimary` |
 | `clients` | `users` | `add`, `get`, `list`, `update` |

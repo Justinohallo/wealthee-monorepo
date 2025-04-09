@@ -194,7 +194,7 @@ export const update = createHttpFunction({
 /**
  * Deletes a portfolio manager's account
  */
-export const delete_ = createHttpFunction({
+export const remove = createHttpFunction({
   handler: async ({ req, res }) => {
     // Check for required parameters
     const { uid } = req.params;
