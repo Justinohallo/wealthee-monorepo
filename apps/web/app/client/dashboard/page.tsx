@@ -1,4 +1,4 @@
-import { AccountSummary, DashboardHeader, PortfolioCard, UserInfoCard } from "./_components";
+import { AccountSummary, PortfolioCard, UserInfoCard } from "./_components";
 import { getUserId, verifySessionAndGetUser } from "@/lib/server-auth-utils";
 
 import { AccountActivities } from "@/components/account/AccountActivities";
