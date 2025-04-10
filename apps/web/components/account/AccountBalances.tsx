@@ -26,8 +26,8 @@ async function AccountBalancesContent({ idToken, portfolioManagerId, snapTradeUs
 
   if (!response) {
     return (
-      <div className="p-4 bg-gray-50 rounded-md text-center">
-        <p className="text-gray-700">
+      <div className="bg-gray-50 rounded-lg p-6 text-center">
+        <p className="text-gray-600">
           No balance information available for this account.
         </p>
       </div>
@@ -67,11 +67,13 @@ async function AccountBalancesContent({ idToken, portfolioManagerId, snapTradeUs
 export function AccountBalances(props: AccountBalancesProps) {
   return (
     <AccountErrorBoundary title="Balance Data Error">
-      <div className="bg-white rounded-lg shadow overflow-hidden p-6 h-full">
-        <h2 className="text-xl font-semibold mb-4">Cash Balances</h2>
-        <Suspense fallback={<AccountBalancesSkeleton />}>
-          <AccountBalancesContent {...props} />
-        </Suspense>
+      <div className="bg-white rounded-xl shadow-sm overflow-hidden border border-gray-100 h-full">
+        <div className="p-6">
+          <h2 className="text-xl font-semibold text-gray-800 mb-4">Cash Balances</h2>
+          <Suspense fallback={<AccountBalancesSkeleton />}>
+            <AccountBalancesContent {...props} />
+          </Suspense>
+        </div>
       </div>
     </AccountErrorBoundary>
   );

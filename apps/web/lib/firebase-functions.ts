@@ -152,7 +152,6 @@ export async function callFirebaseFunction<T = unknown>({
   retries?: number
 }): Promise<{ data: T, } | null> {
   const functionUrl = buildFunctionUrl(functionName, queryParams);
-  console.log(`Calling Firebase function '${functionName}' at: ${functionUrl}`);
 
 
   let lastError: unknown;
@@ -191,7 +190,6 @@ export async function callFirebaseFunction<T = unknown>({
       }
 
       const response = await fetch(functionUrl, fetchOptions);
-      console.log(`Response from Firebase function '${functionName}':`, response);
       // Handle error responses
       if (!response.ok) {
         // Only retry on 5xx errors (server errors) and 429 (rate limiting)

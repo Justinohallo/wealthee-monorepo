@@ -30,7 +30,7 @@ async function AccountHoldingsContent({
 
   if (!response) {
     return (
-      <div className="p-4 bg-yellow-50 rounded-md text-center">
+      <div className="bg-yellow-50 rounded-lg p-6 text-center">
         <p className="text-yellow-700">
           No holdings found for this account. The account may be new or not yet synced.
         </p>
@@ -42,11 +42,11 @@ async function AccountHoldingsContent({
     <div className="space-y-6">
       {/* Stock Positions */}
       <div>
-        <h3 className="text-lg font-semibold mb-4">Stock Positions</h3>
+        <h3 className="text-lg font-semibold text-gray-800 mb-4">Stock Positions</h3>
         <div className="overflow-x-auto">
           {response.positions?.length === 0 ? (
-            <div className="p-4 bg-gray-50 rounded-md text-center">
-              <p className="text-gray-700">No stock positions in this account.</p>
+            <div className="bg-gray-50 rounded-lg p-4 text-center">
+              <p className="text-gray-600">No stock positions in this account.</p>
             </div>
           ) : (
             <Table>
@@ -85,10 +85,10 @@ async function AccountHoldingsContent({
 
       {/* Account Summary */}
       <div>
-        <h3 className="text-lg font-semibold mb-4">Account Summary</h3>
+        <h3 className="text-lg font-semibold text-gray-800 mb-4">Account Summary</h3>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div className="p-4 bg-gray-50 rounded-md">
-            <h3 className="text-lg font-medium mb-2">Total Market Value</h3>
+          <div className="bg-gray-50 rounded-lg p-4">
+            <h4 className="text-base font-medium text-gray-700 mb-2">Total Market Value</h4>
             <p className="text-2xl font-bold text-green-600">
               {formatCurrency(response.total_value?.value ?? 0, "USD")}
             </p>
@@ -102,11 +102,13 @@ async function AccountHoldingsContent({
 export function AccountHoldings(props: AccountHoldingsProps) {
   return (
     <AccountErrorBoundary title="Holdings Data Error">
-      <div className="bg-white rounded-lg shadow overflow-hidden p-6 h-full">
-        <h2 className="text-xl font-semibold mb-4">Account Holdings</h2>
-        <Suspense fallback={<AccountHoldingsSkeleton />}>
-          <AccountHoldingsContent {...props} />
-        </Suspense>
+      <div className="bg-white rounded-xl shadow-sm overflow-hidden border border-gray-100 h-full">
+        <div className="p-6">
+          <h2 className="text-xl font-semibold text-gray-800 mb-4">Account Holdings</h2>
+          <Suspense fallback={<AccountHoldingsSkeleton />}>
+            <AccountHoldingsContent {...props} />
+          </Suspense>
+        </div>
       </div>
     </AccountErrorBoundary>
   );

@@ -5,6 +5,7 @@ import { AccountActivities } from "@/components/account/AccountActivities";
 import { AccountBalances } from "@/components/account/AccountBalances";
 import { AccountHoldings } from "@/components/account/AccountHoldings";
 import { AccountOrders } from "@/components/account/AccountOrders";
+import { Info } from "lucide-react";
 import { getManagerPrimaryAccount } from "@/services/client/dashboard";
 import { redirect } from "next/navigation";
 
@@ -35,16 +36,12 @@ export default async function ClientDashboardPage() {
 
   if (!response) {
     return (
-      <div>
-        <h1>No account found</h1>
+      <div className="container py-8 text-center">
+        <h1 className="text-2xl font-semibold text-gray-800 mb-4">No account found</h1>
+        <p className="text-gray-600">Please contact your administrator to set up your account.</p>
       </div>
     )
   }
-
-  const user = {
-    name: decodedClaims.name,
-    email: decodedClaims.email,
-  };
 
   // For demo purposes - in a real app, this would come from the portfolio manager info
   const portfolioManager = {
@@ -67,76 +64,126 @@ export default async function ClientDashboardPage() {
     }
   } : undefined;
 
+  // Total account value
+  console.log(accountSummaryInfo)
   return (
-    <main className="container py-6 space-y-6">
-      <DashboardHeader
-        user={user}
-        portfolioManagerName={portfolioManager.name}
-        portfolioManagerImage={portfolioManager.image}
-      />
+    <main className="container mx-auto py-8 px-4 sm:px-6 lg:px-8 max-w-7xl">
+      <div className="space-y-8">
+        {/* Enhanced Header Section */}
+        <section className="bg-white rounded-xl shadow-sm overflow-hidden border border-gray-100">
+          <div className="p-6">
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+              <div>
+                <h1 className="text-2xl font-bold text-gray-800">Welcome, {decodedClaims.name}</h1>
+                <p className="text-gray-500">Account: <span className="font-medium">{response.accountDetails.name}</span></p>
+              </div>
 
-      <section className="space-y-4">
-        <h2 className="text-xl font-semibold">Your Portfolio</h2>
-        <PortfolioCard account={response.accountDetails} />
-      </section>
+              {/* Portfolio Quick Stats */}
+              <div className="flex flex-wrap gap-4">
+                <div className="bg-gray-50 rounded-lg p-3">
+                  <p className="text-sm text-gray-500">Total Value</p>
+                  <p className="text-xl font-bold text-gray-900">
+                    {response.accountDetails.balance?.total
+                      ? `${response.accountDetails.balance.total.currency}$${Number(response.accountDetails.balance.total.amount).toFixed(2)}`
+                      : '$0.00'}
+                  </p>
+                </div>
 
-      <section className="space-y-4">
-        <h2 className="text-xl font-semibold">Account Summary</h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <AccountSummary
-            accountInfo={accountSummaryInfo}
-            hasSubscription={hasSubscription}
-          />
+                <div className="bg-blue-50 rounded-lg p-3">
+                  <p className="text-sm text-gray-500">Portfolio Manager</p>
+                  <p className="text-md font-medium">{portfolioManager.name}</p>
+                  <button className="text-blue-600 text-sm mt-1 hover:underline">Request Meeting</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
 
+        {/* Top Row: User Information and Portfolio Overview */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {/* User Information */}
           <UserInfoCard
             name={decodedClaims.name}
             email={decodedClaims.email}
             role={decodedClaims.role}
             userId={userId}
           />
+
+          {/* Account Summary */}
+          <AccountSummary
+            accountInfo={accountSummaryInfo}
+            hasSubscription={hasSubscription}
+          />
         </div>
-      </section>
 
-      <section className="space-y-4">
-        <h2 className="text-xl font-semibold">Account Details</h2>
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-          <div className="min-h-[350px]">
-            <AccountBalances
-              portfolioManagerId={response.portfolioManagerId}
-              snapTradeUserId={response.snapTradeUserId}
-              accountId={response.accountDetails.id}
-              idToken={idToken}
-            />
+        {/* Portfolio Overview */}
+        <section className="bg-white rounded-xl shadow-sm overflow-hidden border border-gray-100">
+          <div className="p-6">
+            <h2 className="text-xl font-semibold text-gray-800 mb-4">Portfolio Overview</h2>
+            <PortfolioCard account={response.accountDetails} />
           </div>
+        </section>
 
-          <div className="min-h-[350px]">
-            <AccountHoldings
-              portfolioManagerId={response.portfolioManagerId}
-              snapTradeUserId={response.snapTradeUserId}
-              accountId={response.accountDetails.id}
-              idToken={idToken}
-            />
-          </div>
+        {/* Account Details Section */}
+        <h2 className="text-2xl font-semibold text-gray-800 px-1">Account Details</h2>
 
-          <div className="min-h-[350px]">
-            <AccountActivities
-              portfolioManagerId={response.portfolioManagerId}
-              snapTradeUserId={response.snapTradeUserId}
-              accountId={response.accountDetails.id}
-              idToken={idToken}
-            />
-          </div>
+        {/* Holdings and Balances */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <AccountBalances
+            portfolioManagerId={response.portfolioManagerId}
+            snapTradeUserId={response.snapTradeUserId}
+            accountId={response.accountDetails.id}
+            idToken={idToken}
+          />
 
-          <div className="min-h-[350px]">
-            <AccountOrders
-              portfolioManagerId={response.portfolioManagerId}
-              snapTradeUserId={response.snapTradeUserId}
-              accountId={response.accountDetails.id}
-              idToken={idToken}
-            />
-          </div>
+          <AccountHoldings
+            portfolioManagerId={response.portfolioManagerId}
+            snapTradeUserId={response.snapTradeUserId}
+            accountId={response.accountDetails.id}
+            idToken={idToken}
+          />
         </div>
-      </section>
+
+        {/* Activities and Orders */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <AccountActivities
+            portfolioManagerId={response.portfolioManagerId}
+            snapTradeUserId={response.snapTradeUserId}
+            accountId={response.accountDetails.id}
+            idToken={idToken}
+          />
+
+          <AccountOrders
+            portfolioManagerId={response.portfolioManagerId}
+            snapTradeUserId={response.snapTradeUserId}
+            accountId={response.accountDetails.id}
+            idToken={idToken}
+          />
+        </div>
+
+        {/* Portfolio Manager Insights */}
+        <section className="bg-white rounded-xl shadow-sm overflow-hidden border border-gray-100">
+          <div className="p-6">
+            <h2 className="text-xl font-semibold text-gray-800 mb-4">Portfolio Manager Insights</h2>
+            <div className="bg-blue-50 rounded-lg p-4 border border-blue-100">
+              <div className="flex items-start gap-4">
+                <div className="bg-blue-100 rounded-full p-3 shrink-0">
+                  <Info className="h-6 w-6 text-blue-600" />
+                </div>
+                <div>
+                  <h3 className="font-medium text-gray-800">Latest Update: Portfolio Strategy</h3>
+                  <p className="text-gray-600 mt-1">
+                    We're maintaining a cautious approach given market volatility.
+                    Your portfolio is currently weighted towards stable tech stocks with strong fundamentals.
+                    We'll look for opportunities to diversify in the coming weeks.
+                  </p>
+                  <p className="text-sm text-gray-500 mt-3">Updated: {new Date().toLocaleDateString()}</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+      </div>
     </main>
   );
 }

@@ -27,16 +27,18 @@ async function AccountOrdersContent({ idToken, portfolioManagerId, snapTradeUser
 export function AccountOrders(props: AccountOrdersProps) {
   return (
     <AccountErrorBoundary title="Orders Data Error">
-      <div className="bg-white rounded-lg shadow overflow-hidden p-6 h-full">
-        <h2 className="text-xl font-semibold mb-4">Account Orders</h2>
-        <Suspense fallback={<AccountOrdersSkeleton />}>
-          <AccountOrdersContent
-            portfolioManagerId={props.portfolioManagerId}
-            snapTradeUserId={props.snapTradeUserId}
-            accountId={props.accountId}
-            idToken={props.idToken}
-          />
-        </Suspense>
+      <div className="bg-white rounded-xl shadow-sm overflow-hidden border border-gray-100 h-full">
+        <div className="p-6">
+          <h2 className="text-xl font-semibold text-gray-800 mb-4">Account Orders</h2>
+          <Suspense fallback={<AccountOrdersSkeleton />}>
+            <AccountOrdersContent
+              portfolioManagerId={props.portfolioManagerId}
+              snapTradeUserId={props.snapTradeUserId}
+              accountId={props.accountId}
+              idToken={props.idToken}
+            />
+          </Suspense>
+        </div>
       </div>
     </AccountErrorBoundary>
   );

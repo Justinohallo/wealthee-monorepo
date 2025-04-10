@@ -20,19 +20,19 @@ export default async function ClientLayout({
   }
 
   return (
-    <div className="flex min-h-screen flex-col md:flex-row">
+    <div className="min-h-screen bg-gray-50">
       {/* Sidebar - hidden on mobile */}
-      <div className="hidden md:flex">
+      <div className="hidden md:block">
         <ClientSidebar />
       </div>
 
       {/* Main content */}
-      <main className="flex-1 pb-16 md:pb-0">
+      <main className="md:ml-64 min-h-screen pb-20 md:pb-0">
         {children}
       </main>
 
       {/* Bottom navigation - mobile only */}
-      <div className="fixed bottom-0 left-0 right-0 md:hidden border-t bg-background">
+      <div className="md:hidden">
         <ClientBottomNav />
       </div>
     </div>

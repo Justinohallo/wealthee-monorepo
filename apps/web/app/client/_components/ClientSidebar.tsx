@@ -2,7 +2,6 @@
 
 import { LayoutDashboard, LogOut, Settings, User } from "lucide-react";
 
-import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { auth } from "@/lib/firebase";
 import { cn } from "@/lib/utils";
@@ -26,12 +25,13 @@ export function ClientSidebar() {
       name: "Settings",
       href: "/client/settings",
       icon: Settings,
-    },
+    }
   ];
 
   return (
-    <div className="w-64 h-screen p-4 border-r flex flex-col">
-      <div className="flex items-center gap-2 py-4 px-2">
+    <aside className="w-64 fixed left-0 top-[64px] h-[calc(100vh-64px)] border-r bg-white overflow-y-auto">
+      {/* Header */}
+      <div className="flex items-center gap-2 py-4 px-6 border-b">
         <div className="h-8 w-8 rounded-full bg-primary flex items-center justify-center text-primary-foreground">
           <User className="h-4 w-4" />
         </div>
@@ -41,8 +41,10 @@ export function ClientSidebar() {
         </div>
       </div>
 
-      <nav className="mt-8 flex-1">
+      {/* Navigation */}
+      <nav className="p-4">
         <ul className="space-y-2">
+          {/* Regular nav items */}
           {navItems.map((item) => (
             <li key={item.href}>
               <Link href={item.href}>
@@ -58,19 +60,19 @@ export function ClientSidebar() {
               </Link>
             </li>
           ))}
+
+          {/* Sign out button as nav item */}
+          <li>
+            <button
+              onClick={handleSignOut}
+              className="w-full flex items-center gap-3 px-3 py-2 rounded-md text-sm transition-colors hover:bg-accent/50"
+            >
+              <LogOut className="h-4 w-4" />
+              Sign out
+            </button>
+          </li>
         </ul>
       </nav>
-
-      <div className="mt-auto pt-4 border-t">
-        <Button
-          variant="ghost"
-          className="w-full justify-start gap-3 text-sm"
-          onClick={handleSignOut}
-        >
-          <LogOut className="h-4 w-4" />
-          Sign out
-        </Button>
-      </div>
-    </div>
+    </aside>
   );
 }

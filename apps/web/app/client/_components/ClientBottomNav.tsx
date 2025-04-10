@@ -23,22 +23,24 @@ export function ClientBottomNav() {
   ];
 
   return (
-    <nav className="flex items-center justify-around py-2">
-      {navItems.map((item) => (
-        <Link
-          key={item.href}
-          href={item.href}
-          className={cn(
-            "flex flex-col items-center justify-center p-2 rounded-md w-16 h-16",
-            pathname === item.href
-              ? "text-primary"
-              : "text-muted-foreground hover:text-foreground"
-          )}
-        >
-          <item.icon className="h-5 w-5 mb-1" />
-          <span className="text-xs">{item.name}</span>
-        </Link>
-      ))}
-    </nav>
+    <div className="fixed bottom-0 left-0 right-0 z-50 backdrop-blur-lg bg-white/90 dark:bg-gray-900/90 border-t border-gray-200 dark:border-gray-800 shadow-lg">
+      <nav className="flex items-center justify-around py-2 h-16 pb-safe">
+        {navItems.map((item) => (
+          <Link
+            key={item.href}
+            href={item.href}
+            className={cn(
+              "flex flex-col items-center justify-center p-2 rounded-md w-16 h-16",
+              pathname === item.href
+                ? "text-blue-600 dark:text-blue-400"
+                : "text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200"
+            )}
+          >
+            <item.icon className="h-5 w-5 mb-1" />
+            <span className="text-xs font-medium">{item.name}</span>
+          </Link>
+        ))}
+      </nav>
+    </div>
   );
 }

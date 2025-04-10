@@ -43,7 +43,6 @@ export function DashboardHeader({
               <p className="text-sm text-muted-foreground">{portfolioManagerName}</p>
             </div>
           </div>
-          <Button size="sm" variant="outline">Message</Button>
         </div>
       )}
     </header>

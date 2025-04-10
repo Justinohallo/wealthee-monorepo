@@ -5,8 +5,8 @@ import { theme } from "@/styles/theme"
 
 export default function Footer() {
   return (
-    <footer className="bg-gray-900 text-white py-12">
-      <div className="max-w-7xl mx-auto px-6">
+    <footer className="bg-gray-900 text-white py-12 relative">
+      <div className="max-w-7xl mx-auto px-6 pb-0 md:pb-0 lg:pb-0">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           <div>
             <h3 className="text-xl font-bold mb-4" style={{ color: theme.textBlue }}>
@@ -116,7 +116,7 @@ export default function Footer() {
           </div>
         </div>
 
-        <div className="border-t border-gray-800 mt-8 pt-8 text-center text-gray-400">
+        <div className="border-t border-gray-800 mt-8 pt-8 text-center text-gray-400 pb-20 md:pb-0">
           <p>&copy; {new Date().getFullYear()} Wealthee. All rights reserved.</p>
         </div>
       </div>
