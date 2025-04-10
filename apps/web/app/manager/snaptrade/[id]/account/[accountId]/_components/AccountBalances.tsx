@@ -13,14 +13,14 @@ import { getAccountBalances } from "@/services/snaptrade/accounts";
 
 interface AccountBalancesProps {
   idToken: string;
-  userId: string;
+  portfolioManagerId: string;
   snapTradeUserId: string;
   accountId: string;
 }
 
-async function AccountBalancesContent({ idToken, userId, snapTradeUserId, accountId }: AccountBalancesProps) {
+async function AccountBalancesContent({ idToken, portfolioManagerId, snapTradeUserId, accountId }: AccountBalancesProps) {
 
-  const response = await getAccountBalances({ userId, snapTradeUserId, accountId, idToken });
+  const response = await getAccountBalances({ portfolioManagerId, snapTradeUserId, accountId, idToken });
 
 
 

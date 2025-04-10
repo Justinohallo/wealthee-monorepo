@@ -13,7 +13,6 @@ import { SetPrimaryAccountButton } from "@/components/snaptrade/SetPrimaryAccoun
 interface ServerAccountLayoutProps {
   account: Account;
   idToken: string;
-  userId: string;
   snapTradeUserId: string;
   accountId: string;
   isPrimary: boolean;
@@ -30,7 +29,6 @@ interface ServerAccountLayoutProps {
 export function ServerAccountLayout({
   account,
   idToken,
-  userId,
   snapTradeUserId,
   accountId,
   isPrimary,
@@ -61,7 +59,7 @@ export function ServerAccountLayout({
   // Create the content for each section
   const positionsContent = (
     <AccountPositions
-      userId={userId}
+      portfolioManagerId={portfolioManagerId}
       snapTradeUserId={snapTradeUserId}
       accountId={accountId}
       idToken={idToken}
@@ -70,7 +68,7 @@ export function ServerAccountLayout({
 
   const activitiesContent = (
     <AccountActivities
-      userId={userId}
+      portfolioManagerId={portfolioManagerId}
       snapTradeUserId={snapTradeUserId}
       accountId={accountId}
       idToken={idToken}
@@ -79,7 +77,7 @@ export function ServerAccountLayout({
 
   const ordersContent = (
     <AccountOrders
-      userId={userId}
+      portfolioManagerId={portfolioManagerId}
       snapTradeUserId={snapTradeUserId}
       accountId={accountId}
       idToken={idToken}

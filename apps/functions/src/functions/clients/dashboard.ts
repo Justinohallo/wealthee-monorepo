@@ -15,7 +15,7 @@ import { snaptradeSecrets } from "../../config";
  * This function fetches the primary account of the portfolio manager
  * associated with the client to display on the client dashboard.
  */
-export const getManagerPrimaryAccountV2 = createHttpFunction({
+export const getManagerPrimaryAccount = createHttpFunction({
   handler: async ({ req, res }) => {
     const { clientId } = req.query;
     logger.info(`Getting portfolio manager's primary account for client: ${clientId}`, "ClientDashboard");
@@ -101,7 +101,7 @@ export const getManagerPrimaryAccountV2 = createHttpFunction({
       // Return the account data in a consistent response format
       res.json({
         success: true,
-        data: { accountDetails },
+        data: { accountDetails, portfolioManagerId, snapTradeUserId: primaryAccountData.snapTradeUserId },
         timestamp: new Date().toISOString(),
       });
     } catch (error) {

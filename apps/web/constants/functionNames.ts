@@ -107,7 +107,7 @@ export const CLIENT = {
   },
 
   DASHBOARD: {
-    GET_MANAGER_PRIMARY_ACCOUNT: 'client-dashboard-getPmPrimary'
+    GET_MANAGER_PRIMARY_ACCOUNT: 'client-dashboard-getManagerPrimaryAccount'
   }
 };
 

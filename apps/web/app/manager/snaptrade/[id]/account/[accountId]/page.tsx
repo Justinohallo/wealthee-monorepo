@@ -27,7 +27,7 @@ export default async function AccountDetailsPage({
 
   // Fetch the account details and primary account ID concurrently
   const accountDetailsPromise = fetchAccountDetails({
-    userId: portfolioManagerId,
+    portfolioManagerId,
     snapTradeUserId,
     accountId,
     idToken
@@ -63,7 +63,6 @@ export default async function AccountDetailsPage({
       <ServerAccountLayout
         account={account}
         idToken={idToken}
-        userId={portfolioManagerId}
         snapTradeUserId={snapTradeUserId}
         accountId={accountId}
         isPrimary={isPrimary}

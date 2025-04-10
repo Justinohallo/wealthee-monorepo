@@ -18,8 +18,8 @@ interface HttpFunctionOptions {
   secrets?: ReturnType<typeof defineSecret>[];
   /** Whether authentication is required */
   requireAuth?: boolean;
-  /** Required user role if auth is required */
-  requiredRole?: string;
+  /** Required user role if auth is required (can be a single role or array of allowed roles) */
+  requiredRole?: string | string[];
   /** Required parameters in the request */
   requiredParams?: {
     body?: string[];
@@ -51,7 +51,7 @@ interface HandlerContext {
  */
 async function authenticateRequest(
   req: Request,
-  requiredRole?: string
+  requiredRole?: string | string[]
 ): Promise<DecodedIdToken> {
   // Check for Authorization header
   const authHeader = req.headers.authorization;
@@ -67,10 +67,18 @@ async function authenticateRequest(
     const decodedToken = await auth.verifyIdToken(idToken);
 
     // Check for required role if specified
-    if (requiredRole && (!decodedToken.role || decodedToken.role !== requiredRole)) {
-      throw new ForbiddenError(
-        `Required role '${requiredRole}' not found`
-      );
+    if (requiredRole) {
+      // If requiredRole is a string, convert to array for consistent handling
+      const requiredRoles = Array.isArray(requiredRole) ? requiredRole : [requiredRole];
+
+      // Check if user has any of the required roles
+      const userRole = decodedToken.role;
+
+      if (!userRole || !requiredRoles.includes(userRole)) {
+        throw new ForbiddenError(
+          `User role '${userRole || "none"}' not found in required roles: [${requiredRoles.join(", ")}]`
+        );
+      }
     }
 
     return decodedToken;

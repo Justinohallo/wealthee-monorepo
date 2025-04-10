@@ -191,6 +191,7 @@ export async function callFirebaseFunction<T = unknown>({
       }
 
       const response = await fetch(functionUrl, fetchOptions);
+      console.log(`Response from Firebase function '${functionName}':`, response);
       // Handle error responses
       if (!response.ok) {
         // Only retry on 5xx errors (server errors) and 429 (rate limiting)

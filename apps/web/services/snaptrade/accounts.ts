@@ -14,7 +14,7 @@ import { callFirebaseFunction } from "@/lib/firebase-functions";
  * List all accounts for a SnapTrade user
  */
 export async function listUserAccounts(
-  userId: string,
+  portfolioManagerId: string,
   snapTradeUserId: string,
   idToken: string
 ): Promise<Account[]> {
@@ -22,7 +22,7 @@ export async function listUserAccounts(
     const response = await callFirebaseFunction<{ accounts: Account[] }>({
       idToken,
       functionName: SNAPTRADE.ACCOUNTS.LIST_USER_ACCOUNTS,
-      queryParams: { userId, snapTradeUserId },
+      queryParams: { userId: portfolioManagerId, snapTradeUserId },
       options: {
         method: "GET",
         revalidate: 0 // Don't cache accounts
@@ -40,12 +40,12 @@ export async function listUserAccounts(
  * Get details for a specific account
  */
 export async function getAccountDetails(
-  { userId,
+  { portfolioManagerId,
     snapTradeUserId,
     accountId,
     idToken,
   }: {
-    userId: string,
+    portfolioManagerId: string,
     snapTradeUserId: string,
     accountId: string,
     idToken: string
@@ -54,7 +54,7 @@ export async function getAccountDetails(
     const response = await callFirebaseFunction<Account>({
       idToken,
       functionName: SNAPTRADE.ACCOUNTS.GET_DETAILS,
-      queryParams: { userId, snapTradeUserId, accountId },
+      queryParams: { userId: portfolioManagerId, snapTradeUserId, accountId },
       options: { method: "GET" }
     });
 
@@ -68,12 +68,13 @@ export async function getAccountDetails(
 /**
  * Get account balances
  */
-export async function getAccountBalances({ userId, snapTradeUserId, accountId, idToken }: { userId: string, snapTradeUserId: string, accountId: string, idToken: string }) {
+export async function getAccountBalances({ portfolioManagerId, snapTradeUserId, accountId, idToken }: { portfolioManagerId: string, snapTradeUserId: string, accountId: string, idToken: string }) {
+  console.log({ portfolioManagerId, snapTradeUserId, accountId });
   try {
     const response = await callFirebaseFunction<{ balances: Balance[] }>({
       idToken,
       functionName: SNAPTRADE.ACCOUNTS.GET_ACCOUNT_BALANCES,
-      queryParams: { userId, snapTradeUserId, accountId },
+      queryParams: { userId: portfolioManagerId, snapTradeUserId, accountId },
       options: { method: "GET" }
     });
 
@@ -87,9 +88,9 @@ export async function getAccountBalances({ userId, snapTradeUserId, accountId, i
 /**
  * Get account holdings
  */
-export async function getAccountHoldings({ userId, snapTradeUserId, accountId, idToken }:
+export async function getAccountHoldings({ portfolioManagerId, snapTradeUserId, accountId, idToken }:
   {
-    userId: string,
+    portfolioManagerId: string,
     snapTradeUserId: string,
     accountId: string,
     idToken: string
@@ -99,7 +100,7 @@ export async function getAccountHoldings({ userId, snapTradeUserId, accountId, i
     const response = await callFirebaseFunction<{ holdings: AccountHoldingsAccount }>({
       idToken,
       functionName: SNAPTRADE.ACCOUNTS.GET_ACCOUNT_HOLDINGS,
-      queryParams: { userId, snapTradeUserId, accountId },
+      queryParams: { userId: portfolioManagerId, snapTradeUserId, accountId },
       options: { method: "GET" }
     });
 
@@ -113,9 +114,9 @@ export async function getAccountHoldings({ userId, snapTradeUserId, accountId, i
 /**
  * Get account positions
  */
-export async function getAccountPositions({ userId, snapTradeUserId, accountId, idToken }:
+export async function getAccountPositions({ portfolioManagerId, snapTradeUserId, accountId, idToken }:
   {
-    userId: string,
+    portfolioManagerId: string,
     snapTradeUserId: string,
     accountId: string,
     idToken: string
@@ -125,7 +126,7 @@ export async function getAccountPositions({ userId, snapTradeUserId, accountId, 
     const response = await callFirebaseFunction<{ positions: Position[] }>({
       idToken,
       functionName: SNAPTRADE.ACCOUNTS.GET_ACCOUNT_POSITIONS,
-      queryParams: { userId, snapTradeUserId, accountId },
+      queryParams: { userId: portfolioManagerId, snapTradeUserId, accountId },
       options: { method: "GET" }
     });
 
@@ -140,12 +141,12 @@ export async function getAccountPositions({ userId, snapTradeUserId, accountId, 
  * Get details for a specific account (fetches more comprehensive account details)
  */
 export async function fetchAccountDetails(
-  { userId,
+  { portfolioManagerId,
     snapTradeUserId,
     accountId,
     idToken,
   }: {
-    userId: string,
+    portfolioManagerId: string,
     snapTradeUserId: string,
     accountId: string,
     idToken: string
@@ -156,7 +157,7 @@ export async function fetchAccountDetails(
       idToken,
       functionName: SNAPTRADE.ACCOUNTS.GET_DETAILS,
       queryParams: {
-        userId,
+        userId: portfolioManagerId,
         snapTradeUserId,
         accountId
       },
@@ -206,14 +207,14 @@ export async function fetchSnapTradeAccounts(
  * Get account orders
  */
 export async function getAccountOrders({
-  userId,
+  portfolioManagerId,
   snapTradeUserId,
   accountId,
   idToken,
   state,
   days
 }: {
-  userId: string,
+  portfolioManagerId: string,
   snapTradeUserId: string,
   accountId: string,
   idToken: string,
@@ -222,7 +223,7 @@ export async function getAccountOrders({
 }) {
   try {
     const queryParams: Record<string, string> = {
-      userId,
+      userId: portfolioManagerId,
       snapTradeUserId,
       accountId
     };
@@ -249,14 +250,14 @@ export async function getAccountOrders({
  * Get account activities
  */
 export async function getAccountActivities({
-  userId,
+  portfolioManagerId,
   snapTradeUserId,
   accountId,
   idToken,
   startDate,
   endDate
 }: {
-  userId: string,
+  portfolioManagerId: string,
   snapTradeUserId: string,
   accountId: string,
   idToken: string,
@@ -265,7 +266,7 @@ export async function getAccountActivities({
 }) {
   try {
     const queryParams: Record<string, string> = {
-      userId,
+      portfolioManagerId,
       snapTradeUserId,
       accountId
     };

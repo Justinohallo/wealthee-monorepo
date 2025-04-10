@@ -156,7 +156,7 @@ If you need real-time data, please use the manual refresh endpoint.
 export const getBalances = createHttpFunction({
   options: {
     requireAuth: true,
-    requiredRole: "portfolioManager",
+    requiredRole: ["portfolioManager", "client"],
     secrets: snaptradeSecrets,
     requiredParams: {
       query: ["snapTradeUserId", "accountId"]
@@ -165,6 +165,8 @@ export const getBalances = createHttpFunction({
   handler: async ({ req, res }) => {
     // Get query parameters
     const { snapTradeUserId, accountId } = req.query;
+
+    console.log({ snapTradeUserId, accountId });
 
     // Get the SnapTrade user from the database
     const snapTradeUser = await getSnapTradeUser(snapTradeUserId as string, res);

@@ -6,6 +6,7 @@ import { cn } from "@/lib/utils";
 import { LayoutList } from "lucide-react";
 import { ResponsiveTableClient } from "./ResponsiveTableClient";
 import { type SimpleColumn } from "@/components/ui/responsive-table";
+import { formatDate } from "@/lib/format-date";
 
 // Define columns with simple structure
 const MOBILE_COLUMNS: SimpleColumn[] = [
@@ -35,15 +36,7 @@ interface AccountOrdersTableProps {
   isLoading?: boolean;
 }
 
-// Format date to a readable string
-function formatDate(dateString: string): string {
-  if (!dateString) return "N/A";
-  return new Date(dateString).toLocaleDateString('en-US', {
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric'
-  });
-}
+
 
 function OrderStatusBadge({ status }: { status: string }) {
   const getVariant = (status: string) => {

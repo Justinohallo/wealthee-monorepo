@@ -2,6 +2,12 @@ import { Account } from "@/types/snaptrade";
 import { CLIENT } from "@/constants/functionNames";
 import { callFirebaseFunction } from "@/lib/firebase-functions";
 
+type ManagerPrimaryAccountResponse = {
+  accountDetails: Account;
+  portfolioManagerId: string;
+  snapTradeUserId: string;
+}
+
 /**
  * Get the primary SnapTrade account of the client's portfolio manager
  * @param clientId The client's user ID
@@ -11,9 +17,9 @@ import { callFirebaseFunction } from "@/lib/firebase-functions";
 export async function getManagerPrimaryAccount(
   clientId: string,
   idToken: string
-): Promise<Account | null> {
+): Promise<ManagerPrimaryAccountResponse | null> {
   try {
-    const response = await callFirebaseFunction<{ accountDetails: Account }>({
+    const response = await callFirebaseFunction<ManagerPrimaryAccountResponse>({
       functionName: CLIENT.DASHBOARD.GET_MANAGER_PRIMARY_ACCOUNT,
       idToken,
       queryParams: { clientId },
@@ -22,7 +28,7 @@ export async function getManagerPrimaryAccount(
         revalidate: 60 // Cache for 60 seconds
       }
     });
-    return response?.data?.accountDetails || null;
+    return response?.data || null;
   } catch (error) {
     console.error("Error fetching manager's primary account:", error);
     return null;

@@ -12,16 +12,16 @@ import { getAccountHoldings } from "@/services/snaptrade/accounts";
 
 export const AccountHoldings = async ({
   idToken,
-  userId,
+  portfolioManagerId,
   snapTradeUserId,
   accountId,
 }: {
   idToken: string;
-  userId: string;
+  portfolioManagerId: string;
   snapTradeUserId: string;
   accountId: string;
 }) => {
-  const response = await getAccountHoldings({ userId, snapTradeUserId, accountId, idToken });
+  const response = await getAccountHoldings({ portfolioManagerId, snapTradeUserId, accountId, idToken });
 
   if (!response) {
     return (

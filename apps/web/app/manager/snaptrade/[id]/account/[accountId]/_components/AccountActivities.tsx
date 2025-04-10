@@ -4,15 +4,15 @@ import { getAccountActivities } from "@/services/snaptrade/accounts";
 
 interface AccountActivitiesProps {
   idToken: string;
-  userId: string;
+  portfolioManagerId: string;
   snapTradeUserId: string;
   accountId: string;
 }
 
-async function AccountActivitiesContent({ idToken, userId, snapTradeUserId, accountId }: AccountActivitiesProps) {
+async function AccountActivitiesContent({ idToken, portfolioManagerId, snapTradeUserId, accountId }: AccountActivitiesProps) {
   // This is a server component, so we can fetch data directly
   const activities = await getAccountActivities({
-    userId,
+    portfolioManagerId,
     snapTradeUserId,
     accountId,
     idToken,
@@ -28,7 +28,7 @@ export function AccountActivities(props: AccountActivitiesProps) {
       <AccountActivitiesTable activities={{ data: [] }} isLoading={true} />
     }>
       <AccountActivitiesContent
-        userId={props.userId}
+        portfolioManagerId={props.portfolioManagerId}
         snapTradeUserId={props.snapTradeUserId}
         accountId={props.accountId}
         idToken={props.idToken}

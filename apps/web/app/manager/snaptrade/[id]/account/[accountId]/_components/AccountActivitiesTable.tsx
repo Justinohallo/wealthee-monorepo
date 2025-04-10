@@ -7,21 +7,14 @@ import { ActivitySquare } from "lucide-react";
 import { PaginatedUniversalActivity } from "@/types/snaptrade";
 import { ResponsiveTableClient } from "./ResponsiveTableClient";
 import { type SimpleColumn, type CellContent } from "@/components/ui/responsive-table";
+import { formatDate } from "@/lib/format-date";
 
 interface AccountActivitiesTableProps {
   activities: PaginatedUniversalActivity;
   isLoading?: boolean;
 }
 
-// Format date to a readable string
-function formatDate(dateString: string): string {
-  if (!dateString) return "N/A";
-  return new Date(dateString).toLocaleDateString('en-US', {
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric'
-  });
-}
+
 
 function ActivityTypeBadge({ type }: { type: string }) {
   const getVariant = (type: string) => {

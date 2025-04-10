@@ -4,15 +4,15 @@ import { getAccountOrders } from "@/services/snaptrade/accounts";
 
 interface AccountOrdersProps {
   idToken: string;
-  userId: string;
+  portfolioManagerId: string;
   snapTradeUserId: string;
   accountId: string;
 }
 
-async function AccountOrdersContent({ idToken, userId, snapTradeUserId, accountId }: AccountOrdersProps) {
+async function AccountOrdersContent({ idToken, portfolioManagerId, snapTradeUserId, accountId }: AccountOrdersProps) {
   // This is a server component, so we can fetch data directly
   const orders = await getAccountOrders({
-    userId,
+    portfolioManagerId,
     snapTradeUserId,
     accountId,
     idToken,
@@ -28,7 +28,7 @@ export function AccountOrders(props: AccountOrdersProps) {
       <AccountOrdersTable orders={[]} isLoading={true} />
     }>
       <AccountOrdersContent
-        userId={props.userId}
+        portfolioManagerId={props.portfolioManagerId}
         snapTradeUserId={props.snapTradeUserId}
         accountId={props.accountId}
         idToken={props.idToken}

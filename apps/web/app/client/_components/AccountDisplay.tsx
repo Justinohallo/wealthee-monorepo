@@ -11,9 +11,9 @@ interface AccountDisplayProps {
 }
 
 export default async function AccountDisplay({ clientId, token }: AccountDisplayProps) {
-  const account = await getManagerPrimaryAccount(clientId, token);
+  const response = await getManagerPrimaryAccount(clientId, token);
 
-  if (!account) {
+  if (!response) {
     return (
       <Alert variant="destructive">
         <AlertCircle className="h-4 w-4" />
@@ -26,8 +26,8 @@ export default async function AccountDisplay({ clientId, token }: AccountDisplay
   }
 
   // Extract account balance information
-  const totalValue = account.totalEquityValue || 0;
-  const cashValue = account.cash || 0;
+  const totalValue = response.accountDetails.totalEquityValue || 0;
+  const cashValue = response.accountDetails.cash || 0;
   const investmentsValue = totalValue - cashValue;
 
   // Determine if account is up or down (placeholder logic)
@@ -37,7 +37,7 @@ export default async function AccountDisplay({ clientId, token }: AccountDisplay
   return (
     <div>
       <div className="flex items-center justify-between mb-6">
-        <h3 className="text-xl font-semibold">{account.name}</h3>
+        <h3 className="text-xl font-semibold">{response.accountDetails.name}</h3>
         <div className={`flex items-center ${isPositive ? 'text-green-600' : 'text-red-600'}`}>
           {isPositive ? (
             <ArrowUpIcon className="h-4 w-4 mr-1" />

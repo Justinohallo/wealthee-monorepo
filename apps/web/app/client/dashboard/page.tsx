@@ -1,6 +1,7 @@
 import { AccountSummary, DashboardHeader, PortfolioCard, UserInfoCard } from "./_components";
 import { getUserId, verifySessionAndGetUser } from "@/lib/server-auth-utils";
 
+import { AccountBalances } from "@/app/manager/snaptrade/[id]/account/[accountId]/_components/AccountBalances";
 import { getManagerPrimaryAccount } from "@/services/client/dashboard";
 import { redirect } from "next/navigation";
 
@@ -27,9 +28,9 @@ export default async function ClientDashboardPage() {
   const { decodedClaims } = session;
 
   // Fetch the portfolio manager's primary account
-  const managerAccount = await getManagerPrimaryAccount(decodedClaims.uid, idToken);
+  const response = await getManagerPrimaryAccount(decodedClaims.uid, idToken);
 
-  if (!managerAccount) {
+  if (!response) {
     return (
       <div>
         <h1>No account found</h1>
@@ -52,13 +53,13 @@ export default async function ClientDashboardPage() {
   const hasSubscription = true; // This would be fetched from actual subscription data
 
   // Create a properly typed account info for the AccountSummary component
-  const accountSummaryInfo = managerAccount ? {
-    id: managerAccount.id,
-    name: managerAccount.name || "Account",
+  const accountSummaryInfo = response ? {
+    id: response.accountDetails.id,
+    name: response.accountDetails.name || "Account",
     balance: {
-      total: managerAccount.balance?.total ? {
-        amount: Number(managerAccount.balance.total.amount) || 0,
-        currency: managerAccount.balance.total.currency || "USD"
+      total: response.accountDetails.balance?.total ? {
+        amount: Number(response.accountDetails.balance.total.amount) || 0,
+        currency: response.accountDetails.balance.total.currency || "USD"
       } : null
     }
   } : undefined;
@@ -73,7 +74,7 @@ export default async function ClientDashboardPage() {
 
       <section className="space-y-4">
         <h2 className="text-xl font-semibold">Your Portfolio</h2>
-        <PortfolioCard account={managerAccount} />
+        <PortfolioCard account={response.accountDetails} />
       </section>
 
       <section className="space-y-4">
@@ -90,6 +91,17 @@ export default async function ClientDashboardPage() {
             role={decodedClaims.role}
             userId={userId}
           />
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="bg-white rounded-lg shadow overflow-hidden p-6">
+              <h3 className="text-lg font-semibold mb-4">Account Balances</h3>
+              <AccountBalances
+                portfolioManagerId={response.portfolioManagerId}
+                snapTradeUserId={response.snapTradeUserId}
+                accountId={response.accountDetails.id}
+                idToken={idToken}
+              />
+            </div>
+          </div>
         </div>
       </section>
     </main>
