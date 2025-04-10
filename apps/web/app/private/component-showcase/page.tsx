@@ -1,8 +1,8 @@
 'use client';
 
-import { AccountPositionsTable } from "@/app/manager/snaptrade/[id]/account/[accountId]/_components/AccountPositionsTable";
-import { AccountActivitiesTable } from "@/app/manager/snaptrade/[id]/account/[accountId]/_components/AccountActivitiesTable";
-import { AccountOrdersTable } from "@/app/manager/snaptrade/[id]/account/[accountId]/_components/AccountOrdersTable";
+import { AccountPositionsTable } from "@/components/account/AccountPositionsTable";
+import { AccountActivitiesTable } from "@/components/account/AccountActivitiesTable";
+import { AccountOrdersTable } from "@/components/account/AccountOrdersTable";
 import { type Position, type PaginatedUniversalActivity, type Order, type SecurityType } from "@/types/snaptrade";
 import { cn } from "@/lib/utils";
 import { useState } from "react";

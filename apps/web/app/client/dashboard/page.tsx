@@ -1,7 +1,10 @@
 import { AccountSummary, DashboardHeader, PortfolioCard, UserInfoCard } from "./_components";
 import { getUserId, verifySessionAndGetUser } from "@/lib/server-auth-utils";
 
-import { AccountBalances } from "@/app/manager/snaptrade/[id]/account/[accountId]/_components/AccountBalances";
+import { AccountActivities } from "@/components/account/AccountActivities";
+import { AccountBalances } from "@/components/account/AccountBalances";
+import { AccountHoldings } from "@/components/account/AccountHoldings";
+import { AccountOrders } from "@/components/account/AccountOrders";
 import { getManagerPrimaryAccount } from "@/services/client/dashboard";
 import { redirect } from "next/navigation";
 
@@ -91,16 +94,46 @@ export default async function ClientDashboardPage() {
             role={decodedClaims.role}
             userId={userId}
           />
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="bg-white rounded-lg shadow overflow-hidden p-6">
-              <h3 className="text-lg font-semibold mb-4">Account Balances</h3>
-              <AccountBalances
-                portfolioManagerId={response.portfolioManagerId}
-                snapTradeUserId={response.snapTradeUserId}
-                accountId={response.accountDetails.id}
-                idToken={idToken}
-              />
-            </div>
+        </div>
+      </section>
+
+      <section className="space-y-4">
+        <h2 className="text-xl font-semibold">Account Details</h2>
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+          <div className="min-h-[350px]">
+            <AccountBalances
+              portfolioManagerId={response.portfolioManagerId}
+              snapTradeUserId={response.snapTradeUserId}
+              accountId={response.accountDetails.id}
+              idToken={idToken}
+            />
+          </div>
+
+          <div className="min-h-[350px]">
+            <AccountHoldings
+              portfolioManagerId={response.portfolioManagerId}
+              snapTradeUserId={response.snapTradeUserId}
+              accountId={response.accountDetails.id}
+              idToken={idToken}
+            />
+          </div>
+
+          <div className="min-h-[350px]">
+            <AccountActivities
+              portfolioManagerId={response.portfolioManagerId}
+              snapTradeUserId={response.snapTradeUserId}
+              accountId={response.accountDetails.id}
+              idToken={idToken}
+            />
+          </div>
+
+          <div className="min-h-[350px]">
+            <AccountOrders
+              portfolioManagerId={response.portfolioManagerId}
+              snapTradeUserId={response.snapTradeUserId}
+              accountId={response.accountDetails.id}
+              idToken={idToken}
+            />
           </div>
         </div>
       </section>

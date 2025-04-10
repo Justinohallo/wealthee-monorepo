@@ -10,6 +10,7 @@ interface ResponsiveTabsClientProps {
   positionsContent: ReactNode;
   activitiesContent: ReactNode;
   ordersContent: ReactNode;
+  accountBalances: ReactNode;
 }
 
 /**
@@ -19,7 +20,8 @@ interface ResponsiveTabsClientProps {
 export function ResponsiveTabsClient({
   positionsContent,
   activitiesContent,
-  ordersContent
+  ordersContent,
+  accountBalances
 }: ResponsiveTabsClientProps) {
   const isMobile = useMediaQuery("(max-width: 767px)");
 
@@ -30,10 +32,12 @@ export function ResponsiveTabsClient({
           <TabsTrigger value="positions" className="min-h-[44px] py-2">Positions</TabsTrigger>
           <TabsTrigger value="activities" className="min-h-[44px] py-2">Activities</TabsTrigger>
           <TabsTrigger value="orders" className="min-h-[44px] py-2">Orders</TabsTrigger>
+          <TabsTrigger value="balances" className="min-h-[44px] py-2">Balances</TabsTrigger>
         </TabsList>
         <TabsContent value="positions">{positionsContent}</TabsContent>
         <TabsContent value="activities">{activitiesContent}</TabsContent>
         <TabsContent value="orders">{ordersContent}</TabsContent>
+        <TabsContent value="balances">{accountBalances}</TabsContent>
       </Tabs>
     );
   }
@@ -47,6 +51,7 @@ export function ResponsiveTabsClient({
       <ResponsiveGrid xs={1} lg={2} spacing="md">
         {activitiesContent}
         {ordersContent}
+        {accountBalances}
       </ResponsiveGrid>
     </div>
   );

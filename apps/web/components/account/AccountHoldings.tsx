@@ -7,40 +7,42 @@ import {
   TableRow,
 } from "@/components/ui/table";
 
+import { AccountErrorBoundary } from "./AccountErrorBoundary";
+import { AccountHoldingsSkeleton } from "./AccountSkeletons";
+import { Suspense } from "react";
 import { formatCurrency } from "@/lib/format-currency";
 import { getAccountHoldings } from "@/services/snaptrade/accounts";
 
-export const AccountHoldings = async ({
-  idToken,
-  portfolioManagerId,
-  snapTradeUserId,
-  accountId,
-}: {
+interface AccountHoldingsProps {
   idToken: string;
   portfolioManagerId: string;
   snapTradeUserId: string;
   accountId: string;
-}) => {
+}
+
+async function AccountHoldingsContent({
+  idToken,
+  portfolioManagerId,
+  snapTradeUserId,
+  accountId,
+}: AccountHoldingsProps) {
   const response = await getAccountHoldings({ portfolioManagerId, snapTradeUserId, accountId, idToken });
 
   if (!response) {
     return (
-      <div className="bg-white rounded-lg shadow overflow-hidden p-6">
-        <h2 className="text-xl font-semibold mb-4">Holdings</h2>
-        <div className="p-4 bg-yellow-50 rounded-md text-center">
-          <p className="text-yellow-700">
-            No holdings found for this account. The account may be new or not yet synced.
-          </p>
-        </div>
+      <div className="p-4 bg-yellow-50 rounded-md text-center">
+        <p className="text-yellow-700">
+          No holdings found for this account. The account may be new or not yet synced.
+        </p>
       </div>
     );
-
   }
+
   return (
     <div className="space-y-6">
       {/* Stock Positions */}
-      <div className="bg-white rounded-lg shadow overflow-hidden p-6">
-        <h2 className="text-xl font-semibold mb-4">Stock Positions</h2>
+      <div>
+        <h3 className="text-lg font-semibold mb-4">Stock Positions</h3>
         <div className="overflow-x-auto">
           {response.positions?.length === 0 ? (
             <div className="p-4 bg-gray-50 rounded-md text-center">
@@ -82,8 +84,8 @@ export const AccountHoldings = async ({
       </div>
 
       {/* Account Summary */}
-      <div className="bg-white rounded-lg shadow overflow-hidden p-6">
-        <h2 className="text-xl font-semibold mb-4">Account Summary</h2>
+      <div>
+        <h3 className="text-lg font-semibold mb-4">Account Summary</h3>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div className="p-4 bg-gray-50 rounded-md">
             <h3 className="text-lg font-medium mb-2">Total Market Value</h3>
@@ -95,6 +97,19 @@ export const AccountHoldings = async ({
       </div>
     </div>
   );
-};
+}
+
+export function AccountHoldings(props: AccountHoldingsProps) {
+  return (
+    <AccountErrorBoundary title="Holdings Data Error">
+      <div className="bg-white rounded-lg shadow overflow-hidden p-6 h-full">
+        <h2 className="text-xl font-semibold mb-4">Account Holdings</h2>
+        <Suspense fallback={<AccountHoldingsSkeleton />}>
+          <AccountHoldingsContent {...props} />
+        </Suspense>
+      </div>
+    </AccountErrorBoundary>
+  );
+}
 
 export default AccountHoldings;

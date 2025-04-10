@@ -7,6 +7,8 @@ import {
   TableRow,
 } from "@/components/ui/table";
 
+import { AccountBalancesSkeleton } from "./AccountSkeletons";
+import { AccountErrorBoundary } from "./AccountErrorBoundary";
 import { Suspense } from "react";
 import { formatCurrency } from "@/lib/format-currency";
 import { getAccountBalances } from "@/services/snaptrade/accounts";
@@ -21,8 +23,6 @@ interface AccountBalancesProps {
 async function AccountBalancesContent({ idToken, portfolioManagerId, snapTradeUserId, accountId }: AccountBalancesProps) {
 
   const response = await getAccountBalances({ portfolioManagerId, snapTradeUserId, accountId, idToken });
-
-
 
   if (!response) {
     return (
@@ -66,11 +66,13 @@ async function AccountBalancesContent({ idToken, portfolioManagerId, snapTradeUs
 
 export function AccountBalances(props: AccountBalancesProps) {
   return (
-    <div className="bg-white rounded-lg shadow overflow-hidden p-6">
-      <h2 className="text-xl font-semibold mb-4">Cash Balances</h2>
-      <Suspense fallback={<div>Loading balances...</div>}>
-        <AccountBalancesContent {...props} />
-      </Suspense>
-    </div>
+    <AccountErrorBoundary title="Balance Data Error">
+      <div className="bg-white rounded-lg shadow overflow-hidden p-6 h-full">
+        <h2 className="text-xl font-semibold mb-4">Cash Balances</h2>
+        <Suspense fallback={<AccountBalancesSkeleton />}>
+          <AccountBalancesContent {...props} />
+        </Suspense>
+      </div>
+    </AccountErrorBoundary>
   );
 }

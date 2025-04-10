@@ -10,6 +10,8 @@ import {
 import { SNAPTRADE } from "@/constants/functionNames";
 import { callFirebaseFunction } from "@/lib/firebase-functions";
 
+const REVALIDATION_TIME = 0;
+
 /**
  * List all accounts for a SnapTrade user
  */
@@ -25,7 +27,7 @@ export async function listUserAccounts(
       queryParams: { userId: portfolioManagerId, snapTradeUserId },
       options: {
         method: "GET",
-        revalidate: 0 // Don't cache accounts
+        revalidate: REVALIDATION_TIME // Don't cache accounts
       }
     });
 
@@ -55,7 +57,7 @@ export async function getAccountDetails(
       idToken,
       functionName: SNAPTRADE.ACCOUNTS.GET_DETAILS,
       queryParams: { userId: portfolioManagerId, snapTradeUserId, accountId },
-      options: { method: "GET" }
+      options: { method: "GET", revalidate: REVALIDATION_TIME }
     });
 
     return response?.data || null;
@@ -69,13 +71,12 @@ export async function getAccountDetails(
  * Get account balances
  */
 export async function getAccountBalances({ portfolioManagerId, snapTradeUserId, accountId, idToken }: { portfolioManagerId: string, snapTradeUserId: string, accountId: string, idToken: string }) {
-  console.log({ portfolioManagerId, snapTradeUserId, accountId });
   try {
     const response = await callFirebaseFunction<{ balances: Balance[] }>({
       idToken,
       functionName: SNAPTRADE.ACCOUNTS.GET_ACCOUNT_BALANCES,
       queryParams: { userId: portfolioManagerId, snapTradeUserId, accountId },
-      options: { method: "GET" }
+      options: { method: "GET", revalidate: REVALIDATION_TIME }
     });
 
     return response?.data?.balances || null;
@@ -101,7 +102,7 @@ export async function getAccountHoldings({ portfolioManagerId, snapTradeUserId, 
       idToken,
       functionName: SNAPTRADE.ACCOUNTS.GET_ACCOUNT_HOLDINGS,
       queryParams: { userId: portfolioManagerId, snapTradeUserId, accountId },
-      options: { method: "GET" }
+      options: { method: "GET", revalidate: REVALIDATION_TIME }
     });
 
     return response?.data?.holdings || null;
@@ -127,7 +128,7 @@ export async function getAccountPositions({ portfolioManagerId, snapTradeUserId,
       idToken,
       functionName: SNAPTRADE.ACCOUNTS.GET_ACCOUNT_POSITIONS,
       queryParams: { userId: portfolioManagerId, snapTradeUserId, accountId },
-      options: { method: "GET" }
+      options: { method: "GET", revalidate: REVALIDATION_TIME }
     });
 
     return response?.data?.positions || null;
@@ -163,7 +164,7 @@ export async function fetchAccountDetails(
       },
       options: {
         method: 'GET',
-        revalidate: 0 // Don't cache this data
+        revalidate: REVALIDATION_TIME // Don't cache this data
       }
     });
     return response?.data?.accountDetails || null;
@@ -192,7 +193,7 @@ export async function fetchSnapTradeAccounts(
           'Content-Type': 'application/json'
         },
         method: 'GET',
-        revalidate: 0 // Don't cache this data
+        revalidate: REVALIDATION_TIME // Don't cache this data
       }
     });
 
@@ -236,7 +237,7 @@ export async function getAccountOrders({
       idToken,
       functionName: SNAPTRADE.ACCOUNTS.GET_ACCOUNT_ORDERS,
       queryParams,
-      options: { method: "GET" }
+      options: { method: "GET", revalidate: REVALIDATION_TIME }
     });
 
     return response?.data?.orders || [];
@@ -279,7 +280,7 @@ export async function getAccountActivities({
       idToken,
       functionName: SNAPTRADE.ACCOUNTS.GET_ACCOUNT_ACTIVITIES,
       queryParams,
-      options: { method: "GET" }
+      options: { method: "GET", revalidate: REVALIDATION_TIME }
     });
 
     return response?.data?.activities || [];

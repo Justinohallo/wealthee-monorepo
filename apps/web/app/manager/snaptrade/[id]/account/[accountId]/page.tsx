@@ -1,6 +1,6 @@
 import { Card, CardContent } from "@/components/ui/card";
 
-import { ServerAccountLayout } from "./_components/ServerAccountLayout";
+import { ServerAccountLayout } from "../../../../../../components/account/ServerAccountLayout";
 import { Suspense } from "react";
 import { fetchAccountDetails } from "@/services/snaptrade/accounts";
 import { getPrimaryAccount } from "@/services/portfolioManager/primaryAccount";

@@ -9,7 +9,7 @@ import { ResponsiveAccountSummary } from "@/components/account/responsive-accoun
 import { ResponsiveContainer } from "@/components/ui/responsive-container";
 import { ResponsiveTabsClient } from "./ResponsiveTabsClient";
 import { SetPrimaryAccountButton } from "@/components/snaptrade/SetPrimaryAccountButton";
-
+import { AccountBalances } from "./AccountBalances";
 interface ServerAccountLayoutProps {
   account: Account;
   idToken: string;
@@ -55,6 +55,15 @@ export function ServerAccountLayout({
     },
     currency: account.total_value?.currency
   };
+
+  const accountBalances = (
+    <AccountBalances
+      portfolioManagerId={portfolioManagerId}
+      snapTradeUserId={snapTradeUserId}
+      accountId={accountId}
+      idToken={idToken}
+    />
+  )
 
   // Create the content for each section
   const positionsContent = (
@@ -116,6 +125,7 @@ export function ServerAccountLayout({
         positionsContent={positionsContent}
         activitiesContent={activitiesContent}
         ordersContent={ordersContent}
+        accountBalances={accountBalances}
       />
     </ResponsiveContainer>
   );

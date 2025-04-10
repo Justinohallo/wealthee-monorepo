@@ -1,3 +1,5 @@
+import { AccountErrorBoundary } from "./AccountErrorBoundary";
+import { AccountOrdersSkeleton } from "./AccountSkeletons";
 import { AccountOrdersTable } from "./AccountOrdersTable";
 import { Suspense } from "react";
 import { getAccountOrders } from "@/services/snaptrade/accounts";
@@ -24,15 +26,18 @@ async function AccountOrdersContent({ idToken, portfolioManagerId, snapTradeUser
 
 export function AccountOrders(props: AccountOrdersProps) {
   return (
-    <Suspense fallback={
-      <AccountOrdersTable orders={[]} isLoading={true} />
-    }>
-      <AccountOrdersContent
-        portfolioManagerId={props.portfolioManagerId}
-        snapTradeUserId={props.snapTradeUserId}
-        accountId={props.accountId}
-        idToken={props.idToken}
-      />
-    </Suspense>
+    <AccountErrorBoundary title="Orders Data Error">
+      <div className="bg-white rounded-lg shadow overflow-hidden p-6 h-full">
+        <h2 className="text-xl font-semibold mb-4">Account Orders</h2>
+        <Suspense fallback={<AccountOrdersSkeleton />}>
+          <AccountOrdersContent
+            portfolioManagerId={props.portfolioManagerId}
+            snapTradeUserId={props.snapTradeUserId}
+            accountId={props.accountId}
+            idToken={props.idToken}
+          />
+        </Suspense>
+      </div>
+    </AccountErrorBoundary>
   );
 }

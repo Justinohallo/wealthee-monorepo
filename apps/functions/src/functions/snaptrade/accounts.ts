@@ -61,7 +61,7 @@ If you need real-time data, please use the manual refresh endpoint.
 export const getHoldings = createHttpFunction({
   options: {
     requireAuth: true,
-    requiredRole: "portfolioManager",
+    requiredRole: ["portfolioManager", "client"],
     secrets: snaptradeSecrets,
     requiredParams: {
       query: ["snapTradeUserId", "accountId"]
@@ -106,7 +106,7 @@ export const getDetails = createHttpFunction({
   options:
   {
     requireAuth: true,
-    requiredRole: "portfolioManager",
+    requiredRole: ["portfolioManager", "client"],
     secrets: snaptradeSecrets,
     requiredParams: {
       query: ["snapTradeUserId", "accountId"]
@@ -198,7 +198,7 @@ export const getBalances = createHttpFunction({
 export const getPositions = createHttpFunction({
   options: {
     requireAuth: true,
-    requiredRole: "portfolioManager",
+    requiredRole: ["portfolioManager", "client"],
     secrets: snaptradeSecrets,
     requiredParams: {
       query: ["snapTradeUserId", "accountId"]
@@ -241,7 +241,7 @@ export const getPositions = createHttpFunction({
 export const getOrders = createHttpFunction({
   options: {
     requireAuth: true,
-    requiredRole: "portfolioManager",
+    requiredRole: ["portfolioManager", "client"],
     secrets: snaptradeSecrets,
     requiredParams: {
       query: ["snapTradeUserId", "accountId"]
@@ -290,7 +290,7 @@ export const getOrders = createHttpFunction({
 export const getActivities = createHttpFunction({
   options: {
     requireAuth: true,
-    requiredRole: "portfolioManager",
+    requiredRole: ["portfolioManager", "client"],
     secrets: snaptradeSecrets,
     requiredParams: {
       query: ["snapTradeUserId", "accountId"],
