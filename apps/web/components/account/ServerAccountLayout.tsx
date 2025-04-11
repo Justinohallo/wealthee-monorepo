@@ -1,5 +1,6 @@
 import { Account } from "@/types/snaptrade";
 import { AccountActivities } from "./AccountActivities";
+import { AccountBalances } from "./AccountBalances";
 import { AccountOrders } from "./AccountOrders";
 import { AccountPositions } from "./AccountPositions";
 import { Button } from "@/components/ui/button";
@@ -9,7 +10,7 @@ import { ResponsiveAccountSummary } from "@/components/account/responsive-accoun
 import { ResponsiveContainer } from "@/components/ui/responsive-container";
 import { ResponsiveTabsClient } from "./ResponsiveTabsClient";
 import { SetPrimaryAccountButton } from "@/components/snaptrade/SetPrimaryAccountButton";
-import { AccountBalances } from "./AccountBalances";
+
 interface ServerAccountLayoutProps {
   account: Account;
   idToken: string;
@@ -34,28 +35,6 @@ export function ServerAccountLayout({
   isPrimary,
   portfolioManagerId,
 }: ServerAccountLayoutProps) {
-  // Transform account data to match the format expected by ResponsiveAccountSummary
-  const accountData = {
-    id: account.id,
-    name: account.name || "Account", // Provide default for name if null
-    number: account.number,
-    institution_name: account.institution_name,
-    status: "Open", // Assuming account is open if we're viewing it
-    meta: {
-      type: account.type,
-      status: "open" as "open" | "closed"
-    },
-    balance: {
-      totalValue: account.total_value?.amount,
-      cash: account.cash?.amount,
-      investments: account.total_value?.amount
-        ? (account.total_value.amount - (account.cash?.amount || 0))
-        : undefined,
-      buyingPower: account.buying_power?.amount
-    },
-    currency: account.total_value?.currency
-  };
-
   const accountBalances = (
     <AccountBalances
       portfolioManagerId={portfolioManagerId}
@@ -116,7 +95,7 @@ export function ServerAccountLayout({
       {/* Account Summary */}
       <div className="mb-4 sm:mb-6">
         <ResponsiveAccountSummary
-          account={accountData}
+          account={account}
         />
       </div>
 
