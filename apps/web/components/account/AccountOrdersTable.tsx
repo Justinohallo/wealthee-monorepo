@@ -1,6 +1,5 @@
 'use client'
 import { type Order } from "@/types/snaptrade";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import { LayoutList } from "lucide-react";
@@ -86,33 +85,28 @@ export function AccountOrdersTable({
   });
 
   return (
-    <Card className="w-full overflow-hidden">
-      <CardHeader className="sticky top-0 z-10 bg-background border-b">
-        <CardTitle className="text-lg sm:text-xl">Recent Orders</CardTitle>
-      </CardHeader>
-      <CardContent className="p-3 sm:p-4 md:p-6">
-        {isLoading ? (
-          // Skeleton loading state
-          <div className="space-y-3">
-            {[...Array(3)].map((_, i) => (
-              <div key={i} className="animate-pulse flex h-12 items-center">
-                <div className="h-4 bg-muted rounded w-1/4"></div>
-                <div className="ml-auto h-4 bg-muted rounded w-16"></div>
-              </div>
-            ))}
-          </div>
-        ) : (
-          // Use our client component for responsive tables
-          <ResponsiveTableClient
-            data={orderData}
-            mobileColumns={MOBILE_COLUMNS}
-            desktopColumns={DESKTOP_COLUMNS}
-            emptyMessage={EMPTY_MESSAGE}
-            keyField="_orderIndex"
-            rowClassName="transition-colors hover:bg-muted/50"
-          />
-        )}
-      </CardContent>
-    </Card>
+    <div className="w-full overflow-hidden">
+      {isLoading ? (
+        // Skeleton loading state
+        <div className="space-y-3">
+          {[...Array(3)].map((_, i) => (
+            <div key={i} className="animate-pulse flex h-12 items-center">
+              <div className="h-4 bg-muted rounded w-1/4"></div>
+              <div className="ml-auto h-4 bg-muted rounded w-16"></div>
+            </div>
+          ))}
+        </div>
+      ) : (
+        // Use our client component for responsive tables
+        <ResponsiveTableClient
+          data={orderData}
+          mobileColumns={MOBILE_COLUMNS}
+          desktopColumns={DESKTOP_COLUMNS}
+          emptyMessage={EMPTY_MESSAGE}
+          keyField="_orderIndex"
+          rowClassName="transition-colors hover:bg-muted/50"
+        />
+      )}
+    </div>
   );
 }

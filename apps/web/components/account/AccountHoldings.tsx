@@ -83,18 +83,6 @@ async function AccountHoldingsContent({
         </div>
       </div>
 
-      {/* Account Summary */}
-      <div>
-        <h3 className="text-lg font-semibold text-gray-800 mb-4">Account Summary</h3>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div className="bg-gray-50 rounded-lg p-4">
-            <h4 className="text-base font-medium text-gray-700 mb-2">Total Market Value</h4>
-            <p className="text-2xl font-bold text-green-600">
-              {formatCurrency(response.total_value?.value ?? 0, "USD")}
-            </p>
-          </div>
-        </div>
-      </div>
     </div>
   );
 }

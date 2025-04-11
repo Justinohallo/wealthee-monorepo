@@ -1,3 +1,5 @@
+import { AccountErrorBoundary } from "./AccountErrorBoundary";
+import { AccountPositionsSkeleton } from "./AccountSkeletons";
 import { AccountPositionsTable } from "./AccountPositionsTable";
 import { Suspense } from "react";
 import { getAccountPositions } from "@/services/snaptrade/accounts";
@@ -9,7 +11,12 @@ interface AccountPositionsProps {
   accountId: string;
 }
 
-async function AccountPositionsContent({ idToken, portfolioManagerId, snapTradeUserId, accountId }: AccountPositionsProps) {
+async function AccountPositionsContent({
+  idToken,
+  portfolioManagerId,
+  snapTradeUserId,
+  accountId
+}: AccountPositionsProps) {
   // This is a server component, so we can fetch data directly
   const positions = await getAccountPositions({ portfolioManagerId, snapTradeUserId, accountId, idToken });
 
@@ -19,15 +26,20 @@ async function AccountPositionsContent({ idToken, portfolioManagerId, snapTradeU
 
 export function AccountPositions(props: AccountPositionsProps) {
   return (
-    <Suspense fallback={
-      <AccountPositionsTable positions={[]} isLoading={true} />
-    }>
-      <AccountPositionsContent
-        portfolioManagerId={props.portfolioManagerId}
-        snapTradeUserId={props.snapTradeUserId}
-        accountId={props.accountId}
-        idToken={props.idToken}
-      />
-    </Suspense>
+    <AccountErrorBoundary title="Positions Data Error">
+      <div className="bg-white rounded-xl shadow-sm overflow-hidden border border-gray-100 h-full">
+        <div className="p-6">
+          <h2 className="text-xl font-semibold text-gray-800 mb-4">Positions</h2>
+          <Suspense fallback={<AccountPositionsSkeleton />}>
+            <AccountPositionsContent
+              portfolioManagerId={props.portfolioManagerId}
+              snapTradeUserId={props.snapTradeUserId}
+              accountId={props.accountId}
+              idToken={props.idToken}
+            />
+          </Suspense>
+        </div>
+      </div>
+    </AccountErrorBoundary>
   );
 }

@@ -63,6 +63,23 @@ export function AccountBalancesSkeleton() {
   );
 }
 
+export function AccountPositionsSkeleton() {
+  return (
+    <div className="bg-white rounded-xl shadow-sm overflow-hidden border border-gray-100 h-full">
+      <div className="p-6">
+        <Skeleton className="h-8 w-48 mb-6 rounded-md" />
+        <div className="mb-4">
+          <div className="flex justify-between items-center mb-4">
+            <Skeleton className="h-5 w-32 rounded-md" />
+            <Skeleton className="h-5 w-20 rounded-md" />
+          </div>
+        </div>
+        <AccountTableSkeleton rows={4} />
+      </div>
+    </div>
+  );
+}
+
 export function AccountActivitiesSkeleton() {
   return (
     <div className="bg-white rounded-xl shadow-sm overflow-hidden border border-gray-100 h-full">

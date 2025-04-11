@@ -29,7 +29,7 @@ export function AccountOrders(props: AccountOrdersProps) {
     <AccountErrorBoundary title="Orders Data Error">
       <div className="bg-white rounded-xl shadow-sm overflow-hidden border border-gray-100 h-full">
         <div className="p-6">
-          <h2 className="text-xl font-semibold text-gray-800 mb-4">Account Orders</h2>
+          <h2 className="text-xl font-semibold text-gray-800 mb-4">Recent Orders</h2>
           <Suspense fallback={<AccountOrdersSkeleton />}>
             <AccountOrdersContent
               portfolioManagerId={props.portfolioManagerId}

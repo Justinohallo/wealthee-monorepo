@@ -1,11 +1,12 @@
 import { AccountSummary, PortfolioCard, UserInfoCard } from "./_components";
+import { Clock, Info } from "lucide-react";
 import { getUserId, verifySessionAndGetUser } from "@/lib/server-auth-utils";
 
 import { AccountActivities } from "@/components/account/AccountActivities";
 import { AccountBalances } from "@/components/account/AccountBalances";
 import { AccountHoldings } from "@/components/account/AccountHoldings";
 import { AccountOrders } from "@/components/account/AccountOrders";
-import { Info } from "lucide-react";
+import { AccountPositions } from "@/components/account/AccountPositions";
 import { getManagerPrimaryAccount } from "@/services/client/dashboard";
 import { redirect } from "next/navigation";
 
@@ -13,6 +14,27 @@ export const metadata = {
   title: "Dashboard | Wealthee",
   description: "View your portfolio and account information",
 };
+
+// Data Cache Alert component
+function DataCacheAlert() {
+  // Get yesterday's date formatted nicely (e.g., "May 15, 2023")
+  const yesterday = new Date();
+  yesterday.setDate(yesterday.getDate() - 1);
+  const formattedDate = yesterday.toLocaleDateString('en-US', {
+    month: 'long',
+    day: 'numeric',
+    year: 'numeric'
+  });
+
+  return (
+    <div className="bg-amber-50 border border-amber-200 rounded-xl p-3 mb-4">
+      <div className="flex items-center gap-2 text-amber-800 text-sm">
+        <Clock className="h-4 w-4 flex-shrink-0" />
+        <span>Account data shown is cached as of market close on {formattedDate}. Market data is delayed by at least 15 minutes.</span>
+      </div>
+    </div>
+  );
+}
 
 export default async function ClientDashboardPage() {
   // Verify the session
@@ -64,8 +86,6 @@ export default async function ClientDashboardPage() {
     }
   } : undefined;
 
-  // Total account value
-  console.log(accountSummaryInfo)
   return (
     <main className="container mx-auto py-8 px-4 sm:px-6 lg:px-8 max-w-7xl">
       <div className="space-y-8">
@@ -104,7 +124,7 @@ export default async function ClientDashboardPage() {
           {/* User Information */}
           <UserInfoCard
             name={decodedClaims.name}
-            email={decodedClaims.email}
+            email={decodedClaims.email || ""}
             role={decodedClaims.role}
             userId={userId}
           />
@@ -120,12 +140,18 @@ export default async function ClientDashboardPage() {
         <section className="bg-white rounded-xl shadow-sm overflow-hidden border border-gray-100">
           <div className="p-6">
             <h2 className="text-xl font-semibold text-gray-800 mb-4">Portfolio Overview</h2>
-            <PortfolioCard account={response.accountDetails} />
+            <PortfolioCard account={{
+              type: response.accountDetails.type,
+              institution_name: response.accountDetails.institution_name
+            }} />
           </div>
         </section>
 
         {/* Account Details Section */}
         <h2 className="text-2xl font-semibold text-gray-800 px-1">Account Details</h2>
+
+        {/* Data Cache Alert */}
+        <DataCacheAlert />
 
         {/* Holdings and Balances */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -143,6 +169,14 @@ export default async function ClientDashboardPage() {
             idToken={idToken}
           />
         </div>
+
+        {/* Positions */}
+        <AccountPositions
+          portfolioManagerId={response.portfolioManagerId}
+          snapTradeUserId={response.snapTradeUserId}
+          accountId={response.accountDetails.id}
+          idToken={idToken}
+        />
 
         {/* Activities and Orders */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">

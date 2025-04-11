@@ -29,7 +29,7 @@ export function AccountActivities(props: AccountActivitiesProps) {
     <AccountErrorBoundary title="Activities Data Error">
       <div className="bg-white rounded-xl shadow-sm overflow-hidden border border-gray-100 h-full">
         <div className="p-6">
-          <h2 className="text-xl font-semibold text-gray-800 mb-4">Account Activities</h2>
+          <h2 className="text-xl font-semibold text-gray-800 mb-4">Recent Activities</h2>
           <Suspense fallback={<AccountActivitiesSkeleton />}>
             <AccountActivitiesContent
               portfolioManagerId={props.portfolioManagerId}
