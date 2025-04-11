@@ -1,6 +1,5 @@
 "use client"
 
-
 import Link from "next/link"
 import type React from "react"
 import { Button } from "@/components/ui/button"
@@ -14,15 +13,16 @@ import { type UserRole } from "@/contexts/AuthContext"
 import { useRouter } from "next/navigation"
 import { useState } from "react"
 import { useToast } from '@/hooks/use-toast'
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
+import { Eye, EyeOff, Mail, Lock } from "lucide-react"
 
 export const LoginForm = () => {
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [loading, setLoading] = useState(false)
+  const [showPassword, setShowPassword] = useState(false)
   const router = useRouter()
   const { toast } = useToast()
-
-
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
@@ -53,11 +53,8 @@ export const LoginForm = () => {
         })
       }
 
-
       if (response.ok) {
         const data = await response.json()
-
-
 
         // Store user role in localStorage for easy access if needed
         const userRole = data.user?.role || customClaims?.role as UserRole
@@ -88,78 +85,92 @@ export const LoginForm = () => {
   }
 
   return (
-    <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
-      <div className="space-y-6">
-        <div>
-          <Label htmlFor="email" className="block text-sm font-medium leading-6 text-gray-900">
-            Email address
-          </Label>
-          <div className="mt-2">
-            <Input
-              id="email"
-              name="email"
-              type="email"
-              autoComplete="email"
-              required
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="block w-full rounded-lg border-0 py-3 px-4 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-textBlue sm:text-sm sm:leading-6"
-              placeholder="Enter your email"
-            />
+    <Card className="w-full">
+      <CardHeader>
+        <CardTitle className="text-xl text-center">Welcome back</CardTitle>
+      </CardHeader>
+      <form onSubmit={handleSubmit}>
+        <CardContent className="space-y-4">
+          <div className="space-y-2">
+            <Label htmlFor="email" className="text-sm font-medium">
+              Email address
+            </Label>
+            <div className="relative">
+              <div className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500">
+                <Mail className="h-4 w-4" />
+              </div>
+              <Input
+                id="email"
+                name="email"
+                type="email"
+                autoComplete="email"
+                required
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                className="pl-10 h-11 bg-white"
+                placeholder="Enter your email"
+              />
+            </div>
           </div>
-        </div>
 
-        <div>
-          <Label htmlFor="password" className="block text-sm font-medium leading-6 text-gray-900">
-            Password
-          </Label>
-          <div className="mt-2">
-            <Input
-              id="password"
-              name="password"
-              type="password"
-              autoComplete="current-password"
-              required
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className="block w-full rounded-lg border-0 py-3 px-4 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-textBlue sm:text-sm sm:leading-6"
-              placeholder="Enter your password"
-            />
+          <div className="space-y-2">
+            <div className="flex items-center justify-between">
+              <Label htmlFor="password" className="text-sm font-medium">
+                Password
+              </Label>
+              <Link href="/forgot-password" className="text-xs font-medium text-blue-600 hover:text-blue-800">
+                Forgot password?
+              </Link>
+            </div>
+            <div className="relative">
+              <div className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500">
+                <Lock className="h-4 w-4" />
+              </div>
+              <Input
+                id="password"
+                name="password"
+                type={showPassword ? "text" : "password"}
+                autoComplete="current-password"
+                required
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                className="pl-10 h-11 bg-white"
+                placeholder="Enter your password"
+              />
+              <button
+                type="button"
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500"
+                onClick={() => setShowPassword(!showPassword)}
+              >
+                {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+              </button>
+            </div>
           </div>
-        </div>
 
-        <div className="flex items-center justify-between">
           <div className="flex items-center">
             <Input
               id="remember-me"
               name="remember-me"
               type="checkbox"
-              className="h-4 w-4 rounded border-gray-300 text-textBlue focus:ring-textBlue"
+              className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-600"
             />
-            <Label htmlFor="remember-me" className="ml-2 block text-sm text-gray-900">
+            <Label htmlFor="remember-me" className="ml-2 block text-sm text-gray-700">
               Remember me
             </Label>
           </div>
+        </CardContent>
 
-          <div className="text-sm">
-            <Link href="/forgot-password" className="font-medium hover:opacity-80" style={{ color: theme.textBlue }}>
-              Forgot your password?
-            </Link>
-          </div>
-        </div>
-
-        <div>
+        <CardFooter>
           <Button
             type="submit"
             disabled={loading}
-            style={{ backgroundColor: theme.textBlue }}
-            className="flex w-full justify-center rounded-lg px-3 py-3 text-sm font-semibold leading-6 text-white shadow-sm hover:opacity-80 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-textBlue"
+            className="w-full h-11 bg-blue-600 hover:bg-blue-700"
           >
             {loading ? "Signing in..." : "Sign in"}
           </Button>
-        </div>
-      </div>
-    </form>
+        </CardFooter>
+      </form>
+    </Card>
   )
 }
 
