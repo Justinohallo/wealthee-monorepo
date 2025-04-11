@@ -1,4 +1,3 @@
-import { ResponsiveAccountSummary } from "@/components/account/responsive-account-summary";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { ResponsiveContainer } from "@/components/ui/responsive-container";
@@ -7,26 +6,6 @@ import { ResponsiveTable, type SimpleColumn, type CellContent } from "@/componen
 import { Separator } from "@/components/ui/separator";
 import { StatsGrid } from "@/components/ui/stats-grid";
 import { ArrowUpDown, BarChart3, DollarSign, TrendingDown, TrendingUp, Users } from "lucide-react";
-
-// Example data for demonstration
-const mockAccount = {
-  id: "acc12345",
-  name: "TFSA Investment Account",
-  number: "12345678",
-  institution_name: "TD Direct Investing",
-  status: "Open",
-  balance: {
-    totalValue: 43250.75,
-    cash: 5280.42,
-    investments: 37970.33,
-    buyingPower: 5280.42
-  },
-  meta: {
-    type: "Tax-Free Savings Account",
-    status: "open" as "open" | "closed"
-  },
-  currency: "CAD"
-};
 
 
 
@@ -106,7 +85,6 @@ export function MobileDesignGuideExample() {
 
       {/* Account Summary Example */}
       <h2 className="text-xl font-semibold mb-4">Account Summary</h2>
-      <ResponsiveAccountSummary account={mockAccount} className="mb-8" />
 
       {/* Stats Grid Example */}
       <h2 className="text-xl font-semibold mb-4">Portfolio Dashboard</h2>

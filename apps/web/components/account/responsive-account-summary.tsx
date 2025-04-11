@@ -77,7 +77,7 @@ export function ResponsiveAccountSummary({
           formattedSyncDate = new Date(dateStr).toLocaleDateString();
         }
       }
-    } catch (e) {
+    } catch {
       // If there's an error parsing the date, use the raw string
       formattedSyncDate = lastSyncDate;
     }
