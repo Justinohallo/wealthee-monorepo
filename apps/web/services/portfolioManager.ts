@@ -82,7 +82,7 @@ export async function createPortfolioManager(
  */
 export async function listPortfolioManagers(idToken: string): Promise<PortfolioManager[]> {
   try {
-    const response = await callFirebaseFunction<{ managers: PortfolioManager[] }>({
+    const response = await callFirebaseFunction<PortfolioManager[]>({
       idToken,
       functionName: PORTFOLIO_MANAGER.USERS.LIST,
       options: {
@@ -92,7 +92,7 @@ export async function listPortfolioManagers(idToken: string): Promise<PortfolioM
         },
       }
     });
-    return response?.data?.managers || [];
+    return response?.data || [];
   } catch (error) {
     console.error('Error fetching portfolio managers:', error);
     return [];
