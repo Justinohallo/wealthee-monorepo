@@ -2,7 +2,7 @@
 
 A portfolio-management platform for independent financial advisors and their clients. An advisor (portfolio manager) onboards clients, connects their brokerage accounts, and sees holdings and activity in one dashboard; the client sees their own portfolio.
 
-I co-founded Wealthee with a Toronto-based financial advisor and was the sole engineer from 2020 to 2025. This repository is the 2025 rebuild: the earlier product (a React web dashboard, a React Native app and a Firebase backend) consolidated into one TypeScript monorepo. The partnership ended in 2025 and the product never went to market, so the code is shared as a record of the architecture rather than a live service.
+I co-founded Wealthee with a Toronto-based financial advisor and was the sole engineer from 2020 to 2025. The original product was a React web dashboard, a React Native app and a Firebase backend; this repository is the 2025 rebuild of the web dashboard and backend as one TypeScript monorepo. The partnership ended in 2025 and the product never went to market, so the code is shared as a record of the architecture rather than a live service.
 
 ## What it does
 
