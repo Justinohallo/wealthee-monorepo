@@ -1,84 +1,42 @@
-# Turborepo starter
+# Wealthee
 
-This Turborepo starter is maintained by the Turborepo core team.
+A portfolio-management platform for independent financial advisors and their clients. An advisor (portfolio manager) onboards clients, connects their brokerage accounts, and sees holdings and activity in one dashboard; the client sees their own portfolio.
 
-## Using this example
+I co-founded Wealthee with a Toronto-based financial advisor and was the sole engineer from 2020 to 2025. This repository is the 2025 rebuild: the earlier product (a React web dashboard, a React Native app and a Firebase backend) consolidated into one TypeScript monorepo. The partnership ended in 2025 and the product never went to market, so the code is shared as a record of the architecture rather than a live service.
 
-Run the following command:
+## What it does
 
-```sh
-npx create-turbo@latest
-```
+- **Three roles, one app.** Admin, portfolio manager and client each get their own route tree (`app/admin`, `app/manager`, `app/client`), gated by a role stored as a Firebase Auth custom claim and checked again server-side by the functions' auth middleware.
+- **Broker-connected accounts through SnapTrade.** Brokerage connections (for example Wealthsimple and Questrade) go through the SnapTrade SDK on the server. It replaced an earlier custom trading backend when the original market-data provider stopped being viable.
+- **Server-side secrets only.** The browser talks to Cloud Functions with a Firebase ID token; SnapTrade credentials and the Firebase Admin key never reach the client bundle.
 
-## What's inside?
-
-This Turborepo includes the following packages/apps:
-
-### Apps and Packages
-
-- `docs`: a [Next.js](https://nextjs.org/) app
-- `web`: another [Next.js](https://nextjs.org/) app
-- `@repo/ui`: a stub React component library shared by both `web` and `docs` applications
-- `@repo/eslint-config`: `eslint` configurations (includes `eslint-config-next` and `eslint-config-prettier`)
-- `@repo/typescript-config`: `tsconfig.json`s used throughout the monorepo
-
-Each package/app is 100% [TypeScript](https://www.typescriptlang.org/).
-
-### Utilities
-
-This Turborepo has some additional tools already setup for you:
-
-- [TypeScript](https://www.typescriptlang.org/) for static type checking
-- [ESLint](https://eslint.org/) for code linting
-- [Prettier](https://prettier.io) for code formatting
-
-### Build
-
-To build all apps and packages, run the following command:
+## Architecture
 
 ```
-cd my-turborepo
-pnpm build
+apps/
+  web/          Next.js 15 (App Router), React 19, Tailwind, Radix UI primitives,
+                react-hook-form, Recharts
+  functions/    Firebase Cloud Functions (Express handlers): auth middleware,
+                request validation, admin / client / portfolio-manager / SnapTrade services
+packages/
+  eslint-config, typescript-config   shared tooling
 ```
 
-### Develop
+- **Data and auth:** Firebase Auth and the Realtime Database, with security rules in `apps/functions/database.rules.json`.
+- **Build:** Turborepo runs lint, type-check and build across the workspaces.
+- **CI/CD:** `.github/workflows/production.yaml` runs lint and type-check on every push to `main`, then deploys the functions to Firebase and the web app to Vercel, in that order, so the frontend never ships ahead of the API it calls.
 
-To develop all apps and packages, run the following command:
+## Running it locally
 
-```
-cd my-turborepo
-pnpm dev
-```
+Requires Node 18+ and the Firebase CLI.
 
-### Remote Caching
-
-> [!TIP]
-> Vercel Remote Cache is free for all plans. Get started today at [vercel.com](https://vercel.com/signup?/signup?utm_source=remote-cache-sdk&utm_campaign=free_remote_cache).
-
-Turborepo can use a technique known as [Remote Caching](https://turbo.build/repo/docs/core-concepts/remote-caching) to share cache artifacts across machines, enabling you to share build caches with your team and CI/CD pipelines.
-
-By default, Turborepo will cache locally. To enable Remote Caching you will need an account with Vercel. If you don't have an account you can [create one](https://vercel.com/signup?utm_source=turborepo-examples), then enter the following commands:
-
-```
-cd my-turborepo
-npx turbo login
+```bash
+npm install
+npm run dev   # starts the Firebase emulators (auth, database, functions) and the web app
 ```
 
-This will authenticate the Turborepo CLI with your [Vercel account](https://vercel.com/docs/concepts/personal-accounts/overview).
+The emulators load seeded fake users from `emulator-data/`. Real SnapTrade and Firebase credentials are needed for anything beyond the emulators and are not included.
 
-Next, you can link your Turborepo to your Remote Cache by running the following command from the root of your Turborepo:
+## Status
 
-```
-npx turbo link
-```
-
-## Useful Links
-
-Learn more about the power of Turborepo:
-
-- [Tasks](https://turbo.build/repo/docs/core-concepts/monorepos/running-tasks)
-- [Caching](https://turbo.build/repo/docs/core-concepts/caching)
-- [Remote Caching](https://turbo.build/repo/docs/core-concepts/remote-caching)
-- [Filtering](https://turbo.build/repo/docs/core-concepts/monorepos/filtering)
-- [Configuration Options](https://turbo.build/repo/docs/reference/configuration)
-- [CLI Usage](https://turbo.build/repo/docs/reference/command-line-reference)
+Shelved in 2025 when the co-founder partnership ended. Not maintained.
